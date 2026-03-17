@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'theme/app_theme.dart';
-import 'screens/main_scaffold.dart';
+import 'screens/market_selection_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +23,7 @@ class SijangYeojidoApp extends StatelessWidget {
       title: '시장여지도',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const MainScaffold(),
+      home: const MarketSelectionScreen(),
     );
   }
 }

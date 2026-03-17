@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import 'map/market_map_screen.dart';
-import 'explore/explore_screen.dart';
-import 'profile/profile_screen.dart';
 import 'reservation/reservation_list_screen.dart';
+import 'profile/profile_screen.dart';
 
 class MainScaffold extends StatefulWidget {
-  const MainScaffold({super.key});
+  final String marketName;
+  const MainScaffold({super.key, required this.marketName});
 
   @override
   State<MainScaffold> createState() => _MainScaffoldState();
@@ -15,12 +15,17 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    MarketMapScreen(),
-    ExploreScreen(),
-    ReservationListScreen(),
-    ProfileScreen(),
-  ];
+  late final List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      MarketMapScreen(marketName: widget.marketName),
+      const ReservationListScreen(),
+      const ProfileScreen(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,25 +61,18 @@ class _MainScaffoldState extends State<MainScaffold> {
                   onTap: () => setState(() => _currentIndex = 0),
                 ),
                 _NavItem(
-                  icon: Icons.search_outlined,
-                  activeIcon: Icons.search,
-                  label: '탐색',
-                  isSelected: _currentIndex == 1,
-                  onTap: () => setState(() => _currentIndex = 1),
-                ),
-                _NavItem(
                   icon: Icons.receipt_long_outlined,
                   activeIcon: Icons.receipt_long,
                   label: '예약',
-                  isSelected: _currentIndex == 2,
-                  onTap: () => setState(() => _currentIndex = 2),
+                  isSelected: _currentIndex == 1,
+                  onTap: () => setState(() => _currentIndex = 1),
                 ),
                 _NavItem(
                   icon: Icons.person_outline,
                   activeIcon: Icons.person,
                   label: '마이',
-                  isSelected: _currentIndex == 3,
-                  onTap: () => setState(() => _currentIndex = 3),
+                  isSelected: _currentIndex == 2,
+                  onTap: () => setState(() => _currentIndex = 2),
                 ),
               ],
             ),
@@ -109,36 +107,23 @@ class _NavItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Stack(
-              alignment: Alignment.topRight,
-              children: [
-                Icon(
-                  isSelected ? activeIcon : icon,
-                  color: isSelected ? AppColors.primaryRed : AppColors.textTertiary,
-                  size: 24,
-                ),
-                if (isSelected)
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primaryRed,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-              ],
+            Icon(
+              isSelected ? activeIcon : icon,
+              color: isSelected
+                  ? AppColors.primaryRed
+                  : AppColors.textTertiary,
+              size: 24,
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 11,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                color: isSelected ? AppColors.primaryRed : AppColors.textTertiary,
+                fontWeight:
+                    isSelected ? FontWeight.w700 : FontWeight.w400,
+                color: isSelected
+                    ? AppColors.primaryRed
+                    : AppColors.textTertiary,
               ),
             ),
           ],

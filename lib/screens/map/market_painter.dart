@@ -47,7 +47,7 @@ class MarketPainter extends CustomPainter {
 
       // Border
       final borderPaint = Paint()
-        ..color = zone.color.withOpacity(0.6)
+        ..color = zone.color.withValues(alpha:0.6)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5;
       canvas.drawRRect(rRect, borderPaint);
@@ -109,12 +109,12 @@ class MarketPainter extends CustomPainter {
       final color = poi.type.color;
 
       // Background circle
-      final bgPaint = Paint()..color = color.withOpacity(0.15);
+      final bgPaint = Paint()..color = color.withValues(alpha:0.15);
       canvas.drawCircle(pos, 14, bgPaint);
 
       // Border circle
       final borderPaint = Paint()
-        ..color = color.withOpacity(0.5)
+        ..color = color.withValues(alpha:0.5)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5;
       canvas.drawCircle(pos, 14, borderPaint);
@@ -159,7 +159,7 @@ class MarketPainter extends CustomPainter {
       if (isSelected) {
         // Selection ring
         final selectionPaint = Paint()
-          ..color = AppColors.primaryRed.withOpacity(0.25)
+          ..color = AppColors.primaryRed.withValues(alpha:0.25)
           ..style = PaintingStyle.fill;
         canvas.drawCircle(pos, 18, selectionPaint);
       }

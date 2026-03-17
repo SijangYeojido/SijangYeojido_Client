@@ -149,3 +149,7 @@ iOS 앱
 Android 앱
 상인 웹 콘솔
 운영 웹 콘솔
+
+디자인 래퍼런스 : https://ko.designus.design/reference/service/26
+디자인 래퍼런스 : https://ko.designus.design/reference/service/15
+디자인 래퍼런스 : https://brunch.co.kr/@bydot/4
