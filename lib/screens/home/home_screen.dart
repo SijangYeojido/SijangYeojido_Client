@@ -127,19 +127,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
-                    // Sophisticated Gradient Overlay
+                    // Sophisticated Gradient Overlay (Optimized for Legibility)
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Colors.black.withValues(alpha: 0.5),
+                              Colors.black.withValues(alpha: 0.6), // Dark top for status bar
                               Colors.transparent,
-                              AppColors.surface.withValues(alpha: 0.85),
-                              AppColors.surface,
+                              Colors.black.withValues(alpha: 0.7), // Stronger dark background for text
+                              AppColors.surface,                   // Transition to content surface
                             ],
-                            stops: const [0.0, 0.35, 0.8, 1.0],
+                            stops: const [0.0, 0.35, 0.85, 1.0],
                         ),
                       ),
                     ),
@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            decoration: SDS.glassDecoration(opacity: 0.25, blur: 12),
+                            decoration: SDS.glassDecoration(opacity: 0.3, blur: 12),
                             child: const Text(
                               '전통과 디지털의 만남 🗺️',
                               style: TextStyle(
@@ -170,9 +170,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontSize: 34,
                               fontWeight: FontWeight.w900,
-                              color: AppColors.textPrimary,
+                              color: Colors.white,
                               letterSpacing: -1.8,
                               height: 1.15,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withValues(alpha: 0.3),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: SDS.spaceL),
@@ -181,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textSecondary,
+                              color: Colors.white.withValues(alpha: 0.9),
                             ),
                           ),
                         ],
