@@ -210,3 +210,14 @@ class AppEmptyState extends StatelessWidget {
   }
 }
 
+class AppUI {
+  static LinearGradient get primaryGradient => const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          AppColors.primary,
+          AppColors.accent,
+        ],
+      );
+}
+
