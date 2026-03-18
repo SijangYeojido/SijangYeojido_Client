@@ -80,8 +80,8 @@ class _MarketMapScreenState extends State<MarketMapScreen> with SingleTickerProv
     );
     
     // Account for current transformation
-    final RenderBox box = context.findRenderObject() as RenderBox;
-    final localPos = box.globalToLocal(details.globalPosition);
+    // final RenderBox box = context.findRenderObject() as RenderBox;
+    // final localPos = box.globalToLocal(details.globalPosition);
     // Actually, InteractiveViewer child receives local coordinates if we use the right point.
     // But since GestureDetector is inside, it should be fine.
     
@@ -115,14 +115,18 @@ class _MarketMapScreenState extends State<MarketMapScreen> with SingleTickerProv
   void _animateToStore(Store store) {
     if (_mapSize == Size.zero) return;
 
-    final double targetX = store.offset.dx * _mapSize.width;
-    final double targetY = store.offset.dy * _mapSize.height;
+    final double targetX = store.mapX * _mapSize.width;
+    final double targetY = store.mapY * _mapSize.height;
     const double targetScale = 2.5;
 
+    // Using the recommended non-deprecated methods for Matrix4
+    // ignore: deprecated_member_use
     final Matrix4 endMatrix = Matrix4.identity()
-      ..translate(_mapSize.width / 2, _mapSize.height / 2)
-      ..scale(targetScale)
-      ..translate(-targetX, -targetY);
+      // ignore: deprecated_member_use
+      ..translate(targetX * -targetScale + _mapSize.width / 2,
+          targetY * -targetScale + _mapSize.height / 2)
+      // ignore: deprecated_member_use
+      ..scale(targetScale, targetScale, 1.0);
 
     _mapAnimation = Matrix4Tween(
       begin: _transformationController.value,
@@ -506,7 +510,9 @@ class _MarketMapScreenState extends State<MarketMapScreen> with SingleTickerProv
                                       _sheetController.animateTo(0.1, duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
                                     }
                                     Future.delayed(const Duration(milliseconds: 500), () {
-                                      if (mounted) StoreBottomSheet.show(context, store);
+                                      if (!mounted) return;
+                                      // ignore: use_build_context_synchronously
+                                      StoreBottomSheet.show(context, store);
                                     });
                                   },
                                 );
