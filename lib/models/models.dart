@@ -216,3 +216,59 @@ extension POITypeInfo on POIType {
     }
   }
 }
+
+class StoreStory {
+  final String id;
+  final String storeId;
+  final String imageUrl;
+  final bool isLive;
+  final DateTime createdAt;
+
+  const StoreStory({
+    required this.id,
+    required this.storeId,
+    required this.imageUrl,
+    this.isLive = false,
+    required this.createdAt,
+  });
+}
+
+class FlashDeal {
+  final String id;
+  final String storeId;
+  final String title;
+  final String discount;
+  final DateTime expiresAt;
+
+  const FlashDeal({
+    required this.id,
+    required this.storeId,
+    required this.title,
+    required this.discount,
+    required this.expiresAt,
+  });
+
+  bool get isExpired => DateTime.now().isAfter(expiresAt);
+}
+
+class StoreReview {
+  final String id;
+  final String storeId;
+  final String userName;
+  final String userAvatar;
+  final String content;
+  final double rating;
+  final List<String> images;
+  final DateTime createdAt;
+
+  const StoreReview({
+    required this.id,
+    required this.storeId,
+    required this.userName,
+    required this.userAvatar,
+    required this.content,
+    required this.rating,
+    this.images = const [],
+    required this.createdAt,
+  });
+}

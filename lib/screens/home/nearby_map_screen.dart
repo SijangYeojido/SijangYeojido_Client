@@ -36,6 +36,8 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
       isAvailable: MockData.markets[0].isAvailable,
       highlights: MockData.markets[0].highlights,
       accentColor: MockData.markets[0].accentColor,
+      hasFlashDeal: true,
+      isLiveStory: true,
     ),
     _MarketPin(
       name: MockData.markets[1].name,
@@ -62,6 +64,7 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
       isAvailable: MockData.markets[2].isAvailable,
       highlights: MockData.markets[2].highlights,
       accentColor: MockData.markets[2].accentColor,
+      hasFlashDeal: true,
     ),
   ];
 
@@ -491,6 +494,38 @@ class _NearbyMapPainter extends CustomPainter {
         Paint()..color = pinColor,
       );
 
+      // --- V8 Dynamic Indicators (⚡ or 📸) ---
+      if (market.hasFlashDeal || market.isLiveStory) {
+        final indicatorX = cx + (isSelected ? 18 : 14);
+        final indicatorY = cy - (isSelected ? 18 : 14);
+        
+        // Glow effect
+        canvas.drawCircle(
+          Offset(indicatorX, indicatorY),
+          12,
+          Paint()
+            ..color = const Color(0xFFF04452).withValues(alpha: 0.2 + 0.1 * sin(pulseValue.value * pi))
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+        );
+
+        final indicatorText = TextSpan(
+          text: market.hasFlashDeal ? '⚡' : '📸',
+          style: const TextStyle(fontSize: 10),
+        );
+        final indicatorTp = TextPainter(
+          text: indicatorText,
+          textDirection: TextDirection.ltr,
+        )..layout();
+        
+        canvas.drawCircle(
+          Offset(indicatorX, indicatorY),
+          9,
+          Paint()..color = const Color(0xFFF04452),
+        );
+        
+        indicatorTp.paint(canvas, Offset(indicatorX - indicatorTp.width/2, indicatorY - indicatorTp.height/2));
+      }
+
       // Pin icon (storefront)
       final iconText = TextSpan(
         text: '🏪',
@@ -619,6 +654,31 @@ class _MarketDetailCard extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            if (market.hasFlashDeal) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF04452).withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(100),
+                                  border: Border.all(color: const Color(0xFFF04452).withValues(alpha: 0.3)),
+                                ),
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.bolt_rounded, size: 12, color: Color(0xFFF04452)),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'LIVE DEAL',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFFF04452),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                         const SizedBox(height: 4),
@@ -852,6 +912,8 @@ class _MarketPin {
   final bool isAvailable;
   final List<String> highlights;
   final Color accentColor;
+  final bool hasFlashDeal;
+  final bool isLiveStory;
 
   const _MarketPin({
     required this.name,
@@ -865,5 +927,7 @@ class _MarketPin {
     required this.isAvailable,
     required this.highlights,
     required this.accentColor,
+    this.hasFlashDeal = false,
+    this.isLiveStory = false,
   });
 }

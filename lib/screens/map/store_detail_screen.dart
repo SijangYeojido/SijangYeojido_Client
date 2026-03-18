@@ -330,6 +330,8 @@ class StoreDetailScreen extends StatelessWidget {
                         ),
 
                         const SizedBox(height: 16),
+                        _buildSocialReviews(context),
+                        const SizedBox(height: 16),
                         _buildRealTimeInsight(context),
                       ],
                     ),
@@ -427,6 +429,126 @@ class StoreDetailScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSocialReviews(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final storeReviews = MockData.reviews.where((r) => r.storeId == store.id).toList();
+
+    return _SectionCard(
+      title: '방문자 리뷰 💬',
+      child: storeReviews.isEmpty
+          ? AppEmptyState(
+              icon: Icons.rate_review_outlined,
+              title: '첫 번째 리뷰를 남겨주세요',
+              description: '직접 방문한 경험을 공유하면\n다른 분들에게 큰 도움이 성돼요!',
+            )
+          : Column(
+              children: [
+                ...storeReviews.map((review) => Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 16,
+                            backgroundImage: NetworkImage(review.userAvatar),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  review.userName,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(Icons.star_rounded, size: 12, color: Colors.amber[600]),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      review.rating.toString(),
+                                      style: textTheme.labelSmall?.copyWith(
+                                        color: Colors.amber[800],
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            '2일 전', // Simplified for mock
+                            style: textTheme.bodySmall?.copyWith(color: AppColors.textTertiary),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        review.content,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                          height: 1.5,
+                        ),
+                      ),
+                      if (review.images.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 100,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: review.images.length,
+                            separatorBuilder: (context, index) => const SizedBox(width: 8),
+                            itemBuilder: (context, idx) => ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                review.images[idx],
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      const Padding(
+                        padding: EdgeInsets.only(top: 16),
+                        child: Divider(color: AppColors.divider, height: 1),
+                      ),
+                    ],
+                  ),
+                )),
+                const SizedBox(height: 8),
+                ShrinkableButton(
+                  onTap: () {},
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '리뷰 전체 보기',
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
     );
   }
 

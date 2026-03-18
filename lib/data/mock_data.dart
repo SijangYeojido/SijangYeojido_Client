@@ -1792,4 +1792,75 @@ class MockData {
       isCompleted: true,
     ),
   ];
+
+  static final List<StoreStory> stories = [
+    StoreStory(
+      id: 'st1',
+      storeId: 's1',
+      imageUrl: 'https://images.unsplash.com/photo-1547924765-16580479701b?auto=format&fit=crop&q=80&w=300',
+      isLive: true,
+      createdAt: _now.subtract(const Duration(minutes: 15)),
+    ),
+    StoreStory(
+      id: 'st2',
+      storeId: 's7',
+      imageUrl: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300',
+      createdAt: _now.subtract(const Duration(hours: 1)),
+    ),
+    StoreStory(
+      id: 'st3',
+      storeId: 's25',      imageUrl: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=300',
+      isLive: true,
+      createdAt: _now.subtract(const Duration(minutes: 2)),
+    ),
+  ];
+
+  static final List<FlashDeal> flashDeals = [
+    FlashDeal(
+      id: 'fd1',
+      storeId: 's1',
+      title: '씨앗 호떡 1+1 기습 세일!',
+      discount: '50% OFF',
+      expiresAt: _now.add(const Duration(minutes: 45)),
+    ),
+    FlashDeal(
+      id: 'fd2',
+      storeId: 's30',
+      title: '햇딸기 마지막 3팩 한정수량',
+      discount: '3,000원 할인',
+      expiresAt: _now.add(const Duration(minutes: 15)),
+    ),
+  ];
+
+  static final List<StoreReview> reviews = [
+    StoreReview(
+      id: 'rv1',
+      storeId: 's1',
+      userName: '김민수',
+      userAvatar: 'https://i.pravatar.cc/150?u=rv1',
+      content: '부모님 모시고 왔는데 너무 좋아하시네요. 씨앗호떡 진짜 맛있어요!',
+      rating: 5.0,
+      images: ['https://images.unsplash.com/photo-1547924765-16580479701b?auto=format&fit=crop&q=80&w=300'],
+      createdAt: _now.subtract(const Duration(days: 2)),
+    ),
+    StoreReview(
+      id: 'rv2',
+      storeId: 's1',
+      userName: '지혜',
+      userAvatar: 'https://i.pravatar.cc/150?u=rv2',
+      content: '줄이 길지만 금방금방 빠져요. 가성비 최고!',
+      rating: 4.5,
+      createdAt: _now.subtract(const Duration(days: 5)),
+    ),
+    StoreReview(
+      id: 'rv3',
+      storeId: 's7',
+      userName: '맛탐정',
+      userAvatar: 'https://i.pravatar.cc/150?u=rv3',
+      content: '신원호떡은 진리입니다. 겉바속촉 그 자체!',
+      rating: 5.0,
+      images: ['https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300'],
+      createdAt: _now.subtract(const Duration(hours: 12)),
+    ),
+  ];
 }

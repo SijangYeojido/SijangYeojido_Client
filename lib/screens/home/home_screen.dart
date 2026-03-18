@@ -10,6 +10,8 @@ import '../../widgets/skeleton.dart';
 import '../explore/search_screen.dart';
 import '../../services/favorite_service.dart';
 import '../map/store_detail_screen.dart';
+import '../../widgets/market_stories.dart';
+import '../../widgets/flash_deal_ticker.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -197,6 +199,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
+          ),
+
+          // ── V8 Dynamic Commerce (Flash Deal Ticker) ─────────────
+          const SliverToBoxAdapter(child: FlashDealTickerWidget()),
+
+          // ── V8 Social Layer (Market Stories) ────────────────────
+          const SliverPadding(
+            padding: EdgeInsets.only(top: SDS.spaceL, bottom: SDS.spaceL),
+            sliver: SliverToBoxAdapter(child: MarketStoriesWidget()),
           ),
 
 
