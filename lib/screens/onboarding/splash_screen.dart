@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 
@@ -43,8 +42,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 ]),
                 child: Hero(
                   tag: 'app_logo_hero',
-                  child: Image.file(
-                    File('/Users/bagjun-won/.gemini/antigravity/brain/e15396eb-f0dd-4d64-b358-ea947342e98d/hero_3d_pin.png'),
+                  child: Image.asset(
+                    'assets/images/hero_3d_pin.png',
                     width: 220,
                     height: 220,
                     fit: BoxFit.contain,
