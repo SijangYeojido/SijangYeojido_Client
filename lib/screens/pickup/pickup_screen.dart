@@ -4,8 +4,6 @@ import '../../models/models.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/app_ui.dart';
-import '../../widgets/sds_widgets.dart';
-import 'dart:ui';
 
 class PickupScreen extends StatefulWidget {
   final Reservation reservation;

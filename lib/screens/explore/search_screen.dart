@@ -59,40 +59,72 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: Container(
-              height: 52,
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(SDS.radiusS),
-                boxShadow: SDS.shadowSoft,
-                border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-              ),
-              child: TextField(
-                controller: _searchController,
-                autofocus: true,
-                onChanged: _onSearch,
-                decoration: InputDecoration(
-                  hintText: '가게 이름 또는 시장 테마 검색',
-                  hintStyle: TextStyle(
-                    color: AppColors.textTertiary,
-                    fontWeight: SDS.fwBold,
+            child: Hero(
+              tag: 'search_bar',
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  height: 72,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 30,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
                   ),
-                  prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary),
-                  suffixIcon: _searchController.text.isNotEmpty 
-                    ? IconButton(
-                        icon: const Icon(Icons.cancel_rounded, color: AppColors.textTertiary),
-                        onPressed: () {
-                          _searchController.clear();
-                          _onSearch('');
-                        },
-                      )
-                    : null,
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                style: TextStyle(
-                  fontWeight: SDS.fwBlack,
-                  color: AppColors.textPrimary,
+                  child: SDSGlass(
+                    blur: 20,
+                    opacity: 0.9,
+                    radius: 32,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(32),
+                        color: Colors.white.withValues(alpha: 0.6),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1.5),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: TextField(
+                        controller: _searchController,
+                        autofocus: true,
+                        onChanged: _onSearch,
+                        decoration: InputDecoration(
+                          hintText: '가게 이름 또는 시장 테마 검색',
+                          hintStyle: TextStyle(
+                            color: AppColors.textTertiary,
+                            fontWeight: SDS.fwBold,
+                            fontSize: 16,
+                          ),
+                          prefixIcon: ShaderMask(
+                            shaderCallback: (bounds) => AppColors.primaryGradient.createShader(bounds),
+                            child: const Icon(Icons.search_rounded, color: Colors.white, size: 28),
+                          ),
+                          suffixIcon: _searchController.text.isNotEmpty 
+                            ? IconButton(
+                                icon: const Icon(Icons.cancel_rounded, color: AppColors.textTertiary),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  _onSearch('');
+                                },
+                              )
+                            : null,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,  // Explicitly remove default borders
+                          focusedBorder: InputBorder.none,  // Explicitly remove focus border
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 22),
+                        ),
+                        style: TextStyle(
+                          fontWeight: SDS.fwBlack,
+                          color: AppColors.textPrimary,
+                          fontSize: 17,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -109,10 +141,11 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildSearchHome(TextTheme textTheme) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24), // Reduced top padding
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 12), // Small initial gap
           Text(
             '최근 검색어',
             style: textTheme.titleSmall?.copyWith(
@@ -120,13 +153,13 @@ class _SearchScreenState extends State<SearchScreen> {
               color: AppColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12), // Reduced from 16
           Wrap(
             spacing: 12,
             runSpacing: 12,
             children: _recentSearches.map((s) => _buildRecentChip(s)).toList(),
           ),
-          const SizedBox(height: 48),
+          const SizedBox(height: 32), // Reduced from 48
           Text(
             '인기 카테고리',
             style: textTheme.titleSmall?.copyWith(
@@ -134,7 +167,7 @@ class _SearchScreenState extends State<SearchScreen> {
               color: AppColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12), // Reduced from 16
           _buildCategoryList(textTheme),
         ],
       ),

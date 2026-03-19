@@ -17,9 +17,14 @@ class AppColors {
   static const Color cinematicGold = Color(0xFFFFD700);
   static const Color cinematicSlate = Color(0xFF1C1C1E);
 
-  // Primary (Naver green)
-  static const Color primary = Color(0xFF03C75A);
-  static const Color primaryLight = Color(0xFFEAFBF2);
+  // Primary (Traditional Red)
+  static const Color primary = Color(0xFFE0302D);
+  static const Color primaryLight = Color(0xFFFFF1F0);
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [Color(0xFFE0302D), Color(0xFFFF5C5C)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   // Accent (Baemin mint)
   static const Color accent = Color(0xFF2AC1BC);

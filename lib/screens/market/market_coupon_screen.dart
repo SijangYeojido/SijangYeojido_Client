@@ -7,8 +7,8 @@ class MarketCouponScreen extends StatelessWidget {
   final String marketName;
   const MarketCouponScreen({super.key, required this.marketName});
 
-  // Gwangjang Heritage Red
-  static const Color gwangjangRed = Color(0xFFF04452);
+  // Shinwon Brand Red
+  static const Color shinwonRed = Color(0xFFF04452);
 
   @override
   Widget build(BuildContext context) {
@@ -91,9 +91,9 @@ class MarketCouponScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 34),
       decoration: BoxDecoration(
-        color: gwangjangRed,
+        color: shinwonRed,
         borderRadius: BorderRadius.circular(SDS.radiusL),
-        boxShadow: SDS.shadowAccent(gwangjangRed),
+        boxShadow: SDS.shadowAccent(shinwonRed),
       ),
       child: Row(
         children: [
@@ -166,7 +166,7 @@ class MarketCouponScreen extends StatelessWidget {
               child: Center(
                 child: Text(
                   value,
-                  style: const TextStyle(color: gwangjangRed, fontSize: 16, fontWeight: SDS.fwBlack),
+                  style: const TextStyle(color: shinwonRed, fontSize: 16, fontWeight: SDS.fwBlack),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -177,13 +177,13 @@ class MarketCouponScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '\u00A0' + title, 
+                    '\u00A0$title', 
                     style: const TextStyle(fontSize: 16, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: 0.5),
                     overflow: TextOverflow.visible,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '\u00A0' + subtitle, 
+                    '\u00A0$subtitle', 
                     style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: SDS.fwBold, letterSpacing: 0.5),
                     overflow: TextOverflow.visible,
                   ),
@@ -195,12 +195,12 @@ class MarketCouponScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isDownloaded ? const Color(0xFFF2F4F6) : gwangjangRed.withValues(alpha: 0.1),
+                  color: isDownloaded ? const Color(0xFFF2F4F6) : shinwonRed.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   isDownloaded ? Icons.check_circle_rounded : Icons.download_rounded,
-                  color: isDownloaded ? AppColors.textTertiary : gwangjangRed,
+                  color: isDownloaded ? AppColors.textTertiary : shinwonRed,
                   size: 24,
                 ),
               ),

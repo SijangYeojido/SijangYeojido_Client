@@ -59,202 +59,247 @@ class StoreDetailScreen extends StatelessWidget {
             ],
           ),
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // --- Header: Immersive Hero Area ---
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          market.accentColor.withValues(alpha: 0.15),
-                          market.accentColor.withValues(alpha: 0.05),
-                          AppColors.background,
-                        ],
-                        stops: const [0.0, 0.5, 1.0],
-                      ),
-                    ),
-                    padding: EdgeInsets.fromLTRB(24, MediaQuery.of(context).padding.top + 40, 24, 40),
-                    child: Column(
-                      children: [
-                        Hero(
-                          tag: 'store_image_${store.id}',
-                          child: Container(
-                            width: 130,
-                            height: 130,
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(SDS.radiusXL),
-                              boxShadow: SDS.shadowPremium,
-                            ),
-                            child: Center(
-                              child: Icon(
-                                _iconForCategory(store.category),
-                                size: 64,
-                                color: market.accentColor,
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // --- Header: Immersive Hero Area ---
+                      Container(
+                        width: double.infinity,
+                        height: 380,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              AppColors.primary.withValues(alpha: 0.1),
+                              AppColors.background,
+                            ],
+                          ),
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Positioned(
+                              top: -100,
+                              child: Container(
+                                width: 500,
+                                height: 500,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: RadialGradient(
+                                    colors: [
+                                      AppColors.primary.withValues(alpha: 0.15),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const SDSFadeIn(
+                                  delay: Duration(milliseconds: 200),
+                                  child: SDSLogo(size: 180),
+                                ),
+                                const SizedBox(height: 32),
+                                const SDSFadeIn(
+                                  delay: Duration(milliseconds: 400),
+                                  child: Text(
+                                    '지금 이 가게는요',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: SDS.fwBold,
+                                      color: AppColors.textSecondary,
+                                      letterSpacing: -0.3,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                SDSFadeIn(
+                                  delay: const Duration(milliseconds: 600),
+                                  child: _StatusBadge(status: store.status),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 24),
-                        Text(
-                          '지금 이 가게는요',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: SDS.fwBold,
-                            color: AppColors.textSecondary,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        _StatusBadge(status: store.status),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          store.name,
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: SDS.fwBlack,
-                            letterSpacing: SDS.lsTight,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.location_on_rounded, size: 16, color: AppColors.textTertiary),
-                            const SizedBox(width: 8),
                             Text(
-                              '${zone?.name ?? ""} • ${store.unitNumber ?? ""}호',
+                              store.name,
                               style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: SDS.fwBlack,
+                                letterSpacing: SDS.lsTight,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on_rounded, size: 16, color: AppColors.textTertiary),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${zone?.name ?? ""} • ${store.unitNumber ?? ""}호',
+                                  style: const TextStyle(
+                                    fontWeight: SDS.fwBold,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '방금 따끈따끈한 소식이 도착했어요 ✨',
+                              style: TextStyle(
+                                fontSize: 13,
                                 fontWeight: SDS.fwBold,
-                                color: AppColors.textSecondary,
+                                color: market.accentColor,
+                                letterSpacing: -0.3,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '방금 따끈따끈한 소식이 도착했어요 ✨',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: SDS.fwBold,
-                            color: market.accentColor,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // --- Details Sections ---
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                    child: Column(
-                      children: [
-                        // Payment methods
-                        _SectionCard(
-                          title: '결제 수단',
-                          delayMs: 400,
-                          child: store.paymentMethods.isEmpty
-                              ? AppEmptyState(
-                                  icon: Icons.payments_outlined,
-                                  title: '어떤 결제 수단을 받으시나요?',
-                                  description: '직접 결제해본 경험을 알려주시면\n다른 분들에게 큰 도움이 돼요',
-                                )
-                              : Wrap(
-                                  spacing: 12,
-                                  runSpacing: 12,
-                                  children: store.paymentMethods
-                                      .map((m) => _PaymentChip(method: m))
-                                      .toList(),
-                                ),
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Items
-                        _SectionCard(
-                          title: '대표 상품',
-                          delayMs: 500,
-                          child: store.items.isEmpty
-                              ? AppEmptyState(
-                                  icon: Icons.inventory_2_outlined,
-                                  title: '이 가게의 대표 상품을 알고 싶어요',
-                                  description: '가장 자신 있는 상품을 알려주시면\n이곳에 정성껏 소개해 드릴게요',
-                                )
-                              : Column(
-                                  children: store.items.asMap().entries.map((entry) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: 12),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(16),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.background,
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              width: 32,
-                                              height: 32,
-                                              decoration: BoxDecoration(
-                                                gradient: AppUI.primaryGradient,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                '${entry.key + 1}',
-                                                style: textTheme.labelSmall?.copyWith(
-                                                  fontWeight: FontWeight.w900,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                        child: Column(
+                          children: [
+                            _SectionCard(
+                              title: '결제 수단',
+                              delayMs: 400,
+                              child: store.paymentMethods.isEmpty
+                                  ? AppEmptyState(
+                                      icon: Icons.payments_outlined,
+                                      title: '어떤 결제 수단을 받으시나요?',
+                                      description: '직접 결제해본 경험을 알려주시면\n다른 분들에게 큰 도움이 돼요',
+                                    )
+                                  : Wrap(
+                                      spacing: 12,
+                                      runSpacing: 12,
+                                      children: store.paymentMethods
+                                          .map((m) => _PaymentChip(method: m))
+                                          .toList(),
+                                    ),
+                            ),
+                            const SizedBox(height: 16),
+                            _SectionCard(
+                              title: '대표 상품 🍱',
+                              delayMs: 500,
+                              child: store.items.isEmpty
+                                  ? AppEmptyState(
+                                      icon: Icons.inventory_2_outlined,
+                                      title: '이 가게의 대표 상품을 알고 싶어요',
+                                      description: '가장 자신 있는 상품을 알려주시면\n이곳에 정성껏 소개해 드릴게요',
+                                    )
+                                  : Column(
+                                      children: store.items.asMap().entries.map((entry) {
+                                        final item = entry.value;
+                                        return Padding(
+                                          padding: const EdgeInsets.only(bottom: 16),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.background,
+                                              borderRadius: BorderRadius.circular(20),
+                                              border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
                                             ),
-                                            const SizedBox(width: 14),
-                                            Expanded(
-                                              child: Text(
-                                                entry.value.name,
-                                                style: textTheme.bodyLarge?.copyWith(
-                                                  fontWeight: FontWeight.w700,
-                                                  color: AppColors.textPrimary,
+                                            child: Row(
+                                              children: [
+                                                ClipRRect(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  child: item.imageUrl != null
+                                                      ? Image.network(
+                                                          item.imageUrl!,
+                                                          width: 80,
+                                                          height: 80,
+                                                          fit: BoxFit.cover,
+                                                          errorBuilder: (context, error, stackTrace) => Container(
+                                                            width: 80,
+                                                            height: 80,
+                                                            color: AppColors.border.withValues(alpha: 0.3),
+                                                            child: const Icon(Icons.image_not_supported_rounded, color: AppColors.textTertiary),
+                                                          ),
+                                                        )
+                                                      : Container(
+                                                          width: 80,
+                                                          height: 80,
+                                                          color: AppColors.border.withValues(alpha: 0.3),
+                                                          child: const Icon(Icons.image_outlined, color: AppColors.textTertiary),
+                                                        ),
                                                 ),
-                                              ),
+                                                const SizedBox(width: 16),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        item.name,
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: textTheme.titleMedium?.copyWith(
+                                                          fontWeight: SDS.fwBold,
+                                                          color: AppColors.textPrimary,
+                                                          letterSpacing: -0.5,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      if (item.price != null)
+                                                        Text(
+                                                          '${fmt.format(item.price)}원',
+                                                          style: textTheme.titleLarge?.copyWith(
+                                                            fontWeight: SDS.fwBlack,
+                                                            color: AppColors.primary,
+                                                            letterSpacing: -0.5,
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                ShrinkableButton(
+                                                  onTap: () {},
+                                                  child: Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                                    decoration: BoxDecoration(
+                                                      color: AppColors.primary.withValues(alpha: 0.1),
+                                                      borderRadius: BorderRadius.circular(12),
+                                                    ),
+                                                    child: const Text(
+                                                      '담기',
+                                                      style: TextStyle(
+                                                        color: AppColors.primary,
+                                                        fontWeight: SDS.fwBold,
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            if (entry.value.price != null)
-                                              Text(
-                                                '${fmt.format(entry.value.price)}원',
-                                                style: textTheme.titleMedium?.copyWith(
-                                                  fontWeight: FontWeight.w900,
-                                                  color: AppColors.textPrimary,
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildSocialReviews(context),
+                            const SizedBox(height: 16),
+                            _buildRealTimeInsight(context),
+                          ],
                         ),
-
-                        const SizedBox(height: 16),
-                        _buildSocialReviews(context),
-                        const SizedBox(height: 16),
-                        _buildRealTimeInsight(context),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -393,6 +438,12 @@ class StoreDetailScreen extends StatelessWidget {
                                 width: 100,
                                 height: 100,
                                 fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => Container(
+                                  width: 100,
+                                  height: 100,
+                                  color: AppColors.border.withValues(alpha: 0.3),
+                                  child: const Icon(Icons.image_not_supported_rounded, color: AppColors.textTertiary),
+                                ),
                               ),
                             ),
                           ),
@@ -525,15 +576,6 @@ class StoreDetailScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  IconData _iconForCategory(String category) {
-    if (category.contains('먹거리')) return Icons.restaurant_rounded;
-    if (category.contains('수산')) return Icons.set_meal_rounded;
-    if (category.contains('정육')) return Icons.kebab_dining_rounded;
-    if (category.contains('과일') || category.contains('채소')) return Icons.eco_rounded;
-    if (category.contains('건어물')) return Icons.water_drop_rounded;
-    return Icons.storefront_rounded;
   }
   void _showReviewSubmitSheet(BuildContext context) {
     showModalBottomSheet(
@@ -705,25 +747,40 @@ class _PaymentChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.12)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: const Color(0xFFF2F4F6), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            _iconFor(method),
-            size: 18,
-            color: color,
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              _iconFor(method),
+              size: 16,
+              color: color,
+            ),
           ),
           const SizedBox(width: 8),
           Text(
             method.label,
             style: textTheme.labelLarge?.copyWith(
               fontSize: 13,
-              fontWeight: FontWeight.w800,
-              color: color,
+              fontWeight: SDS.fwBold,
+              color: const Color(0xFF191F28), // Toss Deep Graphite
+              letterSpacing: -0.4,
             ),
           ),
         ],
@@ -747,13 +804,13 @@ class _PaymentChip extends StatelessWidget {
   Color _colorFor(PaymentMethod m) {
     switch (m) {
       case PaymentMethod.cash:
-        return const Color(0xFF16A34A);
+        return const Color(0xFF00C896); // Toss Green
       case PaymentMethod.card:
-        return const Color(0xFF2563EB);
+        return const Color(0xFF3182F6); // Toss Blue
       case PaymentMethod.zeroPay:
-        return const Color(0xFF00C7AE);
+        return const Color(0xFFFF5F2E); // Orange
       case PaymentMethod.kakao:
-        return const Color(0xFFFFE812);
+        return const Color(0xFFFFE812); // Kakao Yellow
     }
   }
 }

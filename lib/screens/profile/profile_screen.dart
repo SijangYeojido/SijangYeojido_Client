@@ -1,60 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../../data/mock_data.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/sds_widgets.dart';
 import '../../widgets/shrinkable_button.dart';
+import '../../providers/auth_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final completedReservations =
-        MockData.reservations.where((r) => r.isCompleted).length;
+    final completedReservations = MockData.reservations.where((r) => r.isCompleted).length;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
+          // ── Cinematic V16 Header ────────────────────────────
           SliverToBoxAdapter(
-            child: SDS.topBar(
-              context: context,
-              title: '내 정보',
-              subtitle: '반가워요, 김시장님! 오늘도 활기찬 하루 되세요 ✨',
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Column(
+            child: Stack(
               children: [
-                _ProfileHeader(),
-                const SizedBox(height: 8),
-                _StatsRow(completedDeals: completedReservations),
-                const SizedBox(height: 16),
-                _FavoriteMarketsSection(),
-                const SizedBox(height: 8),
-                _SettingsSection(),
-                const SizedBox(height: 24),
-                Center(
+                // 1. Subtle Premium Gradient BG
+                Container(
+                  height: 260,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF7F8FA),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(SDS.radiusEpic),
+                      bottomRight: Radius.circular(SDS.radiusEpic),
+                    ),
+                  ),
+                ),
+                SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 32),
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '\uc2dc\uc7a5\uc5ec\uc9c0\ub3c4',
-                          style: textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textTertiary,
-                          ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            const Text(
+                              '마이페이지',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: SDS.fwBlack,
+                                color: AppColors.textPrimary,
+                                letterSpacing: -1.0,
+                              ),
+                            ),
+                            const Spacer(),
+                            _ActionIconBtn(
+                              icon: Icons.settings_rounded,
+                              onTap: () {},
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'v1.0.0',
-                          style: textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textTertiary,
-                            fontSize: 11,
+                        const SizedBox(height: 32),
+                        // 2. Glassmorphism Profile Card
+                        SDSFadeIn(
+                          delay: const Duration(milliseconds: 300),
+                          child: SDSGlass(
+                            blur: 32,
+                            opacity: 0.85,
+                            radius: 32,
+                            padding: const EdgeInsets.all(24),
+                            child: Row(
+                              children: [
+                                _ProfileAvatar(initial: '김'),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        '김시장님',
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: SDS.fwBlack,
+                                          color: AppColors.textPrimary,
+                                          letterSpacing: -0.8,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      const Text(
+                                        '시장여지도와 함께한 지 3개월째 ✨',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: SDS.fwBold,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -64,89 +108,283 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
           ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 32)),
+
+          // ── Premium Stats Row ──────────────────────────────
+          SliverToBoxAdapter(
+            child: SDSFadeIn(
+              delay: const Duration(milliseconds: 500),
+              child: _StatsRow(completedDeals: completedReservations),
+            ),
+          ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 48)),
+
+          // ── Settings Sections ──────────────────────────────
+          SliverToBoxAdapter(
+            child: SDSFadeIn(
+              delay: const Duration(milliseconds: 600),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    _buildSectionHeader('단골 시장'),
+                    _FavoriteMarketCard(
+                      name: '신원시장',
+                      address: '서울 종로구 창경궁로 88',
+                      storeCount: MockData.stores.length,
+                    ),
+                    const SizedBox(height: 40),
+                    _buildSectionHeader('나의 활동'),
+                    _UltimateSettingItem(icon: Icons.receipt_long_rounded, label: '주문 내역', color: AppColors.primary),
+                    _UltimateSettingItem(icon: Icons.confirmation_number_rounded, label: '나의 쿠폰', color: AppColors.orange),
+                    _UltimateSettingItem(icon: Icons.star_rounded, label: '내가 쓴 리뷰', color: AppColors.warning),
+                    const SizedBox(height: 40),
+                    _buildSectionHeader('설정'),
+                    _UltimateSettingItem(icon: Icons.notifications_rounded, label: '알림 설정'),
+                    _UltimateSettingItem(icon: Icons.shield_rounded, label: '개인정보 관리'),
+                    _UltimateSettingItem(
+                      icon: Icons.swap_horiz_rounded, 
+                      label: '역할 변경', 
+                      onTap: () => context.read<AuthProvider>().toggleRole(),
+                    ),
+                    _UltimateSettingItem(
+                      icon: Icons.logout_rounded, 
+                      label: '로그아웃', 
+                      onTap: () => context.read<AuthProvider>().logout(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: SDS.fwBlack,
+              color: AppColors.textPrimary,
+              letterSpacing: -0.6,
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _ProfileHeader extends StatelessWidget {
+class _ProfileAvatar extends StatelessWidget {
+  final String initial;
+  const _ProfileAvatar({required this.initial});
+
   @override
   Widget build(BuildContext context) {
-    return SDSFadeIn(
+    return Container(
+      width: 68,
+      height: 68,
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.25),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Text(
+          initial,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: SDS.fwBlack,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatsRow extends StatelessWidget {
+  final int completedDeals;
+  const _StatsRow({required this.completedDeals});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: [
+          _StatBento(label: '방문 시장', value: '1', icon: Icons.location_on_rounded, color: AppColors.primary),
+          const SizedBox(width: 12),
+          _StatBento(label: '즐겨찾기', value: '5', icon: Icons.favorite_rounded, color: AppColors.danger),
+          const SizedBox(width: 12),
+          _StatBento(label: '활동 점수', value: '98', icon: Icons.bolt_rounded, color: AppColors.orange),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatBento extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const _StatBento({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
       child: Container(
-        margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-        padding: EdgeInsets.all(SDS.space24),
+        padding: const EdgeInsets.symmetric(vertical: 24),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: const Color(0xFFF7F8FA),
           borderRadius: BorderRadius.circular(SDS.radiusL),
-          boxShadow: SDS.shadowPremium,
-          border: Border.all(color: AppColors.primary.withValues(alpha: 0.05)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 22, fontWeight: SDS.fwBlack, color: AppColors.textPrimary),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 12, fontWeight: SDS.fwBold, color: AppColors.textTertiary),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FavoriteMarketCard extends StatelessWidget {
+  final String name;
+  final String address;
+  final int storeCount;
+
+  const _FavoriteMarketCard({
+    required this.name,
+    required this.address,
+    required this.storeCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ShrinkableButton(
+      onTap: () {},
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(SDS.radiusL),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+          border: Border.all(color: const Color(0xFFF2F4F6)),
         ),
         child: Row(
           children: [
             Container(
-              width: 64,
-              height: 64,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFE5362B), Color(0xFFFF6B35)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFE5362B).withValues(alpha: 0.2),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: AppColors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: const Center(
-                child: Text(
-                  '김',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: SDS.fwBlack,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              child: const Icon(Icons.storefront_rounded, color: AppColors.primary, size: 26),
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '김시장님',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: SDS.fwBlack,
-                      color: AppColors.textPrimary,
-                    ),
+                    name,
+                    style: const TextStyle(fontSize: 18, fontWeight: SDS.fwBlack, color: AppColors.textPrimary),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '여지도와 함께한 지 3개월째예요',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: SDS.fwBold,
-                      color: AppColors.textSecondary,
-                    ),
+                    address,
+                    style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: SDS.fwMedium),
                   ),
                 ],
               ),
             ),
-            _ActionIconBtn(
-              icon: Icons.settings_rounded,
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('환경 설정을 준비하고 있어요!')),
-                );
-              },
+            const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _UltimateSettingItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color? color;
+  final VoidCallback? onTap;
+
+  const _UltimateSettingItem({
+    required this.icon,
+    required this.label,
+    this.color,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ShrinkableButton(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: Color(0xFFF2F4F6), width: 1)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 22, color: color ?? AppColors.textSecondary),
+            const SizedBox(width: 16),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: SDS.fwBold,
+                color: AppColors.textPrimary,
+                letterSpacing: -0.5,
+              ),
             ),
+            const Spacer(),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: AppColors.textTertiary),
           ],
         ),
       ),
@@ -164,261 +402,14 @@ class _ActionIconBtn extends StatelessWidget {
     return ShrinkableButton(
       onTap: onTap,
       child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: const Color(0xFFF2F4F6),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, size: 20, color: AppColors.textSecondary),
-      ),
-    );
-  }
-}
-
-class _StatsRow extends StatelessWidget {
-  final int completedDeals;
-
-  const _StatsRow({required this.completedDeals});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          _StatCard(value: '1', label: '방문 시장'),
-          const SizedBox(width: 10),
-          _StatCard(value: '5', label: '즐겨찾기'),
-          const SizedBox(width: 10),
-          _StatCard(value: '$completedDeals', label: '완료 거래'),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final String value;
-  final String label;
-
-  const _StatCard({required this.value, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(SDS.radiusM),
-          boxShadow: SDS.shadowSoft,
-          border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),
-        ),
-        child: Column(
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: SDS.fwBlack,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: SDS.fwBold,
-                color: AppColors.textTertiary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FavoriteMarketsSection extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return _Section(
-      title: '즐겨찾기 시장',
-      children: [
-        _MarketTile(
-          name: '광장시장',
-          address: '서울 종로구 창경궁로 88',
-          storeCount: MockData.stores.length,
-        ),
-      ],
-    );
-  }
-}
-
-class _MarketTile extends StatelessWidget {
-  final String name;
-  final String address;
-  final int storeCount;
-
-  const _MarketTile({
-    required this.name,
-    required this.address,
-    required this.storeCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SDS.listRow(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      leading: Container(
         width: 44,
         height: 44,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(SDS.radiusS),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
         ),
-        child: const Icon(Icons.storefront_rounded, color: AppColors.primary, size: 22),
+        child: Icon(icon, size: 22, color: AppColors.textPrimary),
       ),
-      title: Text(name),
-      subtitle: Text(address),
-      trailing: Text(
-        '점포 $storeCount개',
-        style: TextStyle(fontSize: 12, fontWeight: SDS.fwBold, color: AppColors.textSecondary),
-      ),
-    );
-  }
-}
-
-class _SettingsSection extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return _Section(
-      title: '설정',
-      children: [
-        _SettingItem(
-          icon: Icons.notifications_outlined,
-          label: '알림 설정',
-          subtitle: '푸시 알림, 야간 제한',
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('알림 설정 페이지로 이동합니다.')),
-            );
-          },
-        ),
-        _SettingItem(
-          icon: Icons.location_on_outlined,
-          label: '반경 설정',
-          subtitle: '현재 1km',
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('주변 탐색 반경을 설정합니다.')),
-            );
-          },
-        ),
-        _SettingItem(
-          icon: Icons.shield_outlined,
-          label: '개인정보 처리방침',
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('개인정보 처리방침을 불러옵니다.')),
-            );
-          },
-        ),
-        _SettingItem(
-          icon: Icons.info_outline,
-          label: '앱 정보',
-          subtitle: 'v1.0.0',
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('시장여지도 v1.0.0 (최신 버전입니다)')),
-            );
-          },
-        ),
-        _SettingItem(
-          icon: Icons.flag_outlined,
-          label: '신고 내역',
-          onTap: () {},
-        ),
-      ],
-    );
-  }
-}
-
-class _SettingItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String? subtitle;
-  final VoidCallback? onTap;
-
-  const _SettingItem({
-    required this.icon,
-    required this.label,
-    this.subtitle,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SDS.listRow(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: const Color(0xFFF2F4F6),
-          borderRadius: BorderRadius.circular(SDS.radiusS),
-        ),
-        child: Icon(icon, size: 20, color: AppColors.textSecondary),
-      ),
-      title: Text(label),
-      subtitle: subtitle != null ? Text(subtitle!) : null,
-      trailing: const Icon(Icons.chevron_right_rounded, size: 20, color: AppColors.textTertiary),
-      onTap: onTap,
-    );
-  }
-}
-
-class _Section extends StatelessWidget {
-  final String title;
-  final List<Widget> children;
-
-  const _Section({required this.title, required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: SDS.fwBlack,
-              color: AppColors.textTertiary,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(SDS.radiusL),
-            boxShadow: SDS.shadowPremium,
-            border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),
-          ),
-          child: Column(
-            children: [
-              ...children,
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

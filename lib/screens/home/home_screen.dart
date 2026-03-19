@@ -44,390 +44,241 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final openCount =
-        MockData.stores.where((s) => s.status == StoreStatus.open).length;
+    final openCount = MockData.stores.where((s) => s.status == StoreStatus.open).length;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
-          // ── Brand Header (V10 Branding) ──────────────────────
-          // ── Premium Top Bar (V13) ──────────────────────────
+          // ── Cinematic V16 Header (Asymmetric Overhaul) ──────
           SliverToBoxAdapter(
-            child: SDS.topBar(
-              context: context,
-              title: '시장여지도',
-              subtitle: '우리 동네 시장 이야기를 만나보세요 👋',
-              showBackButton: false,
-              leading: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(SDS.radiusS),
-                ),
-                child: const Center(
-                  child: Text('🗺️', style: TextStyle(fontSize: 18)),
-                ),
-              ),
-            ),
-          ),
-
-          // ── Search Bar (Top) ──────────────────────────────────
-          SliverToBoxAdapter(
-            child: SDSFadeIn(
-              offset: const Offset(0, -10),
-              child: Container(
-                color: AppColors.surface,
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-                child: ShrinkableButton(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const SearchScreen()),
-                    );
-                  },
-                  child: Container(
-                    height: 58,
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 24,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.search_rounded,
-                            color: AppColors.primary, size: 24),
-                        const SizedBox(width: 12),
-                        Text(
-                          '가게 이름 또는 상품 검색',
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: AppColors.textSecondary,
-                            fontWeight: SDS.fwBold,
-                            letterSpacing: SDS.lsNormal,
-                          ),
-                        ),
-                      ],
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  height: 320, // Reduced height for a tighter layout
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF9FAFB), 
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(SDS.radiusEpic),
+                      bottomRight: Radius.circular(SDS.radiusEpic),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ),
 
-          // ── Cinematic Storytelling Header (V8) ──────────────────
-          SliverToBoxAdapter(
-            child: Container(
-              height: 440,
-              color: AppColors.surface,
-              child: Stack(
-                children: [
-                    // Dynamic Narrative Image
-                    TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 1.08, end: 1.0),
-                      duration: SDS.durationSlow,
-                      curve: SDS.curveEntrance,
-                      builder: (context, scale, child) {
-                        return Transform.scale(
-                          scale: scale,
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage('https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=1500'),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    // Refined Gradient Overlay
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withValues(alpha: 0.65),
-                              Colors.transparent,
-                              Colors.black.withValues(alpha: 0.75),
-                              AppColors.surface,
-                            ],
-                            stops: const [0.0, 0.3, 0.8, 1.0],
-                        ),
-                      ),
-                    ),
-                    // Narrative Content
-                    Positioned(
-                      left: SDS.gutter,
-                      right: SDS.gutter,
-                      bottom: SDS.space40,
-                      child: SDSFadeIn(
-                        delay: const Duration(milliseconds: 300),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                // 3. Branded Content Column
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 16),
+                        // 3a. Branded Top Bar
+                        Row(
                           children: [
-
                             const Text(
-                              '전통시장의 매력을\n시장여지도에서 📍',
+                              '시장여지도',
                               style: TextStyle(
-                                fontSize: 36,
+                                fontSize: 20,
                                 fontWeight: SDS.fwBlack,
-                                color: Colors.white,
-                                letterSpacing: SDS.lsTight * 2,
-                                height: 1.1,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black26,
-                                    blurRadius: 15,
-                                    offset: Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: SDS.space16),
-                            Text(
-                              '오늘 가기 좋은 시장들을 모아봤어요 👋',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white.withValues(alpha: 0.95),
-                                letterSpacing: -0.4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-
-          // ── V8 Dynamic Commerce (Flash Deal Ticker) ─────────────
-          const SliverToBoxAdapter(
-            child: SDSFadeIn(
-              delay: Duration(milliseconds: 500),
-              offset: Offset(0, 20),
-              child: FlashDealTickerWidget(),
-            ),
-          ),
-
-          // ── V8 Social Layer (Market Stories) ────────────────────
-          const SliverPadding(
-            padding: EdgeInsets.only(top: SDS.space24, bottom: SDS.space24),
-            sliver: SliverToBoxAdapter(
-              child: SDSFadeIn(
-                delay: Duration(milliseconds: 600),
-                offset: Offset(0, 20),
-                child: MarketStoriesWidget(),
-              ),
-            ),
-          ),
-
-
-
-          // ── Favorites Section ──────────────────────────────────
-          SliverToBoxAdapter(
-            child: ListenableBuilder(
-              listenable: FavoriteService(),
-              builder: (context, _) {
-                final favIds = FavoriteService().favoriteIds;
-                if (favIds.isEmpty) return const SizedBox.shrink();
-
-                final favStores = MockData.stores
-                    .where((s) => favIds.contains(s.id))
-                    .toList();
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SDSFadeIn(
-                      delay: const Duration(milliseconds: 700),
-                      offset: const Offset(0, 20),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.favorite_rounded,
-                                color: Colors.redAccent, size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              '나의 단골집',
-                              style: textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w900,
                                 color: AppColors.textPrimary,
-                                letterSpacing: -0.5,
+                                letterSpacing: -1.0,
                               ),
                             ),
+                            const Spacer(),
+                            _ActionIconBtn(icon: Icons.notifications_none_rounded, onTap: () {}),
                           ],
                         ),
-                      ),
-                    ),
-                    SDSFadeIn(
-                      delay: const Duration(milliseconds: 800),
-                      offset: const Offset(0, 20),
-                      child: SizedBox(
-                        height: 140,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                          scrollDirection: Axis.horizontal,
-                          itemCount: favStores.length,
-                          itemBuilder: (context, index) {
-                            final store = favStores[index];
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 6),
-                              child: ShrinkableButton(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => StoreDetailScreen(store: store),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  width: 140,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surface,
-                                    borderRadius: BorderRadius.circular(24),
-                                    boxShadow: SDS.shadowSoft,
+                        // 3b. Headline
+                        const SizedBox(height: 40),
+                        SDSFadeIn(
+                          delay: const Duration(milliseconds: 300),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RichText(
+                                text: const TextSpan(
+                                  style: TextStyle(
+                                    fontSize: 34,
+                                    fontWeight: SDS.fwBlack,
+                                    color: AppColors.textPrimary,
+                                    height: 1.2,
+                                    letterSpacing: -1.5,
                                   ),
-                                  padding: const EdgeInsets.all(16),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 52,
-                                        height: 52,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.background,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          Icons.storefront_rounded,
-                                          color: AppColors.primary,
-                                          size: 26,
-                                        ),
+                                  children: [
+                                    TextSpan(text: '시장에 가고\n'),
+                                    TextSpan(
+                                      text: '싶을 때',
+                                      style: TextStyle(color: AppColors.primary),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '가장 가까운 소식과 정겨운 풍경',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: SDS.fwBold,
+                                  color: AppColors.textSecondary.withValues(alpha: 0.6),
+                                  letterSpacing: -0.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 24),
+
+                        // 3c. High-Fidelity Search Bar (Moved Below Headline)
+                        SDSFadeIn(
+                          delay: const Duration(milliseconds: 500),
+                          offset: const Offset(0, 10),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: SDSGlass(
+                              blur: 40,
+                              opacity: 0.98,
+                              radius: 24,
+                              padding: const EdgeInsets.all(1),
+                              child: Hero(
+                                tag: 'search_bar',
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: ShrinkableButton(
+                                    onTap: () {
+                                      Navigator.of(context).push(PageRouteBuilder(
+                                        transitionDuration: const Duration(milliseconds: 500),
+                                        pageBuilder: (context, animation, secondaryAnimation) => const SearchScreen(),
+                                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                          return FadeTransition(opacity: animation, child: child);
+                                        },
+                                      ));
+                                    },
+                                    child: Container(
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(24),
+                                        color: Colors.white,
+                                        border: Border.all(color: const Color(0xFFF2F4F6), width: 1.5),
                                       ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        store.name,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: textTheme.bodyMedium?.copyWith(
-                                          fontWeight: FontWeight.w800,
-                                          color: AppColors.textPrimary,
-                                        ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.search_rounded, color: AppColors.primary, size: 28),
+                                          const SizedBox(width: 12),
+                                          Text(
+                                            '어느 시장이 궁금하세요?',
+                                            style: TextStyle(
+                                              color: AppColors.textSecondary,
+                                              fontWeight: SDS.fwBold,
+                                              fontSize: 16,
+                                              letterSpacing: -0.5,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-
-
-          // ── Market Section ─────────────────────────────────────
-          SliverToBoxAdapter(
-            child: SDSFadeIn(
-              delay: const Duration(milliseconds: 900),
-              offset: const Offset(0, 20),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 4),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '지금,\n전통시장을 활짝 열어보세요 🎞️',
-                            style: textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.textPrimary,
-                              height: 1.25,
-                              letterSpacing: -1.0,
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '터치해서 실내 지도를 펼쳐보세요',
-                            style: textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: AppColors.success.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: const BoxDecoration(
-                            color: AppColors.success,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          '$openCount곳 영업 중',
-                          style: textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.success,
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+          // ── Adorable 3D Categories ──────────────────────────
+
+          // ── Flash Deal Ticker ────────────────────────────────
+          const SliverToBoxAdapter(child: FlashDealTickerWidget()),
+
+          // ── Market Stories ──────────────────────────────────
+          const SliverPadding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            sliver: SliverToBoxAdapter(child: MarketStoriesWidget()),
+          ),
+
+          // ── Recommended Markets Section ───────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Text(
+                        '지금 추천하는 시장',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: SDS.fwBlack,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.8,
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(
+                          '$openCount곳 영업중',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    '실시간으로 활기찬 시장들을 모아봤어요',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: AppColors.textSecondary,
+                      fontWeight: SDS.fwMedium,
                     ),
                   ),
                 ],
               ),
             ),
           ),
-        ),
 
           SliverPadding(
-            padding: EdgeInsets.fromLTRB(20, 12, 20, bottomPadding + 100),
+            padding: EdgeInsets.fromLTRB(20, 0, 20, bottomPadding + 100),
             sliver: _isLoading 
                 ? SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) => const Padding(
-                        padding: EdgeInsets.only(bottom: 14),
-                        child: Skeleton(height: 160, borderRadius: 28),
+                        padding: EdgeInsets.only(bottom: 16),
+                        child: Skeleton(height: 180, borderRadius: 28),
                       ),
                       childCount: 3,
                     ),
@@ -436,13 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         final market = MockData.markets[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 14),
-                          child: _MarketCard(
-                            market: market,
-                            openStoreCount: market.isAvailable ? openCount : 0,
-                          ),
-                        );
+                        return _PremiumMarketCard(market: market);
                       },
                       childCount: MockData.markets.length,
                     ),
@@ -452,132 +297,182 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
 }
 
-class _MarketCard extends StatelessWidget {
+class _PremiumMarketCard extends StatelessWidget {
   final MarketInfo market;
-  final int openStoreCount;
 
-  const _MarketCard({
-    required this.market,
-    required this.openStoreCount,
-  });
+  const _PremiumMarketCard({required this.market});
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final isAvailable = market.isAvailable;
 
-    return SDSFadeIn(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: SDS.space8),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(SDS.radiusL),
-          boxShadow: isAvailable 
-              ? SDS.shadowAccent(market.accentColor)
-              : SDS.shadowSoft,
-        ),
-        child: SDS.listRow(
-          onTap: () {
-            if (!isAvailable) return;
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => MarketHubScreen(marketName: market.name)),
-            );
-          },
-          leading: Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: isAvailable ? market.accentColor.withValues(alpha: 0.1) : AppColors.background,
-              borderRadius: BorderRadius.circular(SDS.radiusM),
-            ),
-            child: Icon(
-              Icons.storefront_rounded,
-              color: isAvailable ? market.accentColor : AppColors.textTertiary,
-              size: 26,
-            ),
-          ),
-          title: Text(
-            market.name,
-            style: TextStyle(
-              color: isAvailable ? AppColors.textPrimary : AppColors.textTertiary,
-              fontWeight: SDS.fwBlack,
-            ),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                isAvailable ? market.description : '곧 서비스를 시작할 예정이에요',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: ShrinkableButton(
+        onTap: () {
+          if (!isAvailable) return;
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => MarketHubScreen(marketName: market.name)),
+          );
+        },
+        child: Container(
+          height: 180,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(SDS.radiusL),
+            boxShadow: [
+              BoxShadow(
+                color: (isAvailable ? market.accentColor : Colors.black).withValues(alpha: 0.08),
+                blurRadius: 30,
+                offset: const Offset(0, 10),
               ),
-              if (isAvailable) ...[
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 6,
-                  children: [
-                    _StatusChip(
-                      icon: Icons.map_rounded,
-                      label: '지도 있어요',
-                      color: market.accentColor,
+            ],
+            border: isAvailable ? Border.all(
+              color: market.accentColor.withValues(alpha: 0.1),
+              width: 1.5,
+            ) : null,
+          ),
+          child: Stack(
+            children: [
+              // Background Gradient Accent
+              if (isAvailable)
+                Positioned(
+                  right: -40,
+                  top: -40,
+                  child: Container(
+                    width: 160, // Increased from 100
+                    height: 160,
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        colors: [
+                          market.accentColor.withValues(alpha: 0.1),
+                          market.accentColor.withValues(alpha: 0.0),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
                     ),
-                    _StatusChip(
-                      icon: Icons.bolt_rounded,
-                      label: '빠른 탐색',
-                      color: AppColors.primary,
+                  ),
+                ),
+              
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: isAvailable ? AppColors.primary.withValues(alpha: 0.1) : const Color(0xFFF2F4F6),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  isAvailable ? '운영중' : '준비중',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: SDS.fwBlack,
+                                    color: isAvailable ? AppColors.primary : AppColors.textTertiary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                market.address,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: AppColors.textSecondary,
+                                  fontWeight: SDS.fwBold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            market.name,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: SDS.fwBlack,
+                              color: AppColors.textPrimary,
+                              letterSpacing: -0.8,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            isAvailable ? market.description : '곧 서비스를 시작할 예정이에요',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: AppColors.textSecondary,
+                              fontWeight: SDS.fwMedium,
+                              height: 1.4,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF7F8FA),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.storefront_rounded,
+                          color: isAvailable ? market.accentColor : AppColors.textTertiary,
+                          size: 40,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ],
+              ),
             ],
           ),
-          trailing: isAvailable ? const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textTertiary) : null,
         ),
       ),
     );
   }
 }
 
-class _StatusChip extends StatelessWidget {
+class _ActionIconBtn extends StatelessWidget {
   final IconData icon;
-  final String label;
-  final Color color;
+  final VoidCallback onTap;
 
-  const _StatusChip({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
+  const _ActionIconBtn({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(SDS.radiusM),
-        border: Border.all(color: color.withValues(alpha: 0.1)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              color: color,
-              letterSpacing: -0.2,
+    return ShrinkableButton(
+      onTap: onTap,
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Icon(icon, color: AppColors.textPrimary, size: 24),
       ),
     );
   }
 }
-

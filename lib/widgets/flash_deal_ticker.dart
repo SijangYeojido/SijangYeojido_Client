@@ -23,7 +23,7 @@ class _FlashDealTickerWidgetState extends State<FlashDealTickerWidget> {
 
   void _startTicker() {
     _timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-      if (!mounted) return;
+      if (!mounted || !_scrollController.hasClients) return;
       _scrollPosition += 1.0;
       if (_scrollPosition > _scrollController.position.maxScrollExtent) {
         _scrollPosition = 0;

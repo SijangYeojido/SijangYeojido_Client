@@ -7,8 +7,8 @@ class MarketParkingScreen extends StatelessWidget {
   final String marketName;
   const MarketParkingScreen({super.key, required this.marketName});
 
-  // Gwangjang Heritage Red
-  static const Color gwangjangRed = Color(0xFFF04452);
+  // Shinwon Brand Red
+  static const Color shinwonRed = Color(0xFFF04452);
 
   @override
   Widget build(BuildContext context) {
@@ -33,47 +33,45 @@ class MarketParkingScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 16),
             const Padding(
-              padding: EdgeInsets.only(left: 16.0), // Nuclear Buffer
+              padding: EdgeInsets.only(left: 16.0),
               child: Text(
-                '\u00A0가깝고 편리한 주차장',
+                '가깝고 편리한 주차장',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: SDS.fwBlack,
                   color: AppColors.textPrimary,
                   height: 1.3,
-                  letterSpacing: 0.8,
+                  letterSpacing: -0.8,
                 ),
-                overflow: TextOverflow.visible,
               ),
             ),
             const SizedBox(height: 12),
             const Padding(
               padding: EdgeInsets.only(left: 16.0),
               child: Text(
-                '\u00A0시장 인근 주차장 정보를 확인하세요.',
+                '신원시장 방문 시 이용 가능한\n주차장 정보를 확인하세요.',
                 style: TextStyle(fontSize: 15, color: AppColors.textSecondary, fontWeight: SDS.fwBold, height: 1.5),
               ),
             ),
             const SizedBox(height: 32),
 
             _buildNuclearParkingItem(
-              name: '제1공영주차장 (남문)',
-              fee: '30분 1,000원',
-              distance: '남문 시장 입구에서 도보 2분',
-              address: '서울 중구 남대문시장길 10',
+              name: '신원시장 노상 공영주차장',
+              fee: '5분당 250원 (1시간 3,000원)',
+              distance: '시장 입구(도림천변) 바로 앞',
+              address: '서울 관악구 신림동 1587-38',
             ),
             _buildNuclearParkingItem(
-              name: '제2공영주차장 (북문)',
-              fee: '30분 1,200원',
-              distance: '북문 시장 입구에서 도보 5분',
-              address: '서울 중구 소공로 12',
+              name: '타임스트림 주차장',
+              fee: '평일 당일권 22,000원',
+              distance: '신림역 1번 출구 인근 (도보 7분)',
+              address: '서울 관악구 신원로 35',
             ),
             
             const SizedBox(height: 32),
-            // ─── UPGRADED: Parking Tip Card ───
             _buildBentoTipCard(
-              title: '시장 주차 이용 꿀팁',
-              content: '• 점포 이용 시 무료 주차권을 꼭 요청하세요.\n• 공용 주차장은 경차 및 저공해 차량 할인이 적용됩니다.\n• 주말은 대중교통 이용을 권장합니다.',
+              title: '신원시장 주차 꿀팁',
+              content: '• 시장 노상 공영주차장은 카드 결제 전용입니다.\n• 주말 및 공휴일은 매우 혼잡할 수 있습니다.\n• 도림천 산책로와 연결되어 있어 쾌적하게 이용 가능합니다.',
             ),
             const SizedBox(height: 80),
           ],
@@ -105,7 +103,7 @@ class MarketParkingScreen extends StatelessWidget {
                 const SizedBox(width: 20),
                 Expanded(
                   child: Text(
-                    '\u00A0' + name,
+                    '\u00A0$name',
                     style: const TextStyle(fontSize: 18, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: 0.8),
                     overflow: TextOverflow.visible,
                     softWrap: false,
@@ -114,10 +112,10 @@ class MarketParkingScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: gwangjangRed.withValues(alpha: 0.1),
+                    color: shinwonRed.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text('주차가능', style: TextStyle(color: gwangjangRed, fontSize: 12, fontWeight: SDS.fwBlack)),
+                  child: const Text('주차가능', style: TextStyle(color: shinwonRed, fontSize: 12, fontWeight: SDS.fwBlack)),
                 ),
               ],
             ),
@@ -135,7 +133,7 @@ class MarketParkingScreen extends StatelessWidget {
                 height: 54,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: gwangjangRed,
+                  color: shinwonRed,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Center(
@@ -159,7 +157,7 @@ class MarketParkingScreen extends StatelessWidget {
         const SizedBox(width: 20),
         Expanded(
           child: Text(
-            '\u00A0' + text, 
+            '\u00A0$text', 
             style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, fontWeight: SDS.fwBold, letterSpacing: 0.5),
             overflow: TextOverflow.visible,
           ),
@@ -182,10 +180,10 @@ class MarketParkingScreen extends StatelessWidget {
           Row(
             children: [
               const SizedBox(width: 8),
-              const Icon(Icons.tips_and_updates_rounded, color: gwangjangRed, size: 20),
+              const Icon(Icons.tips_and_updates_rounded, color: shinwonRed, size: 20),
               const SizedBox(width: 12),
               Text(
-                '\u00A0' + title, 
+                '\u00A0$title', 
                 style: const TextStyle(fontSize: 16, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: 0.5)
               ),
             ],

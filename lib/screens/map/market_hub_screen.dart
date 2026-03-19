@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
 import '../../data/mock_data.dart';
@@ -14,7 +13,7 @@ import '../../widgets/sds_widgets.dart';
 
 class MarketHubScreen extends StatefulWidget {
   final String marketName;
-  const MarketHubScreen({super.key, this.marketName = '광장시장'});
+  const MarketHubScreen({super.key, this.marketName = '신원시장'});
 
   @override
   State<MarketHubScreen> createState() => _MarketHubScreenState();
@@ -164,81 +163,67 @@ class _MarketHubScreenState extends State<MarketHubScreen> {
                     right: 20,
                     child: SDSFadeIn(
                       delay: const Duration(milliseconds: 600),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(SDS.radiusL),
-                          boxShadow: SDS.shadowPremium,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(SDS.radiusL),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: SDS.space12, vertical: SDS.space24),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.75),
-                                borderRadius: BorderRadius.circular(SDS.radiusL),
-                                border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: [
-                                  _CircularActionButton(
-                                    icon: Icons.map_rounded,
-                                    label: '시장 지도',
-                                    color: market.accentColor,
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => MarketMapSimpleScreen(marketName: widget.marketName),
-                                        ),
-                                      );
-                                    },
+                      child: SDSGlass(
+                        blur: 32,
+                        opacity: 0.9,
+                        radius: 32,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _CircularActionButton(
+                              icon: Icons.map_rounded,
+                              label: '시장 지도',
+                              color: const Color(0xFF00C896), // Shinwon/Toss Green
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MarketMapSimpleScreen(marketName: widget.marketName),
                                   ),
-                                  _CircularActionButton(
-                                    icon: Icons.local_parking_rounded,
-                                    label: '주차 안내',
-                                    color: AppColors.textPrimary,
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => MarketParkingScreen(marketName: widget.marketName),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  _CircularActionButton(
-                                    icon: Icons.local_offer_rounded,
-                                    label: '쿠폰 받기',
-                                    color: AppColors.orange,
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => MarketCouponScreen(marketName: widget.marketName),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  _CircularActionButton(
-                                    icon: Icons.info_outline_rounded,
-                                    label: '시장 정보',
-                                    color: AppColors.textTertiary,
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => MarketInfoScreen(marketName: widget.marketName),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
-                          ),
+                            _CircularActionButton(
+                              icon: Icons.local_parking_rounded,
+                              label: '주차 안내',
+                              color: const Color(0xFF3182F6), // Toss Blue
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MarketParkingScreen(marketName: widget.marketName),
+                                  ),
+                                );
+                              },
+                            ),
+                            _CircularActionButton(
+                              icon: Icons.local_offer_rounded,
+                              label: '쿠폰 받기',
+                              color: const Color(0xFFFF5F2E), // Premium Orange
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MarketCouponScreen(marketName: widget.marketName),
+                                  ),
+                                );
+                              },
+                            ),
+                            _CircularActionButton(
+                              icon: Icons.info_outline_rounded,
+                              label: '시장 정보',
+                              color: const Color(0xFF191F28), // Deep Graphite
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MarketInfoScreen(marketName: widget.marketName),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -429,13 +414,13 @@ class _HeroActionChip extends StatelessWidget {
 }
 
 class _CircularActionButton extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
   final String label;
   final Color color;
   final VoidCallback onTap;
 
   const _CircularActionButton({
-    required this.icon,
+    this.icon,
     required this.label,
     required this.color,
     required this.onTap,
@@ -448,22 +433,41 @@ class _CircularActionButton extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 52,
-            height: 52,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              color: imagePath != null ? Colors.white : color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(22),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04), // Neutral soft shadow
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: Icon(icon, size: 24, color: color),
+            child: Center(
+              child: imagePath != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        imagePath!,
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.contain,
+                      ),
+                    )
+                  : Icon(icon, size: 28, color: color),
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: SDS.fwBold,
               color: AppColors.textPrimary,
-              letterSpacing: -0.3,
+              letterSpacing: -0.4,
             ),
           ),
         ],
@@ -527,9 +531,19 @@ class _StickyCategoryDelegate extends SliverPersistentHeaderDelegate {
   });
 
   @override
-  double get minExtent => 68.0;
+  double get minExtent => 140.0; // Increased to 140 to prevent internal overflows
   @override
-  double get maxExtent => 68.0;
+  double get maxExtent => 140.0;
+
+  String _assetForCategory(String category) {
+    if (category == '전체') return 'assets/images/market_building.png';
+    if (category == '먹거리') return 'assets/images/category_meal_3d.png';
+    if (category == '정육') return 'assets/images/category_meat_3d_cute.png';
+    if (category == '수산물') return 'assets/images/category_fish_3d_cute.png';
+    if (category == '과일/채소') return 'assets/images/category_veggie_3d_cute.png';
+    if (category == '건어물') return 'assets/images/category_dried_fish_3d.png';
+    return 'assets/images/category_etc_3d.png';
+  }
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
@@ -540,38 +554,15 @@ class _StickyCategoryDelegate extends SliverPersistentHeaderDelegate {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 10),
+        separatorBuilder: (context, index) => const SizedBox(width: 0), // SDSCategoryItem handles padding
         itemBuilder: (context, index) {
           final cat = categories[index];
           final isSelected = cat == selectedCategory;
-          return ShrinkableButton(
+          return SDSCategoryItem(
+            label: cat,
+            assetPath: _assetForCategory(cat),
+            isSelected: isSelected,
             onTap: () => onSelected(cat),
-            shrinkScale: 0.94,
-            child: AnimatedContainer(
-              duration: SDS.durationFast,
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.textPrimary : AppColors.surface,
-                borderRadius: BorderRadius.circular(SDS.radiusCapsule),
-                boxShadow: isSelected 
-                  ? [BoxShadow(color: AppColors.textPrimary.withValues(alpha: 0.2), blurRadius: 15, offset: const Offset(0, 8))]
-                  : SDS.shadowSoft,
-                border: Border.all(
-                  color: isSelected ? AppColors.textPrimary : AppColors.divider.withValues(alpha: 0.5),
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  cat,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: isSelected ? SDS.fwBlack : SDS.fwBold,
-                    color: isSelected ? Colors.white : AppColors.textSecondary,
-                    letterSpacing: SDS.lsTight,
-                  ),
-                ),
-              ),
-            ),
           );
         },
       ),

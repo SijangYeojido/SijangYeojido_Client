@@ -7,7 +7,6 @@ import '../../data/mock_data.dart';
 import '../pickup/pickup_screen.dart';
 import '../../widgets/app_ui.dart';
 import '../../theme/sijang_design_system.dart';
-import '../../widgets/sds_widgets.dart';
 
 class ReservationListScreen extends StatefulWidget {
   const ReservationListScreen({super.key});

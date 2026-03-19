@@ -26,9 +26,14 @@ class StoreItem {
   final String name;
   final String? unitNumber;
   final int? price;
+  final String? imageUrl;
 
-  const StoreItem({required this.name,
-    this.unitNumber, this.price});
+  const StoreItem({
+    required this.name,
+    this.unitNumber,
+    this.price,
+    this.imageUrl,
+  });
 }
 
 class Store {
@@ -63,7 +68,7 @@ class Store {
     required this.mapY,
     this.freshness,
     this.inventoryStatus,
-    this.marketName = '광장시장',
+    this.marketName = '신원시장',
   });
 
 

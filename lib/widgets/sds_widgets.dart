@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:path_drawing/path_drawing.dart';
 import '../theme/app_colors.dart';
 import '../theme/sijang_design_system.dart';
 import 'shrinkable_button.dart';
@@ -122,12 +123,13 @@ class SDSButton extends StatelessWidget {
     return ShrinkableButton(
       onTap: onTap,
       child: Container(
-        height: 56,
+        height: 58,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: themeColor,
+          color: isPrimary ? null : themeColor,
+          gradient: isPrimary ? AppColors.primaryGradient : null,
           borderRadius: BorderRadius.circular(SDS.radiusM),
-          boxShadow: isPrimary ? SDS.shadowAccent(themeColor) : null,
+          boxShadow: isPrimary ? SDS.shadowAccent(AppColors.primary) : null,
           border: isPrimary ? null : Border.all(color: AppColors.border.withValues(alpha: 0.5)),
         ),
         child: Row(
@@ -387,4 +389,476 @@ class PremiumPlaceholder extends StatelessWidget {
     if (category.contains('과일') || category.contains('채소')) return Icons.eco_rounded;
     return Icons.storefront_rounded;
   }
+}
+
+/// --- SDS Step Bar ---
+/// A minimalist linear progress indicator for multi-step flows.
+class SDSStepBar extends StatelessWidget {
+  final int totalSteps;
+  final int currentStep;
+  final Color? color;
+
+  const SDSStepBar({
+    super.key,
+    required this.totalSteps,
+    required this.currentStep,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 3,
+      width: double.infinity,
+      color: AppColors.border.withValues(alpha: 0.3),
+      child: FractionallySizedBox(
+        alignment: Alignment.centerLeft,
+        widthFactor: (currentStep + 1) / totalSteps,
+        child: Container(
+          color: color ?? AppColors.primary,
+        ),
+      ),
+    );
+  }
+}
+
+/// --- SDS Sticky Button ---
+/// A full-width button that sticks to the bottom with safe area support.
+class SDSStickyButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onTap;
+  final bool isEnabled;
+  final bool isLoading;
+
+  const SDSStickyButton({
+    super.key,
+    required this.label,
+    this.onTap,
+    this.isEnabled = true,
+    this.isLoading = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 12, 20, bottomPadding > 0 ? bottomPadding : 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppColors.border.withValues(alpha: 0.5), width: 0.5)),
+      ),
+      child: ShrinkableButton(
+        onTap: isEnabled && !isLoading ? onTap : null,
+        child: Container(
+          height: 56,
+          decoration: BoxDecoration(
+            color: isEnabled ? AppColors.primary : AppColors.border.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(SDS.radiusM),
+          ),
+          child: Center(
+            child: isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                  )
+                : Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: SDS.fwBlack,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// --- SDS Glass Container ---
+/// A reusable glassmorphism container for premium overlays.
+class SDSGlass extends StatelessWidget {
+  final Widget child;
+  final double blur;
+  final double opacity;
+  final double radius;
+  final EdgeInsets? padding;
+  final Color? color;
+
+  const SDSGlass({
+    super.key,
+    required this.child,
+    this.blur = 24.0,
+    this.opacity = 0.7,
+    this.radius = SDS.radiusM,
+    this.padding,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            color: (color ?? Colors.white).withValues(alpha: opacity),
+            borderRadius: BorderRadius.circular(radius),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.2),
+              width: 1.5,
+            ),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+/// --- SDS Category Item ---
+/// A premium, circular 3D category item used for navigation.
+class SDSCategoryItem extends StatelessWidget {
+  final String label;
+  final String assetPath;
+  final VoidCallback onTap;
+  final bool isSelected;
+
+  const SDSCategoryItem({
+    super.key,
+    required this.label,
+    required this.assetPath,
+    required this.onTap,
+    this.isSelected = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: ShrinkableButton(
+        onTap: onTap,
+        child: Column(
+          children: [
+            Container(
+              width: 76, 
+              height: 76,
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+                border: Border.all(
+                  color: isSelected ? AppColors.primary.withValues(alpha: 0.3) : const Color(0xFFF2F4F6), 
+                  width: 1.5
+                ),
+              ),
+              child: ClipOval(
+                child: Center(
+                  child: ShaderMask(
+                    shaderCallback: (rect) {
+                      return const RadialGradient(
+                        colors: [Colors.white, Colors.white, Colors.transparent],
+                        stops: [0.0, 0.75, 1.0], // Fades out the square background corners
+                      ).createShader(rect);
+                    },
+                    blendMode: BlendMode.dstIn,
+                    child: Image.asset(
+                      assetPath, 
+                      width: 54, 
+                      height: 54, 
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8), // Reduced from 12 to prevent 2px overflow
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isSelected ? SDS.fwBlack : SDS.fwBold,
+                color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                letterSpacing: -0.4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// --- SDS Logo Widget ---
+/// A premium, code-generated logo for SijangYeojido.
+/// Combines the 'ㅅ' (Sijang) and 'Pin' (Map) into a single 3D-styled icon.
+class SDSLogo extends StatelessWidget {
+  final double size;
+  final bool useGlass;
+
+  const SDSLogo({
+    super.key,
+    this.size = 120,
+    this.useGlass = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // 1. Real-time Drop Shadow
+          Positioned(
+            bottom: size * 0.05,
+            child: Container(
+              width: size * 0.4,
+              height: size * 0.1,
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.12),
+                    blurRadius: size * 0.2,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // 2. The Main Pin with Painter
+          CustomPaint(
+            size: Size(size, size),
+            painter: _SDSLogoPainter(
+              color: AppColors.primary,
+              gradient: AppColors.primaryGradient,
+            ),
+          ),
+          // 3. Premium Glass Highlight
+          if (useGlass)
+            Positioned(
+              top: size * 0.18,
+              child: Opacity(
+                opacity: 0.3,
+                child: Container(
+                  width: size * 0.5,
+                  height: size * 0.25,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.8),
+                        Colors.white.withValues(alpha: 0.0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SDSLogoPainter extends CustomPainter {
+  final Color color;
+  final Gradient gradient;
+
+  _SDSLogoPainter({required this.color, required this.gradient});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final double w = size.width;
+    final double h = size.height;
+    final center = Offset(w / 2, h / 2 - h * 0.08);
+
+    // --- 1. Main Pin Path ---
+    final Paint pinPaint = Paint()
+      ..shader = gradient.createShader(Rect.fromLTWH(0, 0, w, h))
+      ..style = PaintingStyle.fill;
+
+    final Path pinPath = Path();
+    final double radius = w * 0.36;
+    
+    // Top circle part (270 degrees approx)
+    pinPath.addArc(
+      Rect.fromCircle(center: center, radius: radius),
+      0.65 * 3.14159, // start angle
+      1.73 * 3.14159, // sweep angle
+    );
+    
+    // Bottom point
+    pinPath.lineTo(w / 2, h * 0.92);
+    pinPath.close();
+
+    canvas.drawPath(pinPath, pinPaint);
+
+    // --- 2. Inner Glow for Depth ---
+    final Paint glowPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+    canvas.drawPath(pinPath, glowPaint);
+
+    // --- 3. The 'ㅅ' (S) Architectural Cutout ---
+    final Paint cutoutPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    final Path sPath = Path();
+    final double sSize = radius * 0.9;
+    final double sTopY = center.dy - sSize * 0.35;
+    final double sBottomY = center.dy + sSize * 0.45;
+    
+    // Left Stroke of 'ㅅ'
+    sPath.moveTo(center.dx, sTopY);
+    sPath.lineTo(center.dx - sSize * 0.55, sBottomY);
+    sPath.lineTo(center.dx - sSize * 0.28, sBottomY);
+    sPath.lineTo(center.dx, sTopY + sSize * 0.22);
+    
+    // Right Stroke of 'ㅅ'
+    sPath.lineTo(center.dx + sSize * 0.28, sBottomY);
+    sPath.lineTo(center.dx + sSize * 0.55, sBottomY);
+    sPath.lineTo(center.dx, sTopY);
+    sPath.close();
+
+    canvas.drawPath(sPath, cutoutPaint);
+    
+    // --- 4. Shadow inside the Cutout for 'Elevated' look ---
+    final Paint innerShadow = Paint()
+      ..color = const Color(0x33000000)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1);
+    canvas.drawPath(sPath, innerShadow);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// --- SDS Kakao Logo (High-Fidelity) ---
+/// A pixel-perfect recreation of the official Kakao speech bubble.
+class SDSKakaoLogo extends StatelessWidget {
+  final double size;
+  const SDSKakaoLogo({super.key, this.size = 24});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(size, size),
+      painter: _KakaoLogoPainter(),
+    );
+  }
+}
+
+class _KakaoLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final double w = size.width;
+    final double h = size.height;
+    final Paint paint = Paint()
+      ..color = const Color(0xFF3C1E1E)
+      ..style = PaintingStyle.fill;
+
+    final Path path = Path();
+    // Rounded bubble shape (Official proportions)
+    final double centerX = w * 0.5;
+    final double centerY = h * 0.45;
+    final double radiusX = w * 0.46;
+    final double radiusY = h * 0.40;
+
+    path.addOval(Rect.fromCenter(
+      center: Offset(centerX, centerY),
+      width: radiusX * 2,
+      height: radiusY * 2,
+    ));
+
+    // Tail (Little point at bottom-left area)
+    final Path tail = Path();
+    tail.moveTo(w * 0.25, h * 0.75);
+    tail.lineTo(w * 0.18, h * 0.92);
+    tail.lineTo(w * 0.38, h * 0.82);
+    tail.close();
+
+    canvas.drawPath(path, paint);
+    canvas.drawPath(tail, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// --- SDS Google Logo (High-Fidelity) ---
+/// A geometrically perfect recreation of the official multi-colored Google 'G'.
+class SDSGoogleLogo extends StatelessWidget {
+  final double size;
+  const SDSGoogleLogo({super.key, this.size = 24});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(size, size),
+      painter: _GoogleLogoPainter(),
+    );
+  }
+}
+
+class _GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Official Google SVG paths (viewport 0-40, but the 'G' is in a 20x20 box from 10,10)
+    // We scale it so the 'G' (20x20) exactly fills the provided size (e.g. 28x28).
+    final double scale = size.width / 20.0;
+    canvas.scale(scale);
+    canvas.translate(-10, -10); // Center the 20x20 'G' from the 40x40 SVG
+
+    final Paint bluePaint = Paint()..color = const Color(0xFF4285F4)..style = PaintingStyle.fill;
+    final Paint greenPaint = Paint()..color = const Color(0xFF34A853)..style = PaintingStyle.fill;
+    final Paint yellowPaint = Paint()..color = const Color(0xFFFBBC04)..style = PaintingStyle.fill;
+    final Paint redPaint = Paint()..color = const Color(0xFFE94235)..style = PaintingStyle.fill;
+
+    // Blue segment
+    canvas.drawPath(
+      parseSvgPathData("M29.6 20.2273C29.6 19.5182 29.5364 18.8364 29.4182 18.1818H20V22.05H25.3818C25.15 23.3 24.4455 24.3591 23.3864 25.0682V27.5773H26.6182C28.5091 25.8364 29.6 23.2727 29.6 20.2273V20.2273Z"),
+      bluePaint,
+    );
+    // Green segment
+    canvas.drawPath(
+      parseSvgPathData("M20 30C22.7 30 24.9636 29.1045 28.6181 27.5773L25.3863 25.0682C24.4909 25.6682 23.3454 26.0227 20 26.0227C19.3954 26.0227 15.1909 24.2636 14.4045 21.9H11.0636V24.4909C12.7091 27.7591 16.0909 30 20 30Z"),
+      greenPaint,
+    );
+    // Yellow segment
+    canvas.drawPath(
+      parseSvgPathData("M14.4045 21.9C14.2045 21.3 14.0909 20.6591 14.0909 20C14.0909 19.3409 14.2045 18.7 14.4045 18.1V15.5091H11.0636C10.3864 16.8591 10 18.3864 10 20C10 21.6136 10.3864 23.1409 11.0636 24.4909L14.4045 21.9Z"),
+      yellowPaint,
+    );
+    // Red segment
+    canvas.drawPath(
+      parseSvgPathData("M20 13.9773C21.4681 13.9773 22.7863 14.4818 23.8227 15.4727L26.6909 12.6045C24.9591 10.9909 22.6954 10 20 10C16.0909 10 12.7091 12.2409 11.0636 15.5091L14.4045 18.1C15.1909 15.7364 17.3954 13.9773 20 13.9773Z"),
+      redPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

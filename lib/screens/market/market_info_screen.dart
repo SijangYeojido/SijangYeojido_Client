@@ -2,157 +2,233 @@ import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/shrinkable_button.dart';
+import '../../widgets/sds_widgets.dart';
 
 class MarketInfoScreen extends StatelessWidget {
   final String marketName;
   const MarketInfoScreen({super.key, required this.marketName});
 
-  // Gwangjang Heritage Red
-  static const Color gwangjangRed = Color(0xFFF04452);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ShrinkableButton(
-            onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
+      backgroundColor: Colors.white,
+      body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            const Padding(
-              padding: EdgeInsets.only(left: 20.0), // Nuclear Buffer
-              child: Text(
-                '\u00A0시장 정보를\n\u00A0확인해 보세요',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: SDS.fwBlack,
-                  color: AppColors.textPrimary,
-                  height: 1.3,
-                  letterSpacing: 0.8,
+        slivers: [
+          // ── Cinematic V16 Sliver Header ──────────────────────
+          SliverAppBar(
+            expandedHeight: 340,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            pinned: true,
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ShrinkableButton(
+                onTap: () => Navigator.pop(context),
+                child: const CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 18),
                 ),
-                overflow: TextOverflow.visible,
               ),
             ),
-            const SizedBox(height: 24),
-            const Padding(
-              padding: EdgeInsets.only(left: 20.0),
-              child: Text(
-                '\u00A0대한민국 대표 전통시장, 광장시장은 100년의 역사를 가진 먹거리와 볼거리의 성지입니다.',
-                style: TextStyle(fontSize: 16, color: AppColors.textSecondary, fontWeight: SDS.fwBold, height: 1.6),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // 1. Premium 3D Hero Background
+                  Container(
+                    color: const Color(0xFFF7F8FA),
+                    child: Center(
+                      child: Opacity(
+                        opacity: 0.9,
+                        child: Image.asset(
+                          'assets/images/market_hero.png',
+                          width: 280,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // 2. Gradient Overlay for pin text readability
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.05),
+                          Colors.transparent,
+                          Colors.white.withValues(alpha: 0.8),
+                          Colors.white,
+                        ],
+                        stops: const [0.0, 0.4, 0.85, 1.0],
+                      ),
+                    ),
+                  ),
+                  // 3. Floating Glassmorphism Title Card
+                  Positioned(
+                    bottom: 24,
+                    left: 20,
+                    right: 20,
+                    child: SDSFadeIn(
+                      delay: const Duration(milliseconds: 300),
+                      child: SDSGlass(
+                        blur: 24,
+                        opacity: 0.9,
+                        padding: const EdgeInsets.all(24),
+                        radius: 32,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.stars_rounded, color: AppColors.primary, size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '전통의 가치',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: SDS.fwBold,
+                                    color: AppColors.primary,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              marketName,
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: SDS.fwBlack,
+                                color: AppColors.textPrimary,
+                                letterSpacing: -1.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 32),
-
-            // ─── REDESIGNED: Unified Utility Hub (Bento Style) ───
-            _buildBentoUtilityHub(),
-            const SizedBox(height: 48),
-
-            _buildNuclearInfoSection(
-              title: '이용 가이드',
-              items: [
-                _buildNuclearInfoItem(Icons.access_time_filled_rounded, '영업 시간', '매일 09:00 - 23:00'),
-                _buildNuclearInfoItem(Icons.info_rounded, '주요 품목', '마약김밥, 빈대떡, 육회, 한복'),
-                _buildNuclearInfoItem(Icons.payment_rounded, '결제 수단', '온누리상품권, 제로페이 가능'),
-              ],
-            ),
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBentoUtilityHub() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(SDS.radiusL),
-        boxShadow: SDS.shadowPremium,
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Row(
-              children: [
-                const SizedBox(width: 8),
-                const Icon(Icons.stars_rounded, color: gwangjangRed, size: 20),
-                const SizedBox(width: 10),
-                const Text(
-                  '시장 핵심 기능',
-                  style: TextStyle(fontSize: 14, fontWeight: SDS.fwBlack, color: AppColors.textPrimary),
-                ),
-              ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFF2F4F6)),
-          Row(
-            children: [
-              _buildBentoTile(Icons.phone_in_talk_rounded, '전화하기', isFirst: true),
-              _buildBentoTile(Icons.map_rounded, '위치보기'),
-              _buildBentoTile(Icons.share_rounded, '공유하기', isLast: true),
-            ],
+
+          // ── Market Content ──────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 32),
+                  SDSFadeIn(
+                    delay: const Duration(milliseconds: 500),
+                    child: const Text(
+                      '서울 관악구의 대표 전통시장인\n신원시장은 도림천 주변에 늘어서 있던\n노점들로부터 그 역사가 시작되었습니다.\n\n현재는 신림역과 인접한 편리한 교통과 도림천의 자연이 어우러진 현대적인 수변 시장으로 탈바꿈하였으며, 상인들의 넉넉한 인심과 정을 그대로 간직하고 있는 소중한 공간입니다.',
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: AppColors.textSecondary,
+                        height: 1.6,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  _buildDetailSection(
+                    '위치 및 교통',
+                    '서울 관악구 신림동 1587-39\n지하철 2호선 신림역 도보 5분 거리',
+                  ),
+                  SDSFadeIn(
+                    delay: const Duration(milliseconds: 600),
+                    child: _buildUltimateUtilityGrid(),
+                  ),
+                  const SizedBox(height: 56),
+
+                  // ── Immersive Guide Sections ──────────────────
+                  SDSFadeIn(
+                    delay: const Duration(milliseconds: 700),
+                    child: _buildPremiumInfoSection(
+                      title: '방문 가이드',
+                      items: [
+                        _buildPremiumInfoItem(Icons.access_time_filled_rounded, '영업 시간', '매일 09:00 - 23:00'),
+                        _buildPremiumInfoItem(Icons.shopping_bag_rounded, '주요 품목', '먹거리, 빈대떡, 육회, 한복'),
+                        _buildPremiumInfoItem(Icons.credit_card_rounded, '결제 수단', '온누리상품권, 제로페이 가능'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 80),
+                ],
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBentoTile(IconData icon, String label, {bool isFirst = false, bool isLast = false}) {
-    return Expanded(
-      child: ShrinkableButton(
-        onTap: () {},
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 24),
-          decoration: BoxDecoration(
-            border: Border(
-              right: isLast ? BorderSide.none : const BorderSide(color: Color(0xFFF2F4F6), width: 1),
-            ),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: gwangjangRed, size: 24),
-              const SizedBox(height: 12),
-              Text(
-                '\u00A0' + label,
-                style: const TextStyle(fontSize: 13, fontWeight: SDS.fwBold, color: AppColors.textPrimary, letterSpacing: 0.5),
-              ),
-            ],
-          ),
-        ),
-      ),
+  Widget _buildUltimateUtilityGrid() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildCircularAction(Icons.phone_rounded, '전화하기'),
+        _buildCircularAction(Icons.location_on_rounded, '위치보기'),
+        _buildCircularAction(Icons.share_rounded, '공유하기'),
+        _buildCircularAction(Icons.bookmark_rounded, '저장하기'),
+      ],
     );
   }
 
-  Widget _buildNuclearInfoSection({required String title, required List<Widget> items}) {
+  Widget _buildCircularAction(IconData icon, String label) {
+    return Column(
+      children: [
+        ShrinkableButton(
+          onTap: () {},
+          child: Container(
+            width: 68,
+            height: 68,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF7F8FA),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+            ),
+            child: Icon(icon, color: AppColors.textPrimary, size: 28),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: SDS.fwBold,
+            color: AppColors.textSecondary,
+            letterSpacing: -0.5,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPremiumInfoSection({required String title, required List<Widget> items}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 20.0),
-          child: Text('\u00A0' + title, style: const TextStyle(fontSize: 18, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: 0.8)),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: SDS.fwBlack,
+            color: AppColors.textPrimary,
+            letterSpacing: -0.6,
+          ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color(0xFFF7F8FA),
             borderRadius: BorderRadius.circular(SDS.radiusL),
-            boxShadow: SDS.shadowPremium,
           ),
           child: Column(children: items),
         ),
@@ -160,34 +236,74 @@ class MarketInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNuclearInfoItem(IconData icon, String label, String value) {
+  Widget _buildPremiumInfoItem(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: gwangjangRed.withValues(alpha: 0.6)),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 18, color: AppColors.primary),
+          ),
           const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '\u00A0' + label, 
-                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: SDS.fwBold, letterSpacing: 0.5),
-                  overflow: TextOverflow.visible,
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                    fontWeight: SDS.fwBold,
+                  ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
-                  '\u00A0' + value, 
-                  style: const TextStyle(fontSize: 15, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: 0.5),
-                  overflow: TextOverflow.visible,
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: SDS.fwBlack,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.4,
+                  ),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textTertiary),
         ],
       ),
+    );
+  }
+
+  Widget _buildDetailSection(String title, String content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 12),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: SDS.fwBlack,
+            color: AppColors.textPrimary,
+            letterSpacing: -0.5,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          content,
+          style: const TextStyle(
+            fontSize: 15,
+            color: AppColors.textSecondary,
+            height: 1.5,
+          ),
+        ),
+      ],
     );
   }
 }

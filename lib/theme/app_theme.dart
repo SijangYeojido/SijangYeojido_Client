@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
+import 'sijang_design_system.dart';
 
 class AppTheme {
   static ThemeData get lightTheme {
@@ -131,7 +132,7 @@ class AppTheme {
         color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(SDS.radiusM),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -161,7 +162,7 @@ class AppTheme {
           foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(SDS.radiusM),
           ),
           textStyle: GoogleFonts.notoSansKr(
             fontSize: 16,

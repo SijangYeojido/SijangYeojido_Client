@@ -27,11 +27,11 @@ class MockData {
 
   static const List<MarketInfo> markets = [
     MarketInfo(
-      name: '광장시장',
-      description: '100년 전통, 빈대떡과 육회의 성지',
-      address: '서울 종로구 창경궁로 88',
-      storeCount: 5240,
-      highlights: ['먹거리명소', '빈대떡', '마약김밥'],
+      name: '신원시장',
+      description: '도림천 노점상에서 시작된 50년 역사,\n신림역 인근의 활기찬 수변 시장',
+      address: '서울 관악구 신림동 1587-39',
+      storeCount: 220,
+      highlights: ['도림천', '신림역', '수변시장'],
       accentColor: Color(0xFFF04452),
       isAvailable: true,
     ),
@@ -65,13 +65,16 @@ class MockData {
   static final List<Store> stores = [
     Store(
       id: 's1',
-      name: '우리상회 건어물 씨앗 비료',
+      name: '우리상회 건어물',
       unitNumber: 'A-2',
       zoneId: 'A',
       category: '건어물',
       status: StoreStatus.open,
-      paymentMethods: [PaymentMethod.cash, PaymentMethod.card],
-      items: const [],
+      paymentMethods: [PaymentMethod.cash, PaymentMethod.card, PaymentMethod.zeroPay],
+      items: [
+        StoreItem(name: '프리미엄 멸치 (500g)', price: 15000, imageUrl: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=400'),
+        StoreItem(name: '반건조 오징어 (5미)', price: 22000, imageUrl: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&q=80&w=400'),
+      ],
       lastUpdated: DateTime(2026, 3, 16),
       infoSource: '방문자 제보',
       mapX: 0.150,
@@ -83,9 +86,12 @@ class MockData {
       unitNumber: 'A-3',
       zoneId: 'A',
       category: '먹거리',
-      status: StoreStatus.closed,
-      paymentMethods: [PaymentMethod.cash, PaymentMethod.card],
-      items: const [],
+      status: StoreStatus.open,
+      paymentMethods: [PaymentMethod.cash, PaymentMethod.kakao],
+      items: [
+        StoreItem(name: '꿀호떡', price: 1500, imageUrl: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc2fe0a?auto=format&fit=crop&q=80&w=400'),
+        StoreItem(name: '씨앗호떡', price: 2000, imageUrl: 'https://images.unsplash.com/photo-1582928503102-3c1d9b3d2238?auto=format&fit=crop&q=80&w=400'),
+      ],
       lastUpdated: DateTime(2026, 3, 16),
       infoSource: '방문자 제보',
       mapX: 0.400,

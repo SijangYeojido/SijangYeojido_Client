@@ -1,14 +1,22 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
 
 /// SDS (Sijang Design System) v8
 /// 
 /// 앱 전체의 일관된 고품격 미학을 유지하기 위한 통합 디자인 시스템 토큰입니다.
 class SDS {
+  // --- Blur Filters (V8 Cinematic) ---
+  static final blurSubtle = ImageFilter.blur(sigmaX: 10, sigmaY: 10);
+  static final blurNormal = ImageFilter.blur(sigmaX: 20, sigmaY: 20);
+  static final blurHeavy = ImageFilter.blur(sigmaX: 40, sigmaY: 40);
+
+  // --- Border Radius ---
   // --- Border Radius ---
   static const double radiusS = 12.0;
   static const double radiusM = 20.0;
-  static const double radiusL = 34.0;
-  static const double radiusXL = 48.0;
+  static const double radiusL = 28.0; // Optimized for Premium Cards
+  static const double radiusXL = 40.0;
   static const double radiusEpic = 64.0;
   static const double radiusCapsule = 100.0;
 
@@ -178,6 +186,8 @@ class SDS {
               children: [
                 Text(
                   title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: fwBlack,
@@ -189,6 +199,8 @@ class SDS {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: fwBold,
@@ -272,7 +284,7 @@ class SDS {
     Color? color,
     double? width,
   }) {
-    final bgColor = color ?? (isPrimary ? const Color(0xFF3182F6) : const Color(0xFFF2F4F6));
+    final bgColor = color ?? (isPrimary ? AppColors.primary : const Color(0xFFF2F4F6));
     final textColor = isPrimary ? Colors.white : const Color(0xFF4E5968);
 
     return GestureDetector(
@@ -281,7 +293,8 @@ class SDS {
         width: width,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
         decoration: BoxDecoration(
-          color: bgColor,
+          color: color ?? (isPrimary ? null : const Color(0xFFF2F4F6)),
+          gradient: isPrimary ? AppColors.primaryGradient : null,
           borderRadius: BorderRadius.circular(radiusM),
           boxShadow: isPrimary ? [
             BoxShadow(
