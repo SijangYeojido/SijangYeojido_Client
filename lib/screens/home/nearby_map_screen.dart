@@ -36,6 +36,8 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
       isAvailable: MockData.markets[0].isAvailable,
       highlights: MockData.markets[0].highlights,
       accentColor: MockData.markets[0].accentColor,
+      hasFlashDeal: true,
+      isLiveStory: true,
     ),
     _MarketPin(
       name: MockData.markets[1].name,
@@ -62,6 +64,7 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
       isAvailable: MockData.markets[2].isAvailable,
       highlights: MockData.markets[2].highlights,
       accentColor: MockData.markets[2].accentColor,
+      hasFlashDeal: true,
     ),
   ];
 
@@ -139,11 +142,11 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
                           size: 24, color: AppColors.primary),
                       const SizedBox(width: 16),
                       Text(
-                        '어느 시장으로 갈까요?',
+                        '어느 시장으로 안내해 드릴까요?',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textTertiary,
+                          fontWeight: SDS.fwBlack,
+                          color: AppColors.textPrimary,
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -213,7 +216,7 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
             curve: Curves.easeOutBack,
             left: 16,
             right: 16,
-            bottom: _selectedMarket != null ? (20 + bottomPadding) : -400,
+            bottom: _selectedMarket != null ? (100 + bottomPadding) : -400,
             child: _selectedMarket == null
                 ? const SizedBox.shrink()
                 : _MarketDetailCard(
@@ -491,6 +494,38 @@ class _NearbyMapPainter extends CustomPainter {
         Paint()..color = pinColor,
       );
 
+      // --- V8 Dynamic Indicators (⚡ or 📸) ---
+      if (market.hasFlashDeal || market.isLiveStory) {
+        final indicatorX = cx + (isSelected ? 18 : 14);
+        final indicatorY = cy - (isSelected ? 18 : 14);
+        
+        // Glow effect
+        canvas.drawCircle(
+          Offset(indicatorX, indicatorY),
+          12,
+          Paint()
+            ..color = const Color(0xFFF04452).withValues(alpha: 0.2 + 0.1 * sin(pulseValue.value * pi))
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+        );
+
+        final indicatorText = TextSpan(
+          text: market.hasFlashDeal ? '⚡' : '📸',
+          style: const TextStyle(fontSize: 10),
+        );
+        final indicatorTp = TextPainter(
+          text: indicatorText,
+          textDirection: TextDirection.ltr,
+        )..layout();
+        
+        canvas.drawCircle(
+          Offset(indicatorX, indicatorY),
+          9,
+          Paint()..color = const Color(0xFFF04452),
+        );
+        
+        indicatorTp.paint(canvas, Offset(indicatorX - indicatorTp.width/2, indicatorY - indicatorTp.height/2));
+      }
+
       // Pin icon (storefront)
       final iconText = TextSpan(
         text: '🏪',
@@ -550,15 +585,9 @@ class _MarketDetailCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 40,
-            offset: const Offset(0, -10),
-          ),
-        ],
-        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(SDS.radiusXL),
+        boxShadow: SDS.shadowPremium,
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
       ),
       child: SafeArea(
         top: false,
@@ -571,11 +600,11 @@ class _MarketDetailCard extends StatelessWidget {
               // Handle bar
               Center(
                 child: Container(
-                  width: 36,
+                  width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.border,
-                    borderRadius: BorderRadius.circular(100),
+                    color: const Color(0xFFE5E8EB),
+                    borderRadius: BorderRadius.circular(SDS.radiusCapsule),
                   ),
                 ),
               ),
@@ -592,8 +621,9 @@ class _MarketDetailCard extends StatelessWidget {
                           children: [
                             Text(
                               market.name,
-                              style: textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w900,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: SDS.fwBlack,
                                 letterSpacing: -0.5,
                                 color: AppColors.textPrimary,
                               ),
@@ -619,6 +649,31 @@ class _MarketDetailCard extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            if (market.hasFlashDeal) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF04452).withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(100),
+                                  border: Border.all(color: const Color(0xFFF04452).withValues(alpha: 0.3)),
+                                ),
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.bolt_rounded, size: 12, color: Color(0xFFF04452)),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'LIVE DEAL',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFFF04452),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                         const SizedBox(height: 4),
@@ -774,10 +829,10 @@ class _MarketDetailCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            market.isAvailable ? '입장하기' : '준비 중이에요',
+                            market.isAvailable ? '이 시장 구경할까요?' : '아직 준비 중이에요',
                             style: TextStyle(
                               fontSize: 17,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: SDS.fwBlack,
                               letterSpacing: -0.5,
                               color: market.isAvailable ? Colors.white : AppColors.textTertiary,
                             ),
@@ -852,6 +907,8 @@ class _MarketPin {
   final bool isAvailable;
   final List<String> highlights;
   final Color accentColor;
+  final bool hasFlashDeal;
+  final bool isLiveStory;
 
   const _MarketPin({
     required this.name,
@@ -865,5 +922,7 @@ class _MarketPin {
     required this.isAvailable,
     required this.highlights,
     required this.accentColor,
+    this.hasFlashDeal = false,
+    this.isLiveStory = false,
   });
 }

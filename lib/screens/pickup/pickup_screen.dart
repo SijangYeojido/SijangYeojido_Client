@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/sijang_design_system.dart';
 import '../../widgets/app_ui.dart';
 
 class PickupScreen extends StatefulWidget {
@@ -51,40 +52,70 @@ class _PickupScreenState extends State<PickupScreen> {
   void _onCancel() {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          '예약 취소',
-          style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(SDS.radiusL)),
+        backgroundColor: AppColors.surface,
+        child: Padding(
+          padding: EdgeInsets.all(28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.danger.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.warning_amber_rounded, color: AppColors.danger, size: 32),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                '잠시만요, 예약 취소할까요?',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: SDS.fwBlack,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                '취소하시면 되돌릴 수 없어요.\n신중하게 결정해 주세요! 😢',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                  fontWeight: SDS.fwBold,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 32),
+              SDS.button(
+                label: '계속 유지할게요',
+                onTap: () => Navigator.pop(context),
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    '결국 취소할게요',
+                    style: TextStyle(
+                      color: AppColors.textTertiary,
+                      fontWeight: SDS.fwBold,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        content: const Text(
-          '예약을 취소하시겠습니까?\n취소 후에는 되돌릴 수 없습니다.',
-          style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              '유지하기',
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: const Text(
-              '취소하기',
-              style: TextStyle(color: AppColors.primary),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -96,26 +127,13 @@ class _PickupScreenState extends State<PickupScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        automaticallyImplyLeading: false,
-        title: Text(
-          '픽업 코드',
-          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: AppColors.border),
-        ),
-      ),
       body: Column(
         children: [
+          SDS.topBar(
+            context: context,
+            title: '픽업 준비',
+            subtitle: isExpired ? '시간이 지나 아쉽게 만료되었어요 😢' : '상인들의 정성이 기다리고 있어요! 🎁',
+          ),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -165,20 +183,22 @@ class _PickupScreenState extends State<PickupScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isExpired ? '픽업 코드가 만료되었습니다' : '픽업 준비 완료',
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
+                          isExpired ? '픽업 코드가 만료되었어요' : '시장 상품 픽업 준비 완료!',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: SDS.fwBlack,
                             color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           isExpired
-                              ? '예약이 만료되어 사용할 수 없어요'
-                              : '점포에서 코드를 보여주면 픽업이 완료돼요',
-                          style: textTheme.bodySmall?.copyWith(
+                              ? '걱정 마세요, 다음에 다시 예약해 주세요'
+                              : '점포에 아래 코드를 보여드리면 끝이에요!',
+                          style: TextStyle(
+                            fontSize: 13,
                             color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: SDS.fwBold,
                           ),
                         ),
                       ],
@@ -249,35 +269,27 @@ class _PickupScreenState extends State<PickupScreen> {
             ),
             const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
               decoration: BoxDecoration(
                 color: isExpired ? AppColors.divider : AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(SDS.radiusL),
+                boxShadow: isExpired ? null : SDS.shadowPremium,
                 border: Border.all(
                   color: isExpired
                       ? AppColors.border
-                      : AppColors.primary.withValues(alpha: 0.4),
-                  width: 2,
+                      : AppColors.primary.withValues(alpha: 0.3),
+                  width: 1.5,
                 ),
-                boxShadow: isExpired
-                    ? null
-                    : [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          blurRadius: 16,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
               ),
               child: Text(
                 widget.reservation.pickupCode,
                 style: TextStyle(
-                  fontSize: 52,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 58,
+                  fontWeight: SDS.fwBlack,
                   color: isExpired
                       ? AppColors.textTertiary
                       : AppColors.primary,
-                  letterSpacing: 12,
+                  letterSpacing: 10,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
@@ -378,9 +390,9 @@ class _PickupScreenState extends State<PickupScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                AppPrimaryButton(
-                  label: isExpired ? '닫기' : '픽업 완료했어요',
-                  onPressed: () => Navigator.pop(context),
+                SDS.button(
+                  label: isExpired ? '닫을게요' : '잘 받아왔어요!',
+                  onTap: () => Navigator.pop(context),
                 ),
                 const SizedBox(height: 10),
                 GestureDetector(

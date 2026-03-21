@@ -26,9 +26,14 @@ class StoreItem {
   final String name;
   final String? unitNumber;
   final int? price;
+  final String? imageUrl;
 
-  const StoreItem({required this.name,
-    this.unitNumber, this.price});
+  const StoreItem({
+    required this.name,
+    this.unitNumber,
+    this.price,
+    this.imageUrl,
+  });
 }
 
 class Store {
@@ -63,7 +68,7 @@ class Store {
     required this.mapY,
     this.freshness,
     this.inventoryStatus,
-    this.marketName = '광장시장',
+    this.marketName = '신원시장',
   });
 
 
@@ -215,4 +220,60 @@ extension POITypeInfo on POIType {
         return const Color(0xFF7C3AED);
     }
   }
+}
+
+class StoreStory {
+  final String id;
+  final String storeId;
+  final String imageUrl;
+  final bool isLive;
+  final DateTime createdAt;
+
+  const StoreStory({
+    required this.id,
+    required this.storeId,
+    required this.imageUrl,
+    this.isLive = false,
+    required this.createdAt,
+  });
+}
+
+class FlashDeal {
+  final String id;
+  final String storeId;
+  final String title;
+  final String discount;
+  final DateTime expiresAt;
+
+  const FlashDeal({
+    required this.id,
+    required this.storeId,
+    required this.title,
+    required this.discount,
+    required this.expiresAt,
+  });
+
+  bool get isExpired => DateTime.now().isAfter(expiresAt);
+}
+
+class StoreReview {
+  final String id;
+  final String storeId;
+  final String userName;
+  final String userAvatar;
+  final String content;
+  final double rating;
+  final List<String> images;
+  final DateTime createdAt;
+
+  const StoreReview({
+    required this.id,
+    required this.storeId,
+    required this.userName,
+    required this.userAvatar,
+    required this.content,
+    required this.rating,
+    this.images = const [],
+    required this.createdAt,
+  });
 }

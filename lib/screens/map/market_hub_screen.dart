@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../models/models.dart';
 import '../../data/mock_data.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/shrinkable_button.dart';
-import '../../widgets/premium_placeholder.dart';
-import '../../widgets/app_ui.dart';
 import 'store_detail_screen.dart';
-import 'market_map_screen.dart'; // To open the map as an optional quick-action
+import '../market/market_info_screen.dart';
+import '../market/market_map_simple_screen.dart';
+import '../market/market_parking_screen.dart';
+import '../market/market_coupon_screen.dart';
+import '../../widgets/sds_widgets.dart';
 
 class MarketHubScreen extends StatefulWidget {
   final String marketName;
-  const MarketHubScreen({super.key, this.marketName = '광장시장'});
+  const MarketHubScreen({super.key, this.marketName = '신원시장'});
 
   @override
   State<MarketHubScreen> createState() => _MarketHubScreenState();
@@ -31,242 +32,293 @@ class _MarketHubScreenState extends State<MarketHubScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final market = MockData.getMarket(widget.marketName);
+
+    
     return Scaffold(
       backgroundColor: AppColors.background,
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
-          // ── 1. Hero Header ──────────────────────────────────────────
+          // ── 1. Immersive Cinematic Hero Header ─────────────────────
           SliverAppBar(
-            backgroundColor: AppColors.surface,
-            expandedHeight: 200,
+            expandedHeight: 380,
             pinned: true,
+            stretch: true,
             elevation: 0,
-            scrolledUnderElevation: 0,
-            leading: Center(
-              child: ShrinkableButton(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+            backgroundColor: market.accentColor,
+            leading: ShrinkableButton(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
                 ),
+                child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
               ),
             ),
-            flexibleSpace: FlexibleSpaceBar(
-              stretchModes: const [StretchMode.zoomBackground],
-              expandedTitleScale: 1.2,
-              centerTitle: true,
-              titlePadding: const EdgeInsets.only(bottom: 16),
-              title: LayoutBuilder(
-                builder: (context, constraints) {
-                  // Simple logic to show title only when collapsed or partially collapsed
-                  final top = constraints.biggest.height;
-                  final isCollapsed = top < 100;
-                  return AnimatedOpacity(
-                    duration: const Duration(milliseconds: 200),
-                    opacity: isCollapsed ? 1.0 : 0.0,
-                    child: Text(
-                      widget.marketName,
-                      style: textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  );
-                },
+            actions: [
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: _HeroActionChip(
+                    label: '영업 중',
+                    color: AppColors.success,
+                  ),
+                ),
               ),
-              background: Hero(
-                tag: 'market_${widget.marketName}',
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Container(
+              const SizedBox(width: 16),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Primary Cinematic Gradient Area
+                  Positioned.fill(
+                    child: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                           colors: [
                             market.accentColor,
-                            market.accentColor.withValues(alpha: 0.8),
+                            market.accentColor.withValues(alpha: 0.85),
+                            market.accentColor.withValues(alpha: 0.4),
+                            AppColors.background,
                           ],
+                          stops: const [0.0, 0.35, 0.65, 1.0],
                         ),
                       ),
-                      child: const Center(
-                        child: Icon(Icons.storefront_rounded, size: 80, color: Colors.white24),
-                      ),
                     ),
-                    // Bottom title for Expanded state
-                    Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                  ),
+                  // Traditional Pattern (Subtle & Elegant)
+                  Positioned.fill(
+                    bottom: 100,
+                    child: Opacity(
+                      opacity: 0.08,
+                      child: CustomPaint(painter: _TraditionalPatternPainter()),
+                    ),
+                  ),
+                  // Content Overlay
+                  Positioned(
+                    top: 130,
+                    left: 24,
+                    right: 24,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SDSFadeIn(
+                          delay: const Duration(milliseconds: 200),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(SDS.radiusCapsule),
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(100),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Text('📍', style: TextStyle(fontSize: 14)),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        '핫플레이스',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w900,
-                                          color: market.accentColor,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                Icon(Icons.stars_rounded, size: 14, color: Colors.white.withValues(alpha: 0.9)),
                                 const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                  decoration: SDS.glassDecoration(opacity: 0.2, blur: 8),
-                                  child: Text(
-                                    '${MockData.stores.where((s) => s.status == StoreStatus.open).length}곳 영업 중',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                    ),
+                                const Text(
+                                  '대한민국 대표 전통시장',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: SDS.fwBold,
+                                    letterSpacing: 1.2,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              widget.marketName,
-                              style: textTheme.displayLarge?.copyWith(
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                                letterSpacing: -1.0,
-                                height: 1.1,
-                              ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SDSFadeIn(
+                          delay: const Duration(milliseconds: 400),
+                          child: Text(
+                            widget.marketName,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 56,
+                              fontWeight: SDS.fwBlack,
+                              letterSpacing: SDS.lsTight,
+                              height: 1.0,
+                              shadows: [
+                                Shadow(color: Colors.black12, blurRadius: 30, offset: Offset(0, 15)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // ── Integrated Action Palette (Glassmorphic Floating Bar) ──
+                  Positioned(
+                    bottom: 24,
+                    left: 20,
+                    right: 20,
+                    child: SDSFadeIn(
+                      delay: const Duration(milliseconds: 600),
+                      child: SDSGlass(
+                        blur: 32,
+                        opacity: 0.9,
+                        radius: 32,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _CircularActionButton(
+                              icon: Icons.map_rounded,
+                              label: '시장 지도',
+                              color: const Color(0xFF00C896), // Shinwon/Toss Green
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MarketMapSimpleScreen(marketName: widget.marketName),
+                                  ),
+                                );
+                              },
+                            ),
+                            _CircularActionButton(
+                              icon: Icons.local_parking_rounded,
+                              label: '주차 안내',
+                              color: const Color(0xFF3182F6), // Toss Blue
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MarketParkingScreen(marketName: widget.marketName),
+                                  ),
+                                );
+                              },
+                            ),
+                            _CircularActionButton(
+                              icon: Icons.local_offer_rounded,
+                              label: '쿠폰 받기',
+                              color: const Color(0xFFFF5F2E), // Premium Orange
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MarketCouponScreen(marketName: widget.marketName),
+                                  ),
+                                );
+                              },
+                            ),
+                            _CircularActionButton(
+                              icon: Icons.info_outline_rounded,
+                              label: '시장 정보',
+                              color: const Color(0xFF191F28), // Deep Graphite
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MarketInfoScreen(marketName: widget.marketName),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // ── 2. Premium Insight Card Section ──────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              child: SDSFadeIn(
+                delay: const Duration(milliseconds: 800),
+                child: Container(
+                  padding: const EdgeInsets.all(SDS.space24),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(SDS.radiusL),
+                    boxShadow: SDS.shadowSoft,
+                    border: Border.all(color: AppColors.divider.withValues(alpha: 0.5)),
+                  ),
+                  child: Column(
+                    children: [
+                      // Address Bar
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: market.accentColor.withValues(alpha: 0.08),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.near_me_rounded, size: 16, color: market.accentColor),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  market.address,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: SDS.fwBold,
+                                    color: AppColors.textPrimary,
+                                    letterSpacing: SDS.lsTight,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '현재 위치에서 1.2km', // Mock distance
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: SDS.fwMedium,
+                                    color: AppColors.textTertiary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.chevron_right_rounded, size: 24, color: AppColors.textTertiary.withValues(alpha: 0.5)),
+                        ],
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: SDS.space24),
+                        child: Divider(color: AppColors.divider, height: 1, thickness: 1),
+                      ),
+                      // Stats Grid
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(child: _StatItem(label: '총 점포 수', value: '${MockData.stores.length}', icon: Icons.storefront_rounded)),
+                          Container(width: 1, height: 32, color: AppColors.divider),
+                          Expanded(
+                            child: _StatItem(
+                              label: '방문객 점수', 
+                              value: '4.8', 
+                              icon: Icons.star_rounded, 
+                              color: AppColors.warning
+                            ),
+                          ),
+                          Container(width: 1, height: 32, color: AppColors.divider),
+                          Expanded(child: _StatItem(label: '인기 품목', value: '육회, 빈대떡', icon: Icons.auto_awesome_rounded, color: AppColors.accent)),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
 
-          // ── 2. Info / Quick Action Panel ─────────────────────────
-          SliverToBoxAdapter(
-            child: Container(
-              color: AppColors.surface,
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AppSectionHeader(
-                    title: widget.marketName,
-                    subtitle: '서울 종로구 창경궁로 88',
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-                    trailing: ShrinkableButton(
-                      onTap: () {},
-                      child: Text(
-                        '정보',
-                        style: textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _QuickActionButton(
-                          icon: Icons.map_rounded,
-                          label: '실내 지도 보기',
-                          color: market.accentColor,
-                          onTap: () {
-                            // Opens the old map view as a modal/tool
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => MarketMapScreen(marketName: widget.marketName),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _QuickActionButton(
-                          icon: Icons.local_parking_rounded,
-                          label: '주차장 안내',
-                          color: AppColors.textPrimary,
-                          onTap: () {},
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _QuickActionButton(
-                          icon: Icons.local_offer_rounded,
-                          label: '쿠폰함',
-                          color: AppColors.orange,
-                          onTap: () {},
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Divider – seamless transition
-          SliverToBoxAdapter(
-            child: Container(height: 8, color: AppColors.background),
-          ),
-
-          // ── Summary Stats ──────────────────────────────────
-          SliverToBoxAdapter(
-            child: Container(
-              color: AppColors.surface,
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-              child: Row(
-                children: [
-                  _MiniInfoChip(
-                    icon: Icons.storefront_rounded,
-                    label: '전체 ${MockData.stores.length}',
-                    color: AppColors.textSecondary,
-                  ),
-                  const SizedBox(width: 8),
-                  _MiniInfoChip(
-                    icon: Icons.circle,
-                    iconSize: 7,
-                    label: '영업 중 ${MockData.stores.where((s) => s.status == StoreStatus.open).length}',
-                    color: AppColors.success,
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // ── 3. Sticky Categories ─────────────────────────────────
+          // ── 3. Sticky Category Selector ─────────────────────────
           SliverPersistentHeader(
             pinned: true,
             delegate: _StickyCategoryDelegate(
@@ -276,17 +328,19 @@ class _MarketHubScreenState extends State<MarketHubScreen> {
             ),
           ),
 
-          // ── 4. Rich Store Feed ───────────────────────────────────
+          // ── 4. Premium Store Feed ────────────────────────────────
           SliverPadding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final store = _filteredStores[index];
-                  // If a search logic was added, we'd use it here. 
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: _StoreFeedCard(store: store),
+                  return SDSFadeIn(
+                    delay: Duration(milliseconds: 100 * (index % 5)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: _StoreFeedCard(store: store),
+                    ),
                   );
                 },
                 childCount: _filteredStores.length,
@@ -297,6 +351,159 @@ class _MarketHubScreenState extends State<MarketHubScreen> {
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
+    );
+  }
+}
+
+// ── Supporting Components ──────────────────────────────────────────
+
+class _TraditionalPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+
+    const spacing = 48.0;
+    for (double x = 0; x < size.width + spacing; x += spacing) {
+      for (double y = 0; y < size.height + spacing; y += spacing) {
+        final offset = Offset(x + (y / spacing % 2 == 0 ? 0 : spacing / 2), y);
+        canvas.drawCircle(offset, 12, paint);
+        canvas.drawCircle(offset, 3, paint..strokeWidth = 0.5);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _HeroActionChip extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _HeroActionChip({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(100),
+        boxShadow: SDS.shadowSoft,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, fontWeight: SDS.fwBlack, color: color),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CircularActionButton extends StatelessWidget {
+  final IconData? icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _CircularActionButton({
+    this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ShrinkableButton(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(22),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04), // Neutral soft shadow
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Icon(icon, size: 28, color: color),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: SDS.fwBold,
+              color: AppColors.textPrimary,
+              letterSpacing: -0.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color? color;
+
+  const _StatItem({
+    required this.label,
+    required this.value,
+    required this.icon,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Icon(icon, size: 22, color: color ?? AppColors.textTertiary),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: SDS.fwBlack,
+            color: AppColors.textPrimary,
+            letterSpacing: -0.5,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: SDS.fwMedium,
+            color: AppColors.textTertiary,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -314,50 +521,38 @@ class _StickyCategoryDelegate extends SliverPersistentHeaderDelegate {
   });
 
   @override
-  double get minExtent => 60.0;
+  double get minExtent => 140.0; // Increased to 140 to prevent internal overflows
   @override
-  double get maxExtent => 60.0;
+  double get maxExtent => 140.0;
+
+  String _assetForCategory(String category) {
+    if (category == '전체') return 'assets/images/market_building.png';
+    if (category == '먹거리') return 'assets/images/category_meal_3d.png';
+    if (category == '정육') return 'assets/images/category_meat_3d_cute.png';
+    if (category == '수산물') return 'assets/images/category_fish_3d_cute.png';
+    if (category == '과일/채소') return 'assets/images/category_veggie_3d_cute.png';
+    if (category == '건어물') return 'assets/images/category_dried_fish_3d.png';
+    return 'assets/images/category_etc_3d.png';
+  }
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      color: AppColors.surface,
+      color: AppColors.background.withValues(alpha: 0.98),
       alignment: Alignment.centerLeft,
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        separatorBuilder: (context, index) => const SizedBox(width: 0), // SDSCategoryItem handles padding
         itemBuilder: (context, index) {
           final cat = categories[index];
           final isSelected = cat == selectedCategory;
-          return ShrinkableButton(
+          return SDSCategoryItem(
+            label: cat,
+            assetPath: _assetForCategory(cat),
+            isSelected: isSelected,
             onTap: () => onSelected(cat),
-            shrinkScale: 0.92,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.textPrimary : AppColors.surface,
-                borderRadius: BorderRadius.circular(100),
-                boxShadow: [
-                  if (!isSelected)
-                    const BoxShadow(
-                      color: AppColors.cardShadowLight,
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
-                    ),
-                ],
-              ),
-              child: Text(
-                cat,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                  color: isSelected ? Colors.white : AppColors.textSecondary,
-                ),
-              ),
-            ),
           );
         },
       ),
@@ -381,162 +576,126 @@ class _StoreFeedCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => StoreDetailScreen(store: store),
-          ),
+          MaterialPageRoute(builder: (_) => StoreDetailScreen(store: store)),
         );
       },
-      shrinkScale: 0.98, // Subtler shrink for large cards
       child: Container(
-        margin: const EdgeInsets.only(bottom: SDS.spaceM),
+        padding: const EdgeInsets.all(SDS.space18),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(SDS.radiusM),
-          boxShadow: SDS.shadowSoft,
-          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+          borderRadius: BorderRadius.circular(SDS.radiusL),
+          boxShadow: SDS.shadowPremium,
+          border: Border.all(color: AppColors.divider.withValues(alpha: 0.3)),
         ),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
+            Hero(
+              tag: 'store_image_${store.id}',
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(SDS.radiusM),
+                  boxShadow: SDS.shadowSoft,
+                ),
+                child: PremiumPlaceholder(
+                  category: store.category,
+                  width: 84,
+                  height: 84,
+                  borderRadius: SDS.radiusM,
+                ),
+              ),
+            ),
+            const SizedBox(width: 18),
+            Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Icon/Image
-                  Hero(
-                    tag: 'store_image_${store.id}',
-                    child: PremiumPlaceholder(
-                      category: store.category,
-                      width: 64,
-                      height: 64,
-                      borderRadius: 16,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          store.name,
+                          style: const TextStyle(
+                            fontWeight: SDS.fwBlack, 
+                            fontSize: 19, 
+                            letterSpacing: SDS.lsTight,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      _SmallStatusChip(status: store.status),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  
-                  // Content
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                store.name,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.textPrimary,
-                                  letterSpacing: -0.3,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: store.status.bgColor,
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: Text(
-                                store.status.label,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: store.status.color,
-                                ),
-                              ),
-                            ),
-                          ],
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.divider.withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textTertiary),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${store.zoneId}구역 ${store.unitNumber ?? ""}호',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text('·', style: TextStyle(color: AppColors.textTertiary)),
-                            const SizedBox(width: 8),
-                            Text(
-                              store.category,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          '${store.zoneId}구역',
+                          style: const TextStyle(fontSize: 11, fontWeight: SDS.fwBold, color: AppColors.textSecondary),
                         ),
-                        const SizedBox(height: 10),
-                        // Items preview
-                        if (store.items.isNotEmpty)
-                          ...store.items.take(2).map((item) => Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 4,
-                                  height: 4,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.textTertiary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    item.name,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textSecondary,
-                                    ),
-                                  ),
-                                ),
-                                if (item.price != null)
-                                  Text(
-                                    '${NumberFormat('#,###', 'ko_KR').format(item.price)}원',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w800,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          )),
-                        const SizedBox(height: 8),
-                        // Payment methods as tags
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 6,
-                          children: store.paymentMethods.map((pm) => Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: AppColors.background,
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: Text(
-                              pm.label,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          )).toList(),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        store.category,
+                        style: const TextStyle(fontSize: 12, fontWeight: SDS.fwMedium, color: AppColors.textTertiary),
+                      ),
+                      const Spacer(),
+                      if (store.freshness != null) ...[
+                        Icon(Icons.auto_awesome_rounded, size: 12, color: AppColors.accent),
+                        const SizedBox(width: 4),
+                        Text(
+                          '신선도 ${store.freshness}%',
+                          style: TextStyle(fontSize: 11, fontWeight: SDS.fwBold, color: AppColors.accent),
                         ),
                       ],
-                    ),
+                    ],
                   ),
+                  const SizedBox(height: 14),
+                  if (store.items.isNotEmpty || store.inventoryStatus != null)
+                    Row(
+                      children: [
+                        if (store.items.isNotEmpty)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(Icons.shopping_bag_outlined, size: 14, color: AppColors.textTertiary),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    store.items.first.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 13, fontWeight: SDS.fwMedium, color: AppColors.textSecondary),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (store.inventoryStatus != null)
+                          Container(
+                            margin: const EdgeInsets.only(left: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: store.inventoryStatus == '여유' ? AppColors.success.withValues(alpha: 0.1) : AppColors.danger.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(SDS.radiusCapsule),
+                            ),
+                            child: Text(
+                              store.inventoryStatus!,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: SDS.fwBlack,
+                                color: store.inventoryStatus == '여유' ? AppColors.success : AppColors.danger,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -547,86 +706,26 @@ class _StoreFeedCard extends StatelessWidget {
   }
 }
 
-class _MiniInfoChip extends StatelessWidget {
-  final IconData icon;
-  final double iconSize;
-  final String label;
-  final Color color;
-
-  const _MiniInfoChip({
-    required this.icon,
-    this.iconSize = 12,
-    required this.label,
-    required this.color,
-  });
+class _SmallStatusChip extends StatelessWidget {
+  final StoreStatus status;
+  const _SmallStatusChip({required this.status});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: status.bgColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: status.color.withValues(alpha: 0.2)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: iconSize, color: color),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-class _QuickActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _QuickActionButton({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ShrinkableButton(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(SDS.radiusM),
-          border: Border.all(color: color.withValues(alpha: 0.12), width: 1.5),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 24, color: color),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
-                color: color,
-                letterSpacing: -0.5,
-              ),
-            ),
-          ],
+      child: Text(
+        status == StoreStatus.open ? 'OPEN' : 'CLOSED',
+        style: TextStyle(
+          fontSize: 9,
+          fontWeight: SDS.fwBlack,
+          color: status.color,
+          letterSpacing: 0.5,
         ),
       ),
     );

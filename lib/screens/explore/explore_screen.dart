@@ -1,13 +1,15 @@
+import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../../theme/app_colors.dart';
+import '../../theme/sijang_design_system.dart';
 import '../../models/models.dart';
 import '../../data/mock_data.dart';
 
 import '../map/store_detail_screen.dart';
-import '../../widgets/premium_placeholder.dart';
-import '../../widgets/shrinkable_button.dart';
-import 'search_screen.dart';
+import '../../widgets/sds_widgets.dart';
+
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -18,8 +20,6 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   String _selectedCategory = '전체';
-  final String _searchQuery = '';
-
   final List<String> _categories = ['전체', '먹거리', '생선/해산물', '청과/야채', '포목/직물'];
 
   List<Store> get _filteredStores {
@@ -30,302 +30,315 @@ class _ExploreScreenState extends State<ExploreScreen> {
     return stores;
   }
 
-
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
-          _buildAppBar(),
-          _buildSearchBar(),
-          _buildCategoryChips(),
-
-          _buildStoresSection(),
+          _buildHeroHeader(),
+          _buildFloatingSearchBar(),
+          _buildCategoryFilters(),
+          _buildStoresGrid(),
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
     );
   }
 
-  Widget _buildAppBar() {
+  Widget _buildHeroHeader() {
     return SliverAppBar(
-      floating: true,
-      backgroundColor: AppColors.background,
-      elevation: 0,
-      centerTitle: false,
-      title: const Text(
-        '탐색',
-        style: TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.w800,
-          color: AppColors.textPrimary,
+      expandedHeight: 280,
+      backgroundColor: AppColors.cinematicDeep,
+      collapsedHeight: 0,
+      toolbarHeight: 0,
+      pinned: false,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.file(
+              File('/Users/bagjun-won/.gemini/antigravity/brain/673c5789-358e-4d47-abc7-c24556e62ea4/traditional_market_hero_1773854073585.png'),
+              fit: BoxFit.cover,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.1),
+                    Colors.black.withValues(alpha: 0.7),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 24,
+              bottom: 48,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '전통시장 지도 탐험',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: SDS.fwBlack,
+                      color: Colors.white,
+                      letterSpacing: SDS.lsTight,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.auto_awesome, size: 16, color: AppColors.cinematicGold),
+                      const SizedBox(width: 6),
+                      Text(
+                        '오늘의 가장 신선한 이야기가 기다려요',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: SDS.fwBold,
+                          color: Colors.white.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildFloatingSearchBar() {
+    return SliverPersistentHeader(
+      pinned: true,
+      delegate: _GlassSearchDelegate(),
+    );
+  }
+
+  Widget _buildCategoryFilters() {
     return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        child: ShrinkableButton(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SearchScreen()),
-            );
-          },
-          child: Container(
-            height: 52,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.search_rounded,
-                  color: AppColors.primary,
-                  size: 22,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '점포명, 품목으로 검색',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: AppColors.textTertiary,
-                    fontWeight: FontWeight.w600,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: _categories.map((cat) {
+              final isSelected = _selectedCategory == cat;
+              return Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: GestureDetector(
+                  onTap: () => setState(() => _selectedCategory = cat),
+                  child: AnimatedContainer(
+                    duration: SDS.durationFast,
+                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.cinematicDeep : AppColors.surface,
+                      borderRadius: BorderRadius.circular(SDS.radiusCapsule),
+                      boxShadow: isSelected ? SDS.shadowSoft : null,
+                      border: Border.all(
+                        color: isSelected ? AppColors.cinematicDeep : AppColors.divider,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Text(
+                      cat,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: SDS.fwBold,
+                        color: isSelected ? Colors.white : AppColors.textSecondary,
+                        letterSpacing: SDS.lsNormal,
+                      ),
+                    ),
                   ),
                 ),
-              ],
-            ),
+              );
+            }).toList(),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildCategoryChips() {
-    return SliverToBoxAdapter(
-      child: SizedBox(
-        height: 40,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: _categories.length,
-          itemBuilder: (context, i) {
-            final cat = _categories[i];
-            final selected = _selectedCategory == cat;
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: GestureDetector(
-                onTap: () => setState(() => _selectedCategory = cat),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: selected ? AppColors.primary : AppColors.surface,
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(
-                      color: selected ? AppColors.primary : AppColors.border,
-                    ),
-                  ),
-                  child: Text(
-                    cat,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: selected ? Colors.white : AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-
-
-  Widget _buildStoresSection() {
+  Widget _buildStoresGrid() {
     final stores = _filteredStores;
-
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          if (index == 0) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
-              child: Row(
-                children: [
-                  Text(
-                    _searchQuery.isNotEmpty ? '검색 결과' : '시장 점포',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${stores.length}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textTertiary,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-          if (stores.isEmpty) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 48),
-              child: Center(
-                child: Column(
-                  children: [
-                    Icon(Icons.search_off, size: 48, color: AppColors.textTertiary),
-                    SizedBox(height: 12),
-                    Text(
-                      '검색 결과가 없어요',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: AppColors.textTertiary,
-                      ),
-                    ),
-                  ],
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: _StoreEpicCard(
+              store: stores[index],
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => StoreDetailScreen(store: stores[index]),
                 ),
               ),
-            );
-          }
-          final store = stores[index - 1];
-          return _StoreListItem(
-            store: store,
-            onTap: () => _openStore(store),
-          );
-        },
-        childCount: stores.isEmpty ? 2 : stores.length + 1,
-      ),
-    );
-  }
-
-
-
-  void _openStore(Store store) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => StoreDetailScreen(store: store),
+            ),
+          ),
+          childCount: stores.length,
+        ),
       ),
     );
   }
 }
 
+class _GlassSearchDelegate extends SliverPersistentHeaderDelegate {
+  @override
+  double get minExtent => 88;
+  @override
+  double get maxExtent => 88;
 
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+      decoration: BoxDecoration(
+        color: AppColors.background.withValues(alpha: 0.85),
+      ),
+      child: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            height: 56,
+            decoration: SDS.glassDecoration(
+              radius: SDS.radiusM,
+              opacity: 0.5,
+              color: Colors.white,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: Row(
+              children: [
+                const Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 24),
+                const SizedBox(width: 14),
+                Text(
+                  '어떤 가게를 찾아볼까요?',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: SDS.fwSemiBold,
+                    color: AppColors.textTertiary,
+                    letterSpacing: SDS.lsNormal,
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.cinematicDeep.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.tune_rounded, size: 18, color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-class _StoreListItem extends StatelessWidget {
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => false;
+}
+
+class _StoreEpicCard extends StatelessWidget {
   final Store store;
   final VoidCallback onTap;
 
-  const _StoreListItem({required this.store, required this.onTap});
+  const _StoreEpicCard({required this.store, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: AppColors.border,
-            width: 1,
-          ),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x06000000),
-              blurRadius: 6,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Hero(
-                  tag: 'store_image_${store.id}',
-                  child: PremiumPlaceholder(
-                    category: store.category,
-                    width: 48,
-                    height: 48,
-                    borderRadius: 10,
-                  ),
+    return SDS.epicCard(
+      child: InkWell(
+        onTap: onTap,
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Hero(
+                tag: 'store_image_${store.id}',
+                child: PremiumPlaceholder(
+                  category: store.category,
+                  width: 120,
+                  height: 140,
+                  borderRadius: 0,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Row(
                         children: [
-                          Text(
-                            store.name,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          _StatusBadge(status: store.status),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: AppColors.background,
-                              borderRadius: BorderRadius.circular(4),
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(SDS.radiusS),
                             ),
                             child: Text(
-                              '${store.zoneId}구역',
-                              style: const TextStyle(
+                              store.category,
+                              style: TextStyle(
                                 fontSize: 11,
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: SDS.fwBold,
+                                color: AppColors.primary,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          const Spacer(),
+                          const Icon(Icons.star_rounded, size: 16, color: AppColors.cinematicGold),
+                          const SizedBox(width: 4),
                           Text(
-                            store.category,
-                            style: const TextStyle(
+                            '4.8',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: SDS.fwBold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        store.name,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: SDS.fwBlack,
+                          color: AppColors.textPrimary,
+                          letterSpacing: SDS.lsTight,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${store.zoneId}구역 · 장터의 명물',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: SDS.fwMedium,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Icon(Icons.location_on_rounded, size: 14, color: AppColors.textTertiary),
+                          const SizedBox(width: 4),
+                          Text(
+                            '여기서 120m',
+                            style: TextStyle(
                               fontSize: 12,
+                              fontWeight: SDS.fwBold,
                               color: AppColors.textTertiary,
                             ),
                           ),
@@ -334,52 +347,9 @@ class _StoreListItem extends StatelessWidget {
                     ],
                   ),
                 ),
-              ],
-            ),
-            if (store.items.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              const Divider(height: 1, color: AppColors.divider),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: store.items.take(3).map((item) {
-                  return Text(
-                    item.name,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                  );
-                }).toList(),
               ),
             ],
-
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StatusBadge extends StatelessWidget {
-  final StoreStatus status;
-  const _StatusBadge({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: status.bgColor,
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Text(
-        status.label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: status.color,
+          ),
         ),
       ),
     );

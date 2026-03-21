@@ -6,6 +6,7 @@ import '../../models/models.dart';
 import '../../data/mock_data.dart';
 import '../pickup/pickup_screen.dart';
 import '../../widgets/app_ui.dart';
+import '../../theme/sijang_design_system.dart';
 
 class ReservationListScreen extends StatefulWidget {
   const ReservationListScreen({super.key});
@@ -33,7 +34,6 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final active = MockData.reservations.where((r) => r.isActive).toList();
     final past = MockData.reservations.where((r) => !r.isActive).toList();
 
@@ -41,18 +41,13 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            floating: true,
-            backgroundColor: AppColors.background,
-            elevation: 0,
-            centerTitle: false,
-            title: Text(
-              '진행중', // Renamed to match the Nav Bar's new 'Progress' feel
-              style: textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: AppColors.textPrimary,
-                letterSpacing: -1.0,
-              ),
+          SliverToBoxAdapter(
+            child: SDS.topBar(
+              context: context,
+              title: '주문 내역',
+              subtitle: active.isNotEmpty
+                  ? '맛있는 기다림이 ${active.length}건 있어요 😋'
+                  : '기분 좋은 소식을 기다리고 있어요',
             ),
           ),
           if (active.isEmpty && past.isEmpty)
@@ -63,10 +58,10 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
             if (active.isNotEmpty) ...[
               _sectionHeader(
                 context: context,
-                title: '진행 중',
+                title: '지금 준비 중이에요',
                 count: active.length,
                 color: AppColors.primary,
-                subtitle: '픽업 전까지 남은 시간을 확인하세요',
+                subtitle: '픽업까지 얼마나 남았을까요?',
               ),
               SliverList(
                 delegate: SliverChildBuilderDelegate(
@@ -86,10 +81,10 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
             if (past.isNotEmpty) ...[
               _sectionHeader(
                 context: context,
-                title: '지난 예약',
+                title: '지난 주문 내역',
                 count: past.length,
                 color: AppColors.textSecondary,
-                subtitle: '완료/만료 내역을 모아봤어요',
+                subtitle: '완료되거나 취소된 내역들이에요',
               ),
               SliverList(
                 delegate: SliverChildBuilderDelegate(
@@ -145,195 +140,112 @@ class _ActiveReservationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final remaining = reservation.remainingTime;
-    final mins = remaining.inMinutes;
-    final secs = remaining.inSeconds % 60;
-    final isUrgent = mins < 5;
-    final fmt = NumberFormat('#,###');
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.primary.withValues(alpha: isUrgent ? 0.16 : 0.12),
-                    AppColors.accent.withValues(alpha: isUrgent ? 0.14 : 0.10),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: isUrgent
-                        ? AppColors.primary.withValues(alpha: 0.08)
-                        : AppColors.cardShadow,
-                    blurRadius: 20,
-                    offset: const Offset(0, 6),
-                    spreadRadius: 0,
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      decoration: SDS.glassDecoration(
+        radius: SDS.radiusL,
+        opacity: 0.7,
+        color: Colors.white,
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(SDS.radiusM),
                   ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+                  child: const Icon(Icons.shopping_bag_rounded, color: AppColors.primary, size: 28),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              reservation.itemName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              reservation.storeName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: textTheme.bodySmall?.copyWith(
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                      Text(
+                        reservation.itemName,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: SDS.fwBlack,
+                          color: AppColors.textPrimary,
+                          letterSpacing: SDS.lsTight,
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isUrgent
-                                ? AppColors.primary
-                                : AppColors.surface,
-                            borderRadius: BorderRadius.circular(100),
-                            border: Border.all(
-                              color: isUrgent ? Colors.white.withValues(alpha: 0.3) : AppColors.border,
-                              width: 1.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: (isUrgent ? AppColors.primary : Colors.black).withValues(alpha: 0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.timer_rounded,
-                                size: 14,
-                                color: isUrgent ? Colors.white : AppColors.primary,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '$mins:${secs.toString().padLeft(2, '0')}',
-                                style: textTheme.labelLarge?.copyWith(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w900,
-                                  color: isUrgent
-                                      ? Colors.white
-                                      : AppColors.textPrimary,
-                                  fontFeatures: const [
-                                    FontFeature.tabularFigures()
-                                  ],
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
-                          ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${reservation.storeName} · ${reservation.quantity}개',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: SDS.fwMedium,
+                          color: AppColors.textSecondary,
                         ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  AppCard(
-                    padding: const EdgeInsets.all(16),
-                    backgroundColor: AppColors.surface,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _InfoItem(
-                            label: '수량', value: '${reservation.quantity}개'),
-                        _InfoItem(
-                          label: '결제금액',
-                          value: '${fmt.format(reservation.totalAmount)}원',
-                        ),
-                        _InfoItem(
-                          label: '픽업코드',
-                          value: reservation.pickupCode,
-                          valueStyle: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.primary,
-                            letterSpacing: 2,
-                            fontFeatures: const [
-                              FontFeature.tabularFigures()
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  AppPrimaryButton(label: '픽업 코드 보기', onPressed: onTap),
-                ],
-              ),
+                ),
+                _buildTimer(reservation),
+              ],
             ),
-          ],
-        ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: SDS.button(
+              label: '픽업 코드 보기',
+              onTap: onTap,
+              icon: Icons.qr_code_rounded,
+              width: double.infinity,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimer(Reservation reservation) {
+    final now = DateTime.now();
+    final remaining = reservation.expiresAt.difference(now);
+    final isExpired = remaining.isNegative;
+    final totalSeconds = remaining.inSeconds.abs();
+    final mins = totalSeconds ~/ 60;
+    final secs = totalSeconds % 60;
+    final isUrgent = !isExpired && remaining.inMinutes < 5;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: isUrgent ? AppColors.danger.withValues(alpha: 0.1) : AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(SDS.radiusS),
+      ),
+      child: Column(
+        children: [
+          Text(
+            '$mins:${secs.toString().padLeft(2, '0')}',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: SDS.fwBlack,
+              color: isUrgent ? AppColors.danger : AppColors.primary,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          Text(
+            isUrgent ? '마감 임박' : '남음',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: SDS.fwBold,
+              color: isUrgent ? AppColors.danger : AppColors.primary,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _InfoItem extends StatelessWidget {
-  final String label;
-  final String value;
-  final TextStyle? valueStyle;
-
-  const _InfoItem({required this.label, required this.value, this.valueStyle});
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: textTheme.labelMedium?.copyWith(
-            fontSize: 11,
-            color: AppColors.textTertiary,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: valueStyle ??
-              textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
-              ),
-        ),
-      ],
-    );
-  }
-}
 
 class _PastReservationCard extends StatelessWidget {
   final Reservation reservation;
@@ -342,109 +254,32 @@ class _PastReservationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final fmt = NumberFormat('#,###');
-
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
+    return SDS.listRow(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      leading: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: reservation.isCompleted
+              ? AppColors.success.withValues(alpha: 0.1)
+              : AppColors.background,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          reservation.isCompleted ? Icons.check_rounded : Icons.close_rounded,
+          color: reservation.isCompleted ? AppColors.success : AppColors.textTertiary,
+          size: 20,
+        ),
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: reservation.isCompleted
-                  ? AppColors.success.withValues(alpha: 0.05)
-                  : AppColors.background,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: (reservation.isCompleted ? AppColors.success : AppColors.border).withValues(alpha: 0.1),
-              ),
-            ),
-            child: Icon(
-              reservation.isCompleted ? Icons.check_circle_rounded : Icons.cancel_rounded,
-              color: reservation.isCompleted
-                  ? AppColors.success
-                  : AppColors.textTertiary,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  reservation.itemName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.textPrimary,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  reservation.storeName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${fmt.format(reservation.totalAmount)}원',
-                style: textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: reservation.isCompleted
-                      ? AppColors.success.withValues(alpha: 0.1)
-                      : AppColors.background,
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Text(
-                  reservation.isCompleted ? '픽업 완료' : '만료',
-                  style: textTheme.labelLarge?.copyWith(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w900,
-                    color: reservation.isCompleted
-                        ? AppColors.success
-                        : AppColors.textTertiary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+      title: Text(reservation.itemName),
+      subtitle: Text('${reservation.storeName} • ${NumberFormat('#,###', 'ko_KR').format(reservation.totalAmount)}원'),
+      trailing: Text(
+        reservation.isCompleted ? '잘 전달해 드렸어요' : '시간이 지났어요',
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: SDS.fwBold,
+          color: reservation.isCompleted ? AppColors.success : AppColors.textTertiary,
+        ),
       ),
     );
   }
@@ -457,8 +292,8 @@ class _EmptyState extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: AppEmptyState(
         icon: Icons.receipt_long_outlined,
-        title: '아직 예약 내역이 없어요',
-        description: '지도에서 점포를 눌러\n특가 딜을 예약해보세요',
+        title: '아직 주문한 내역이 없어요',
+        description: '지도를 구경하다가 마음에 드는\n점포의 특가 딜을 예약해 보세요!',
       ),
     );
   }

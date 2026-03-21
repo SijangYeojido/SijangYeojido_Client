@@ -27,11 +27,11 @@ class MockData {
 
   static const List<MarketInfo> markets = [
     MarketInfo(
-      name: '광장시장',
-      description: '100년 전통, 빈대떡과 육회의 성지',
-      address: '서울 종로구 창경궁로 88',
-      storeCount: 5240,
-      highlights: ['먹거리명소', '빈대떡', '마약김밥'],
+      name: '신원시장',
+      description: '도림천 노점상에서 시작된 50년 역사,\n신림역 인근의 활기찬 수변 시장',
+      address: '서울 관악구 신림동 1587-39',
+      storeCount: 220,
+      highlights: ['도림천', '신림역', '수변시장'],
       accentColor: Color(0xFFF04452),
       isAvailable: true,
     ),
@@ -65,13 +65,16 @@ class MockData {
   static final List<Store> stores = [
     Store(
       id: 's1',
-      name: '우리상회 건어물 씨앗 비료',
+      name: '우리상회 건어물',
       unitNumber: 'A-2',
       zoneId: 'A',
       category: '건어물',
       status: StoreStatus.open,
-      paymentMethods: [PaymentMethod.cash, PaymentMethod.card],
-      items: const [],
+      paymentMethods: [PaymentMethod.cash, PaymentMethod.card, PaymentMethod.zeroPay],
+      items: [
+        StoreItem(name: '프리미엄 멸치 (500g)', price: 15000, imageUrl: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=400'),
+        StoreItem(name: '반건조 오징어 (5미)', price: 22000, imageUrl: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&q=80&w=400'),
+      ],
       lastUpdated: DateTime(2026, 3, 16),
       infoSource: '방문자 제보',
       mapX: 0.150,
@@ -83,9 +86,12 @@ class MockData {
       unitNumber: 'A-3',
       zoneId: 'A',
       category: '먹거리',
-      status: StoreStatus.closed,
-      paymentMethods: [PaymentMethod.cash, PaymentMethod.card],
-      items: const [],
+      status: StoreStatus.open,
+      paymentMethods: [PaymentMethod.cash, PaymentMethod.kakao],
+      items: [
+        StoreItem(name: '꿀호떡', price: 1500, imageUrl: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc2fe0a?auto=format&fit=crop&q=80&w=400'),
+        StoreItem(name: '씨앗호떡', price: 2000, imageUrl: 'https://images.unsplash.com/photo-1582928503102-3c1d9b3d2238?auto=format&fit=crop&q=80&w=400'),
+      ],
       lastUpdated: DateTime(2026, 3, 16),
       infoSource: '방문자 제보',
       mapX: 0.400,
@@ -1790,6 +1796,77 @@ class MockData {
       expiresAt: _now.subtract(const Duration(hours: 1, minutes: 45)),
       pickupCode: '5291',
       isCompleted: true,
+    ),
+  ];
+
+  static final List<StoreStory> stories = [
+    StoreStory(
+      id: 'st1',
+      storeId: 's1',
+      imageUrl: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=300',
+      isLive: true,
+      createdAt: _now.subtract(const Duration(minutes: 15)),
+    ),
+    StoreStory(
+      id: 'st2',
+      storeId: 's7',
+      imageUrl: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300',
+      createdAt: _now.subtract(const Duration(hours: 1)),
+    ),
+    StoreStory(
+      id: 'st3',
+      storeId: 's25',      imageUrl: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=300',
+      isLive: true,
+      createdAt: _now.subtract(const Duration(minutes: 2)),
+    ),
+  ];
+
+  static final List<FlashDeal> flashDeals = [
+    FlashDeal(
+      id: 'fd1',
+      storeId: 's1',
+      title: '씨앗 호떡 1+1 기습 세일!',
+      discount: '50% OFF',
+      expiresAt: _now.add(const Duration(minutes: 45)),
+    ),
+    FlashDeal(
+      id: 'fd2',
+      storeId: 's30',
+      title: '햇딸기 마지막 3팩 한정수량',
+      discount: '3,000원 할인',
+      expiresAt: _now.add(const Duration(minutes: 15)),
+    ),
+  ];
+
+  static final List<StoreReview> reviews = [
+    StoreReview(
+      id: 'rv1',
+      storeId: 's1',
+      userName: '김민수',
+      userAvatar: 'https://i.pravatar.cc/150?u=rv1',
+      content: '부모님 모시고 왔는데 너무 좋아하시네요. 씨앗호떡 진짜 맛있어요!',
+      rating: 5.0,
+      images: ['https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300'],
+      createdAt: _now.subtract(const Duration(days: 2)),
+    ),
+    StoreReview(
+      id: 'rv2',
+      storeId: 's1',
+      userName: '지혜',
+      userAvatar: 'https://i.pravatar.cc/150?u=rv2',
+      content: '줄이 길지만 금방금방 빠져요. 가성비 최고!',
+      rating: 4.5,
+      createdAt: _now.subtract(const Duration(days: 5)),
+    ),
+    StoreReview(
+      id: 'rv3',
+      storeId: 's7',
+      userName: '맛탐정',
+      userAvatar: 'https://i.pravatar.cc/150?u=rv3',
+      content: '신원호떡은 진리입니다. 겉바속촉 그 자체!',
+      rating: 5.0,
+      images: ['https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300'],
+      createdAt: _now.subtract(const Duration(hours: 12)),
     ),
   ];
 }

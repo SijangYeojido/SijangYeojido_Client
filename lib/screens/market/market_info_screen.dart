@@ -1,236 +1,208 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
-
+import '../../theme/sijang_design_system.dart';
+import '../../widgets/shrinkable_button.dart';
+import '../../widgets/sds_widgets.dart';
 
 class MarketInfoScreen extends StatelessWidget {
-  const MarketInfoScreen({super.key});
+  final String marketName;
+  const MarketInfoScreen({super.key, required this.marketName});
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: AppColors.textPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          '시장 정보',
-          style: textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w900,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildIntroduction(textTheme),
-            const SizedBox(height: 32),
-            _buildFacilityGrid(textTheme),
-            const SizedBox(height: 32),
-            _buildParkingInfo(textTheme),
-            const SizedBox(height: 32),
-            _buildOperatingHours(textTheme),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIntroduction(TextTheme textTheme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(100),
-          ),
-          child: const Text(
-            'SINCE 1970',
-            style: TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w900,
-              fontSize: 11,
-              letterSpacing: 1.5,
+      backgroundColor: Colors.white,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          // ── Cinematic V16 Sliver Header ──────────────────────
+          SliverAppBar(
+            expandedHeight: 340,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            pinned: true,
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ShrinkableButton(
+                onTap: () => Navigator.pop(context),
+                child: const CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 18),
+                ),
+              ),
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // 1. Premium 3D Hero Background
+                  Container(
+                    color: const Color(0xFFF7F8FA),
+                    child: Center(
+                      child: Opacity(
+                        opacity: 0.9,
+                        child: Image.asset(
+                          'assets/images/market_hero.png',
+                          width: 280,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // 2. Gradient Overlay for pin text readability
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.05),
+                          Colors.transparent,
+                          Colors.white.withValues(alpha: 0.8),
+                          Colors.white,
+                        ],
+                        stops: const [0.0, 0.4, 0.85, 1.0],
+                      ),
+                    ),
+                  ),
+                  // 3. Floating Glassmorphism Title Card
+                  Positioned(
+                    bottom: 24,
+                    left: 20,
+                    right: 20,
+                    child: SDSFadeIn(
+                      delay: const Duration(milliseconds: 300),
+                      child: SDSGlass(
+                        blur: 24,
+                        opacity: 0.9,
+                        padding: const EdgeInsets.all(24),
+                        radius: 32,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.stars_rounded, color: AppColors.primary, size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '전통의 가치',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: SDS.fwBold,
+                                    color: AppColors.primary,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              marketName,
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: SDS.fwBlack,
+                                color: AppColors.textPrimary,
+                                letterSpacing: -1.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 24),
-        Text(
-          '서울에서 가장 활기찬\n전통 시장, 시장여지도',
-          style: textTheme.displaySmall?.copyWith(
-            fontWeight: FontWeight.w900,
-            color: AppColors.textPrimary,
-            height: 1.1,
-            letterSpacing: -1.5,
-          ),
-        ),
-        const SizedBox(height: 20),
-        Text(
-          '350여 개의 점포가 함께하며, 신선한 수산물부터 맛있는 먹거리까지 최고의 품질을 약속합니다.',
-          style: textTheme.bodyLarge?.copyWith(
-            color: AppColors.textSecondary,
-            height: 1.6,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.2,
-          ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildFacilityGrid(TextTheme textTheme) {
-    final facilities = [
-      {'icon': Icons.wc_rounded, 'label': '화장실(4개)'},
-      {'icon': Icons.local_parking_rounded, 'label': '공영주차장'},
-      {'icon': Icons.child_care_rounded, 'label': '수유실'},
-      {'icon': Icons.elevator_rounded, 'label': '승강기'},
-      {'icon': Icons.wifi_rounded, 'label': '무료 와이파이'},
-      {'icon': Icons.info_outline_rounded, 'label': '안내소'},
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(textTheme, '편의 시설'),
-        const SizedBox(height: 16),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 1.0,
-          ),
-          itemCount: facilities.length,
-          itemBuilder: (context, index) {
-            final f = facilities[index];
-            return Container(
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
-                    blurRadius: 20,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
+          // ── Market Content ──────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.05),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(f['icon'] as IconData, color: AppColors.primary, size: 24),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    f['label'] as String,
-                    style: textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                      fontSize: 11,
+                  const SizedBox(height: 32),
+                  SDSFadeIn(
+                    delay: const Duration(milliseconds: 500),
+                    child: const Text(
+                      '서울 관악구의 대표 전통시장인\n신원시장은 도림천 주변에 늘어서 있던\n노점들로부터 그 역사가 시작되었습니다.\n\n현재는 신림역과 인접한 편리한 교통과 도림천의 자연이 어우러진 현대적인 수변 시장으로 탈바꿈하였으며, 상인들의 넉넉한 인심과 정을 그대로 간직하고 있는 소중한 공간입니다.',
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: AppColors.textSecondary,
+                        height: 1.6,
+                        letterSpacing: -0.3,
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 32),
+                  _buildDetailSection(
+                    '위치 및 교통',
+                    '서울 관악구 신림동 1587-39\n지하철 2호선 신림역 도보 5분 거리',
+                  ),
+                  SDSFadeIn(
+                    delay: const Duration(milliseconds: 600),
+                    child: _buildUltimateUtilityGrid(),
+                  ),
+                  const SizedBox(height: 56),
+
+                  // ── Immersive Guide Sections ──────────────────
+                  SDSFadeIn(
+                    delay: const Duration(milliseconds: 700),
+                    child: _buildPremiumInfoSection(
+                      title: '방문 가이드',
+                      items: [
+                        _buildPremiumInfoItem(Icons.access_time_filled_rounded, '영업 시간', '매일 09:00 - 23:00'),
+                        _buildPremiumInfoItem(Icons.shopping_bag_rounded, '주요 품목', '먹거리, 빈대떡, 육회, 한복'),
+                        _buildPremiumInfoItem(Icons.credit_card_rounded, '결제 수단', '온누리상품권, 제로페이 가능'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 80),
                 ],
               ),
-            );
-          },
-        ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUltimateUtilityGrid() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildCircularAction(Icons.phone_rounded, '전화하기'),
+        _buildCircularAction(Icons.location_on_rounded, '위치보기'),
+        _buildCircularAction(Icons.share_rounded, '공유하기'),
+        _buildCircularAction(Icons.bookmark_rounded, '저장하기'),
       ],
     );
   }
 
-  Widget _buildParkingInfo(TextTheme textTheme) {
+  Widget _buildCircularAction(IconData icon, String label) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader(textTheme, '주차 안내'),
-        const SizedBox(height: 16),
-        _buildInfoCard(
-          textTheme,
-          Icons.local_parking_rounded,
-          '제1공영주차장',
-          '기본 30분 1,000원 / 추가 10분당 500원\n(시장 이용 고객 1시간 무료 주차권 증정)',
+        ShrinkableButton(
+          onTap: () {},
+          child: Container(
+            width: 68,
+            height: 68,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF7F8FA),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+            ),
+            child: Icon(icon, color: AppColors.textPrimary, size: 28),
+          ),
         ),
         const SizedBox(height: 12),
-        _buildInfoCard(
-          textTheme,
-          Icons.local_parking_rounded,
-          '제2공영주차장 (동문 방향)',
-          '기본 30분 1,200원 / 추가 10분당 600원',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOperatingHours(TextTheme textTheme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(textTheme, '운영 시간'),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Column(
-            children: [
-              _buildHourRow('평일/토요일', '09:00 - 21:00', isAccent: true),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Divider(height: 1, color: AppColors.border),
-              ),
-              _buildHourRow('일요일', '10:00 - 18:00 (일부 휴무)'),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Divider(height: 1, color: AppColors.border),
-              ),
-              _buildHourRow('휴무일', '매월 첫째, 셋째 일요일 전면 휴장'),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSectionHeader(TextTheme textTheme, String title) {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 18,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: 10),
         Text(
-          title,
-          style: textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w900,
-            color: AppColors.textPrimary,
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: SDS.fwBold,
+            color: AppColors.textSecondary,
             letterSpacing: -0.5,
           ),
         ),
@@ -238,52 +210,66 @@ class MarketInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(TextTheme textTheme, IconData icon, String title, String detail) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+  Widget _buildPremiumInfoSection({required String title, required List<Widget> items}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: SDS.fwBlack,
+            color: AppColors.textPrimary,
+            letterSpacing: -0.6,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 20),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF7F8FA),
+            borderRadius: BorderRadius.circular(SDS.radiusL),
+          ),
+          child: Column(children: items),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPremiumInfoItem(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.circular(14),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: AppColors.primary, size: 22),
+            child: Icon(icon, size: 18, color: AppColors.primary),
           ),
-          const SizedBox(width: 18),
+          const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.textPrimary,
-                    letterSpacing: -0.5,
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                    fontWeight: SDS.fwBold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
-                  detail,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                    height: 1.6,
-                    fontWeight: FontWeight.w600,
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: SDS.fwBlack,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.4,
                   ),
                 ),
               ],
@@ -294,24 +280,27 @@ class MarketInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHourRow(String label, String value, {bool isAccent = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildDetailSection(String title, String content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const SizedBox(height: 12),
         Text(
-          label,
-          style: TextStyle(
-            fontWeight: isAccent ? FontWeight.w800 : FontWeight.w600,
-            color: isAccent ? AppColors.textPrimary : AppColors.textSecondary,
-            fontSize: 15,
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: SDS.fwBlack,
+            color: AppColors.textPrimary,
+            letterSpacing: -0.5,
           ),
         ),
+        const SizedBox(height: 12),
         Text(
-          value,
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-            color: isAccent ? AppColors.primary : AppColors.textPrimary,
+          content,
+          style: const TextStyle(
             fontSize: 15,
+            color: AppColors.textSecondary,
+            height: 1.5,
           ),
         ),
       ],
