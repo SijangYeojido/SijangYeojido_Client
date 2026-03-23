@@ -141,16 +141,20 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
                       const Icon(Icons.search_rounded,
                           size: 24, color: AppColors.primary),
                       const SizedBox(width: 16),
-                      Text(
-                        '어느 시장으로 안내해 드릴까요?',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: SDS.fwBlack,
-                          color: AppColors.textPrimary,
-                          letterSpacing: -0.5,
+                      Flexible(
+                        child: Text(
+                          '어느 시장으로 안내해 드릴까요?',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: SDS.fwBlack,
+                            color: AppColors.textPrimary,
+                            letterSpacing: -0.5,
+                          ),
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 8),
@@ -494,11 +498,11 @@ class _NearbyMapPainter extends CustomPainter {
         Paint()..color = pinColor,
       );
 
-      // --- V8 Dynamic Indicators (⚡ or 📸) ---
+      // --- V8 Dynamic Indicators ---
       if (market.hasFlashDeal || market.isLiveStory) {
         final indicatorX = cx + (isSelected ? 18 : 14);
         final indicatorY = cy - (isSelected ? 18 : 14);
-        
+
         // Glow effect
         canvas.drawCircle(
           Offset(indicatorX, indicatorY),
@@ -508,34 +512,19 @@ class _NearbyMapPainter extends CustomPainter {
             ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
         );
 
-        final indicatorText = TextSpan(
-          text: market.hasFlashDeal ? '⚡' : '📸',
-          style: const TextStyle(fontSize: 10),
-        );
-        final indicatorTp = TextPainter(
-          text: indicatorText,
-          textDirection: TextDirection.ltr,
-        )..layout();
-        
         canvas.drawCircle(
           Offset(indicatorX, indicatorY),
           9,
           Paint()..color = const Color(0xFFF04452),
         );
-        
-        indicatorTp.paint(canvas, Offset(indicatorX - indicatorTp.width/2, indicatorY - indicatorTp.height/2));
       }
 
-      // Pin icon (storefront)
-      final iconText = TextSpan(
-        text: '🏪',
-        style: TextStyle(fontSize: isSelected ? 18 : 14),
+      // Pin icon (storefront dot)
+      canvas.drawCircle(
+        Offset(cx, cy),
+        isSelected ? 6 : 4,
+        Paint()..color = Colors.white,
       );
-      final tp = TextPainter(
-        text: iconText,
-        textDirection: TextDirection.ltr,
-      )..layout();
-      tp.paint(canvas, Offset(cx - tp.width / 2, cy - tp.height / 2));
 
       // Market name label
       final nameSpan = TextSpan(
@@ -619,16 +608,20 @@ class _MarketDetailCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              market.name,
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: SDS.fwBlack,
-                                letterSpacing: -0.5,
-                                color: AppColors.textPrimary,
+                            Flexible(
+                              child: Text(
+                                market.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: SDS.fwBlack,
+                                  letterSpacing: -0.5,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),
@@ -650,22 +643,23 @@ class _MarketDetailCard extends StatelessWidget {
                               ),
                             ),
                             if (market.hasFlashDeal) ...[
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFF04452).withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(100),
                                   border: Border.all(color: const Color(0xFFF04452).withValues(alpha: 0.3)),
                                 ),
                                 child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.bolt_rounded, size: 12, color: Color(0xFFF04452)),
-                                    SizedBox(width: 4),
+                                    Icon(Icons.bolt_rounded, size: 11, color: Color(0xFFF04452)),
+                                    SizedBox(width: 3),
                                     Text(
-                                      'LIVE DEAL',
+                                      'DEAL',
                                       style: TextStyle(
-                                        fontSize: 10,
+                                        fontSize: 9,
                                         fontWeight: FontWeight.w900,
                                         color: Color(0xFFF04452),
                                       ),

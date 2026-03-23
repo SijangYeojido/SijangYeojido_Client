@@ -34,7 +34,7 @@ class StoreDetailScreen extends StatelessWidget {
           SDS.topBar(
             context: context,
             title: store.name,
-            subtitle: '${market.name}에서 사랑받는 점포예요 ✨',
+            subtitle: '${market.name}에서 사랑받는 점포예요',
             actions: [
               ListenableBuilder(
                 listenable: FavoriteService(),
@@ -158,7 +158,7 @@ class StoreDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '방금 따끈따끈한 소식이 도착했어요 ✨',
+                              '방금 따끈따끈한 소식이 도착했어요',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: SDS.fwBold,
@@ -192,7 +192,7 @@ class StoreDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             _SectionCard(
-                              title: '대표 상품 🍱',
+                              title: '대표 상품',
                               delayMs: 500,
                               child: store.items.isEmpty
                                   ? AppEmptyState(
@@ -314,40 +314,50 @@ class StoreDetailScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _ActionIconButton(
-                  icon: Icons.phone_rounded,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('${store.name}으로 전화를 연결해요! 📞')),
-                    );
-                  },
+            ShrinkableButton(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${store.name}으로 전화를 연결해요!')),
+                );
+              },
+              child: Container(
+                width: 52,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF2F4F6),
+                  borderRadius: BorderRadius.circular(SDS.radiusM),
                 ),
-                const SizedBox(height: 6),
-                const Text('상담/전화', style: TextStyle(fontSize: 11, fontWeight: SDS.fwBold, color: AppColors.textSecondary)),
-              ],
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: SDS.button(
-                label: '길 안내 시작',
-                isPrimary: false,
-                icon: Icons.directions_rounded,
-                onTap: () => Navigator.pop(context, true),
+                child: const Icon(Icons.phone_rounded, color: AppColors.textPrimary, size: 22),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: SDS.button(
-                label: '점포 상품 예약',
-                color: market.accentColor,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('곧 멋진 예약 시스템으로 찾아뵐게요!')),
-                  );
-                },
+              child: ShrinkableButton(
+                onTap: () => Navigator.pop(context, true),
+                child: Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(SDS.radiusM),
+                    boxShadow: SDS.shadowAccent(AppColors.primary),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.directions_rounded, color: Colors.white, size: 22),
+                      SizedBox(width: 10),
+                      Text(
+                        '길 안내 시작',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: SDS.fwBlack,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -361,7 +371,7 @@ class StoreDetailScreen extends StatelessWidget {
     final storeReviews = MockData.reviews.where((r) => r.storeId == store.id).toList();
 
     return _SectionCard(
-      title: '방문자 리뷰 💬',
+      title: '방문자 리뷰',
       child: storeReviews.isEmpty
           ? AppEmptyState(
               icon: Icons.rate_review_outlined,
@@ -487,7 +497,7 @@ class StoreDetailScreen extends StatelessWidget {
     
     final textTheme = Theme.of(context).textTheme;
     return _SectionCard(
-      title: '지금 가게 상황은 어때요? ⚡',
+      title: '지금 가게 상황은 어때요?',
       child: Column(
         children: [
           if (store.freshness != null) ...[
@@ -623,7 +633,7 @@ class StoreDetailScreen extends StatelessWidget {
               label: '리뷰를 등록할게요',
               onPressed: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('리뷰가 성공적으로 등록되었어요! ✨')));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('리뷰가 성공적으로 등록되었어요!')));
               },
             ),
           ],

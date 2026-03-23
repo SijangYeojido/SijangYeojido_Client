@@ -136,10 +136,16 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             ),
           ),
           Expanded(
-            child: Center(child: content), // Perfectly Centered Content Area
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 32),
+                  child: content,
+                ),
+              ),
+            ),
           ),
-          // Reserved space for bottom bar
-          const SizedBox(height: 120),
         ],
       ),
     );
