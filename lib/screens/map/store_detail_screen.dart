@@ -264,24 +264,6 @@ class StoreDetailScreen extends StatelessWidget {
                                                     ],
                                                   ),
                                                 ),
-                                                ShrinkableButton(
-                                                  onTap: () {},
-                                                  child: Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                                    decoration: BoxDecoration(
-                                                      color: AppColors.primary.withValues(alpha: 0.1),
-                                                      borderRadius: BorderRadius.circular(12),
-                                                    ),
-                                                    child: const Text(
-                                                      '담기',
-                                                      style: TextStyle(
-                                                        color: AppColors.primary,
-                                                        fontWeight: SDS.fwBold,
-                                                        fontSize: 13,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
                                               ],
                                             ),
                                           ),
@@ -373,10 +355,35 @@ class StoreDetailScreen extends StatelessWidget {
     return _SectionCard(
       title: '방문자 리뷰',
       child: storeReviews.isEmpty
-          ? AppEmptyState(
-              icon: Icons.rate_review_outlined,
-              title: '다녀오신 후 리뷰를 남겨주세요',
-              description: '직접 방문한 경험을 들려주시면\n다른 분들에게 큰 도움이 돼요!',
+          ? Column(
+              children: [
+                AppEmptyState(
+                  icon: Icons.rate_review_outlined,
+                  title: '다녀오신 후 리뷰를 남겨주세요',
+                  description: '직접 방문한 경험을 들려주시면\n다른 분들에게 큰 도움이 돼요!',
+                ),
+                const SizedBox(height: 12),
+                ShrinkableButton(
+                  onTap: () => _showReviewSubmitSheet(context),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '리뷰 쓰기',
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             )
           : Column(
               children: [
@@ -467,25 +474,52 @@ class StoreDetailScreen extends StatelessWidget {
                   ),
                 )),
                 const SizedBox(height: 8),
-                ShrinkableButton(
-                  onTap: () => _showReviewSubmitSheet(context),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '리뷰 전체 보기',
-                        style: textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
+                Row(
+                  children: [
+                    Expanded(
+                      child: ShrinkableButton(
+                        onTap: () {},
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '리뷰 전체 보기',
+                              style: textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ShrinkableButton(
+                        onTap: () => _showReviewSubmitSheet(context),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '리뷰 쓰기',
+                              style: textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
