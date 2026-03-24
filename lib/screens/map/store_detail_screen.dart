@@ -622,56 +622,97 @@ class StoreDetailScreen extends StatelessWidget {
     );
   }
   void _showReviewSubmitSheet(BuildContext context) {
+    double rating = 0;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-        ),
-        padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 40),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text('방문은 어떠셨나요?', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: SDS.fwBlack, letterSpacing: SDS.lsTight)),
-            const SizedBox(height: 8),
-            Text('이 가게에 대한 솔직한 후기를 들려주세요.', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) => Icon(Icons.star_rounded, size: 40, color: index < 4 ? AppColors.warning : AppColors.divider)),
-            ),
-            const SizedBox(height: 24),
-            TextField(
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText: '음식의 맛, 서비스, 분위기 등에 대해 알려주세요.',
-                filled: true,
-                fillColor: AppColors.background,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-              ),
-            ),
-            const SizedBox(height: 24),
-            AppPrimaryButton(
-              label: '리뷰를 등록할게요',
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('리뷰가 성공적으로 등록되었어요!')));
-              },
-            ),
-          ],
-        ),
+      builder: (_) => StatefulBuilder(
+        builder: (context, setSheetState) {
+          return Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                ),
+                padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 40),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text('방문은 어떠셨나요?', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: SDS.fwBlack, letterSpacing: SDS.lsTight)),
+                    const SizedBox(height: 8),
+                    Text('이 가게에 대한 솔직한 후기를 들려주세요.', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) {
+                        final starValue = index + 1;
+                        IconData icon;
+                        if (rating >= starValue) {
+                          icon = Icons.star_rounded;
+                        } else if (rating >= starValue - 0.5) {
+                          icon = Icons.star_half_rounded;
+                        } else {
+                          icon = Icons.star_border_rounded;
+                        }
+                        return GestureDetector(
+                          onTapDown: (details) {
+                            final isLeftHalf = details.localPosition.dx < 20;
+                            setSheetState(() {
+                              rating = isLeftHalf ? starValue - 0.5 : starValue.toDouble();
+                            });
+                          },
+                          child: SizedBox(
+                            width: 40,
+                            height: 40,
+                            child: Icon(icon, size: 40, color: rating >= starValue - 0.5 ? AppColors.warning : AppColors.divider),
+                          ),
+                        );
+                      }),
+                    ),
+                    if (rating > 0) ...[
+                      const SizedBox(height: 8),
+                      Center(
+                        child: Text(
+                          '$rating점',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: SDS.fwBold,
+                            color: AppColors.warning,
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    TextField(
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: '음식의 맛, 서비스, 분위기 등에 대해 알려주세요.',
+                        filled: true,
+                        fillColor: AppColors.background,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    AppPrimaryButton(
+                      label: '리뷰를 등록할게요',
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('리뷰가 성공적으로 등록되었어요!')));
+                      },
+                    ),
+                  ],
+                ),
+          );
+        },
       ),
     );
   }
