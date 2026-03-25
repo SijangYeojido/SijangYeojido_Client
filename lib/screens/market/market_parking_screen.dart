@@ -104,9 +104,9 @@ class MarketParkingScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     '\u00A0$name',
-                    style: const TextStyle(fontSize: 18, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: 0.8),
-                    overflow: TextOverflow.visible,
-                    softWrap: false,
+                    style: const TextStyle(fontSize: 18, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: -0.3),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Container(
@@ -157,9 +157,9 @@ class MarketParkingScreen extends StatelessWidget {
         const SizedBox(width: 20),
         Expanded(
           child: Text(
-            '\u00A0$text', 
-            style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, fontWeight: SDS.fwBold, letterSpacing: 0.5),
-            overflow: TextOverflow.visible,
+            '\u00A0$text',
+            style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, fontWeight: SDS.fwBold, letterSpacing: -0.2),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

@@ -4,7 +4,6 @@ import '../providers/auth_provider.dart';
 import '../widgets/sds_widgets.dart';
 import 'home/home_screen.dart';
 import 'home/nearby_map_screen.dart';
-import 'reservation/reservation_list_screen.dart';
 import 'profile/profile_screen.dart';
 import 'merchant/merchant_dashboard.dart';
 import 'merchant/product_management_screen.dart';
@@ -24,14 +23,12 @@ class _MainScaffoldState extends State<MainScaffold> {
       return [
         const MerchantDashboard(),
         const ProductManagementScreen(),
-        const ReservationListScreen(), // Reuse for merchant orders
         const ProfileScreen(),
       ];
     }
     return [
       const HomeScreen(),
       const NearbyMapScreen(),
-      const ReservationListScreen(),
       const ProfileScreen(),
     ];
   }
@@ -50,11 +47,6 @@ class _MainScaffoldState extends State<MainScaffold> {
           label: '상품 관리',
         ),
         SDSFloatingTabItem(
-          icon: Icons.shopping_bag_outlined,
-          activeIcon: Icons.shopping_bag_rounded,
-          label: '주문 관리',
-        ),
-        SDSFloatingTabItem(
           icon: Icons.person_outline_rounded,
           activeIcon: Icons.person_rounded,
           label: '내 정보',
@@ -63,24 +55,19 @@ class _MainScaffoldState extends State<MainScaffold> {
     }
     return const [
       SDSFloatingTabItem(
-        icon: Icons.home_rounded,
+        icon: Icons.home_outlined,
         activeIcon: Icons.home_rounded,
         label: '홈',
       ),
       SDSFloatingTabItem(
-        icon: Icons.location_on_outlined,
-        activeIcon: Icons.location_on_rounded,
-        label: '지도로 찾기',
-      ),
-      SDSFloatingTabItem(
-        icon: Icons.receipt_long_outlined,
-        activeIcon: Icons.receipt_long_rounded,
-        label: '주문 내역',
+        icon: Icons.explore_outlined,
+        activeIcon: Icons.explore_rounded,
+        label: '탐색',
       ),
       SDSFloatingTabItem(
         icon: Icons.person_outline_rounded,
         activeIcon: Icons.person_rounded,
-        label: '내 정보',
+        label: '마이',
       ),
     ];
   }

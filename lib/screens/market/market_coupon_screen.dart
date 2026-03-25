@@ -35,15 +35,14 @@ class MarketCouponScreen extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(left: 12.0),
               child: Text(
-                '\u00A0사용 가능한 쿠폰이\n\u00A03개 있어요', // Non-breaking space
+                '사용 가능한 쿠폰이\n3개 있어요',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: SDS.fwBlack,
                   color: AppColors.textPrimary,
                   height: 1.3,
-                  letterSpacing: 0.8,
+                  letterSpacing: -0.5,
                 ),
-                overflow: TextOverflow.visible,
               ),
             ),
             const SizedBox(height: 32),
@@ -89,7 +88,7 @@ class MarketCouponScreen extends StatelessWidget {
     // NUCLEAR FIX: Bypass SDS.epicCard to avoid forced ClipRRect
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 34),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       decoration: BoxDecoration(
         color: shinwonRed,
         borderRadius: BorderRadius.circular(SDS.radiusL),
@@ -97,31 +96,29 @@ class MarketCouponScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const SizedBox(width: 14), // Safety physical spacer
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '\u00A0이번 달 절약 가능한 금액', 
+                  '이번 달 절약 가능한 금액',
                   style: TextStyle(
-                    color: Colors.white, 
-                    fontSize: 14, 
+                    color: Colors.white,
+                    fontSize: 14,
                     fontWeight: SDS.fwBold,
-                    letterSpacing: 1.0, 
+                    letterSpacing: -0.3,
                   ),
-                  overflow: TextOverflow.visible,
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  '\u00A0약 24,000원', 
+                  '약 24,000원',
                   style: TextStyle(
-                    color: Colors.white, 
-                    fontSize: 26, 
+                    color: Colors.white,
+                    fontSize: 26,
                     fontWeight: SDS.fwBlack,
-                    letterSpacing: 1.0,
+                    letterSpacing: -0.5,
                   ),
-                  overflow: TextOverflow.visible,
                 ),
               ],
             ),
@@ -177,15 +174,17 @@ class MarketCouponScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '\u00A0$title', 
-                    style: const TextStyle(fontSize: 16, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: 0.5),
-                    overflow: TextOverflow.visible,
+                    title,
+                    style: const TextStyle(fontSize: 16, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: -0.3),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '\u00A0$subtitle', 
-                    style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: SDS.fwBold, letterSpacing: 0.5),
-                    overflow: TextOverflow.visible,
+                    subtitle,
+                    style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: SDS.fwBold, letterSpacing: -0.2),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

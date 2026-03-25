@@ -8,8 +8,6 @@ import '../../widgets/shrinkable_button.dart';
 import 'package:sijangyeojido_client/screens/map/market_hub_screen.dart';
 import '../../widgets/skeleton.dart';
 import '../explore/search_screen.dart';
-import '../../widgets/market_stories.dart';
-import '../../widgets/flash_deal_ticker.dart';
 import '../../widgets/sds_widgets.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -209,14 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // ── Adorable 3D Categories ──────────────────────────
 
-          // ── Flash Deal Ticker ────────────────────────────────
-          const SliverToBoxAdapter(child: FlashDealTickerWidget()),
-
-          // ── Market Stories ──────────────────────────────────
-          const SliverPadding(
-            padding: EdgeInsets.symmetric(vertical: 24),
-            sliver: SliverToBoxAdapter(child: MarketStoriesWidget()),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 8)),
 
           // ── Recommended Markets Section ───────────────────────
           SliverToBoxAdapter(
@@ -381,12 +372,16 @@ class _PremiumMarketCard extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              Text(
-                                market.address,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.textSecondary,
-                                  fontWeight: SDS.fwBold,
+                              Flexible(
+                                child: Text(
+                                  market.address,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary,
+                                    fontWeight: SDS.fwBold,
+                                  ),
                                 ),
                               ),
                             ],

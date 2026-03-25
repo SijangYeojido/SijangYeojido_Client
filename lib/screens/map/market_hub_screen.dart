@@ -8,7 +8,6 @@ import 'store_detail_screen.dart';
 import '../market/market_info_screen.dart';
 import '../market/market_map_simple_screen.dart';
 import '../market/market_parking_screen.dart';
-import '../market/market_coupon_screen.dart';
 import '../../widgets/sds_widgets.dart';
 
 class MarketHubScreen extends StatefulWidget {
@@ -169,7 +168,7 @@ class _MarketHubScreenState extends State<MarketHubScreen> {
                         radius: 32,
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             _CircularActionButton(
                               icon: Icons.map_rounded,
@@ -193,19 +192,6 @@ class _MarketHubScreenState extends State<MarketHubScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => MarketParkingScreen(marketName: widget.marketName),
-                                  ),
-                                );
-                              },
-                            ),
-                            _CircularActionButton(
-                              icon: Icons.local_offer_rounded,
-                              label: '쿠폰 받기',
-                              color: const Color(0xFFFF5F2E), // Premium Orange
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => MarketCouponScreen(marketName: widget.marketName),
                                   ),
                                 );
                               },
@@ -428,37 +414,44 @@ class _CircularActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final btnSize = (screenWidth - 88) / 4;
+    final clampedSize = btnSize.clamp(48.0, 64.0);
+
     return ShrinkableButton(
       onTap: onTap,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 64,
-            height: 64,
+            width: clampedSize,
+            height: clampedSize,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(clampedSize * 0.34),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04), // Neutral soft shadow
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: Center(
-              child: Icon(icon, size: 28, color: color),
+              child: Icon(icon, size: clampedSize * 0.44, color: color),
             ),
           ),
           const SizedBox(height: 10),
           Text(
             label,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: SDS.fwBold,
               color: AppColors.textPrimary,
               letterSpacing: -0.4,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

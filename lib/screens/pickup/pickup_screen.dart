@@ -80,7 +80,7 @@ class _PickupScreenState extends State<PickupScreen> {
               ),
               const SizedBox(height: 12),
               const Text(
-                '취소하시면 되돌릴 수 없어요.\n신중하게 결정해 주세요! 😢',
+                '취소하시면 되돌릴 수 없어요.\n신중하게 결정해 주세요!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
@@ -132,7 +132,7 @@ class _PickupScreenState extends State<PickupScreen> {
           SDS.topBar(
             context: context,
             title: '픽업 준비',
-            subtitle: isExpired ? '시간이 지나 아쉽게 만료되었어요 😢' : '상인들의 정성이 기다리고 있어요! 🎁',
+            subtitle: isExpired ? '시간이 지나 아쉽게 만료되었어요' : '상인들의 정성이 기다리고 있어요!',
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -269,7 +269,8 @@ class _PickupScreenState extends State<PickupScreen> {
             ),
             const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
               decoration: BoxDecoration(
                 color: isExpired ? AppColors.divider : AppColors.surface,
                 borderRadius: BorderRadius.circular(SDS.radiusL),
@@ -281,16 +282,19 @@ class _PickupScreenState extends State<PickupScreen> {
                   width: 1.5,
                 ),
               ),
-              child: Text(
-                widget.reservation.pickupCode,
-                style: TextStyle(
-                  fontSize: 58,
-                  fontWeight: SDS.fwBlack,
-                  color: isExpired
-                      ? AppColors.textTertiary
-                      : AppColors.primary,
-                  letterSpacing: 10,
-                  fontFeatures: const [FontFeature.tabularFigures()],
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  widget.reservation.pickupCode,
+                  style: TextStyle(
+                    fontSize: 58,
+                    fontWeight: SDS.fwBlack,
+                    color: isExpired
+                        ? AppColors.textTertiary
+                        : AppColors.primary,
+                    letterSpacing: 10,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
                 ),
               ),
             ),

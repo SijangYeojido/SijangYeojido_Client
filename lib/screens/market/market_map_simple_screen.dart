@@ -3,82 +3,128 @@ import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/shrinkable_button.dart';
-import '../../widgets/sds_widgets.dart';
 
-class MarketMapSimpleScreen extends StatelessWidget {
+class MarketMapSimpleScreen extends StatefulWidget {
   final String marketName;
   const MarketMapSimpleScreen({super.key, required this.marketName});
 
   @override
+  State<MarketMapSimpleScreen> createState() => _MarketMapSimpleScreenState();
+}
+
+class _MarketMapSimpleScreenState extends State<MarketMapSimpleScreen> {
+  final TransformationController _transformController = TransformationController();
+
+  @override
+  void dispose() {
+    _transformController.dispose();
+    super.dispose();
+  }
+
+  void _resetZoom() {
+    _transformController.value = Matrix4.identity();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final safeTop = MediaQuery.of(context).padding.top;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF0F2F5),
       body: Stack(
         children: [
-          // ── Immersive Map Background ──────────────────────────────
+          // ── Interactive Map Image ──────────────────────────────────
           Positioned.fill(
-            child: Container(
-              color: const Color(0xFFEEF1F6),
-              child: Stack(
-                children: [
-                   // Generic Traditional Market Floorplan Mock
-                   Center(
-                     child: Opacity(
-                       opacity: 0.1,
-                       child: Icon(Icons.map_rounded, size: 400, color: AppColors.textPrimary),
-                     ),
-                   ),
-                   // Sample Zone Markers
-                   _buildZoneMarker(context, 0.3, 0.4, 'A구역', AppColors.primary),
-                   _buildZoneMarker(context, 0.7, 0.3, 'B구역', AppColors.accent),
-                   _buildZoneMarker(context, 0.4, 0.7, 'C구역', AppColors.orange),
-                   _buildZoneMarker(context, 0.6, 0.6, 'D구역', AppColors.success),
-                ],
+            child: InteractiveViewer(
+              transformationController: _transformController,
+              minScale: 0.5,
+              maxScale: 5.0,
+              boundaryMargin: const EdgeInsets.all(80),
+              child: Padding(
+                padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 80),
+                child: Image.asset(
+                  'assets/images/sinwon_market_2x.png',
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
 
-          // ── Glassmorphic Top Bar ──────────────────────────────────
+          // ── Glassmorphic Top Bar ───────────────────────────────────
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            child: ClipRRect(
+            child: ClipRect(
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
                 child: Container(
-                  padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 8, 20, 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    border: const Border(bottom: BorderSide(color: Colors.black12, width: 0.5)),
+                  padding: EdgeInsets.fromLTRB(16, safeTop + 8, 16, 14),
+                  decoration: const BoxDecoration(
+                    color: Color(0xE0FFFFFF),
+                    border: Border(
+                      bottom: BorderSide(color: Colors.black12, width: 0.5),
+                    ),
                   ),
                   child: Row(
                     children: [
                       ShrinkableButton(
                         onTap: () => Navigator.pop(context),
-                        child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF2F4F6),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 16,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
                       ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '$marketName 지도',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: SDS.fwBlack,
-                              color: AppColors.textPrimary,
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${widget.marketName} 지도',
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: SDS.fwBlack,
+                                color: AppColors.textPrimary,
+                                letterSpacing: -0.4,
+                              ),
                             ),
-                          ),
-                          const Text(
-                            '실내 구성 및 점포 위치 안내',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: SDS.fwBold,
-                              color: AppColors.textSecondary,
+                            const Text(
+                              '두 손가락으로 확대·축소, 드래그로 이동하세요',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: SDS.fwBold,
+                                color: AppColors.textSecondary,
+                              ),
                             ),
+                          ],
+                        ),
+                      ),
+                      ShrinkableButton(
+                        onTap: _resetZoom,
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF2F4F6),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ],
+                          child: const Icon(
+                            Icons.center_focus_strong_rounded,
+                            size: 18,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -87,98 +133,69 @@ class MarketMapSimpleScreen extends StatelessWidget {
             ),
           ),
 
-          // ── Bottom Insight Card ───────────────────────────────────
+          // ── Zoom Controls ──────────────────────────────────────────
           Positioned(
-            bottom: 30,
-            left: 20,
-            right: 20,
-            child: SDSFadeIn(
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(SDS.radiusXL),
-                  boxShadow: SDS.shadowPremium,
+            right: 16,
+            bottom: MediaQuery.of(context).padding.bottom + 24,
+            child: Column(
+              children: [
+                _ZoomButton(
+                  icon: Icons.add_rounded,
+                  onTap: () {
+                    final current = _transformController.value.clone();
+                    final scale = current.getMaxScaleOnAxis();
+                    if (scale < 5.0) {
+                      _transformController.value =
+                          current * Matrix4.diagonal3Values(1.3, 1.3, 1.0);
+                    }
+                  },
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Icon(Icons.info_outline_rounded, color: AppColors.primary),
-                        ),
-                        const SizedBox(width: 16),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '지도가 준비 중입니다',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: SDS.fwBlack,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              Text(
-                                '더 정확한 실내 안내를 위해 리모델링 중이에요!',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: SDS.fwBold,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    SDS.button(
-                      label: '리스트로 보기',
-                      onTap: () => Navigator.pop(context),
-                    ),
-                  ],
+                const SizedBox(height: 8),
+                _ZoomButton(
+                  icon: Icons.remove_rounded,
+                  onTap: () {
+                    final current = _transformController.value.clone();
+                    final scale = current.getMaxScaleOnAxis();
+                    if (scale > 0.5) {
+                      _transformController.value =
+                          current * Matrix4.diagonal3Values(1 / 1.3, 1 / 1.3, 1.0);
+                    }
+                  },
                 ),
-              ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildZoneMarker(BuildContext context, double x, double y, String label, Color color) {
-    return Positioned(
-      left: MediaQuery.of(context).size.width * x,
-      top: MediaQuery.of(context).size.height * y,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(100),
-              boxShadow: SDS.shadowSoft,
+class _ZoomButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _ZoomButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return ShrinkableButton(
+      onTap: onTap,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x18000000),
+              blurRadius: 12,
+              offset: Offset(0, 4),
             ),
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Icon(Icons.location_on_rounded, color: Colors.white, size: 24),
-        ],
+          ],
+        ),
+        child: Icon(icon, size: 22, color: AppColors.textPrimary),
       ),
     );
   }

@@ -46,7 +46,7 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
               context: context,
               title: '주문 내역',
               subtitle: active.isNotEmpty
-                  ? '맛있는 기다림이 ${active.length}건 있어요 😋'
+                  ? '맛있는 기다림이 ${active.length}건 있어요'
                   : '기분 좋은 소식을 기다리고 있어요',
             ),
           ),

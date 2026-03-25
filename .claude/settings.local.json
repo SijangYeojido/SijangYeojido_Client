@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebFetch(domain:ko.designus.design)",
-      "Bash(flutter pub:*)",
-      "Bash(flutter analyze:*)"
-    ]
-  }
-}

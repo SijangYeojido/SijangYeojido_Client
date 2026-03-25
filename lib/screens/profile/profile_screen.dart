@@ -87,7 +87,7 @@ class ProfileScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 4),
                                       const Text(
-                                        '시장여지도와 함께한 지 3개월째 ✨',
+                                        '시장여지도와 함께한 지 3개월째',
                                         style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: SDS.fwBold,
@@ -137,21 +137,19 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 40),
                     _buildSectionHeader('나의 활동'),
-                    _UltimateSettingItem(icon: Icons.receipt_long_rounded, label: '주문 내역', color: AppColors.primary),
-                    _UltimateSettingItem(icon: Icons.confirmation_number_rounded, label: '나의 쿠폰', color: AppColors.orange),
                     _UltimateSettingItem(icon: Icons.star_rounded, label: '내가 쓴 리뷰', color: AppColors.warning),
                     const SizedBox(height: 40),
                     _buildSectionHeader('설정'),
                     _UltimateSettingItem(icon: Icons.notifications_rounded, label: '알림 설정'),
                     _UltimateSettingItem(icon: Icons.shield_rounded, label: '개인정보 관리'),
                     _UltimateSettingItem(
-                      icon: Icons.swap_horiz_rounded, 
-                      label: '역할 변경', 
+                      icon: Icons.swap_horiz_rounded,
+                      label: '역할 변경',
                       onTap: () => context.read<AuthProvider>().toggleRole(),
                     ),
                     _UltimateSettingItem(
-                      icon: Icons.logout_rounded, 
-                      label: '로그아웃', 
+                      icon: Icons.logout_rounded,
+                      label: '로그아웃',
                       onTap: () => context.read<AuthProvider>().logout(),
                     ),
                   ],
@@ -233,8 +231,6 @@ class _StatsRow extends StatelessWidget {
           _StatBento(label: '방문 시장', value: '1', icon: Icons.location_on_rounded, color: AppColors.primary),
           const SizedBox(width: 12),
           _StatBento(label: '즐겨찾기', value: '5', icon: Icons.favorite_rounded, color: AppColors.danger),
-          const SizedBox(width: 12),
-          _StatBento(label: '활동 점수', value: '98', icon: Icons.bolt_rounded, color: AppColors.orange),
         ],
       ),
     );
@@ -353,7 +349,6 @@ class _UltimateSettingItem extends StatelessWidget {
   final String label;
   final Color? color;
   final VoidCallback? onTap;
-
   const _UltimateSettingItem({
     required this.icon,
     required this.label,

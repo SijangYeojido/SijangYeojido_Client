@@ -45,3 +45,8 @@ app.*.map.json
 /android/app/release
 
 prd.md
+CLAUDE.md
+kakao_login_medium_narrow.png
+.claude/
+.metadata
+.flutter-plugins

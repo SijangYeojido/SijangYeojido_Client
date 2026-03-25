@@ -34,7 +34,7 @@ class StoreDetailScreen extends StatelessWidget {
           SDS.topBar(
             context: context,
             title: store.name,
-            subtitle: '${market.name}에서 사랑받는 점포예요 ✨',
+            subtitle: '${market.name}에서 사랑받는 점포예요',
             actions: [
               ListenableBuilder(
                 listenable: FavoriteService(),
@@ -158,7 +158,7 @@ class StoreDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '방금 따끈따끈한 소식이 도착했어요 ✨',
+                              '방금 따끈따끈한 소식이 도착했어요',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: SDS.fwBold,
@@ -192,7 +192,7 @@ class StoreDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             _SectionCard(
-                              title: '대표 상품 🍱',
+                              title: '대표 상품',
                               delayMs: 500,
                               child: store.items.isEmpty
                                   ? AppEmptyState(
@@ -264,24 +264,6 @@ class StoreDetailScreen extends StatelessWidget {
                                                     ],
                                                   ),
                                                 ),
-                                                ShrinkableButton(
-                                                  onTap: () {},
-                                                  child: Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                                    decoration: BoxDecoration(
-                                                      color: AppColors.primary.withValues(alpha: 0.1),
-                                                      borderRadius: BorderRadius.circular(12),
-                                                    ),
-                                                    child: const Text(
-                                                      '담기',
-                                                      style: TextStyle(
-                                                        color: AppColors.primary,
-                                                        fontWeight: SDS.fwBold,
-                                                        fontSize: 13,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
                                               ],
                                             ),
                                           ),
@@ -314,40 +296,50 @@ class StoreDetailScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _ActionIconButton(
-                  icon: Icons.phone_rounded,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('${store.name}으로 전화를 연결해요! 📞')),
-                    );
-                  },
+            ShrinkableButton(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${store.name}으로 전화를 연결해요!')),
+                );
+              },
+              child: Container(
+                width: 52,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF2F4F6),
+                  borderRadius: BorderRadius.circular(SDS.radiusM),
                 ),
-                const SizedBox(height: 6),
-                const Text('상담/전화', style: TextStyle(fontSize: 11, fontWeight: SDS.fwBold, color: AppColors.textSecondary)),
-              ],
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: SDS.button(
-                label: '길 안내 시작',
-                isPrimary: false,
-                icon: Icons.directions_rounded,
-                onTap: () => Navigator.pop(context, true),
+                child: const Icon(Icons.phone_rounded, color: AppColors.textPrimary, size: 22),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: SDS.button(
-                label: '점포 상품 예약',
-                color: market.accentColor,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('곧 멋진 예약 시스템으로 찾아뵐게요!')),
-                  );
-                },
+              child: ShrinkableButton(
+                onTap: () => Navigator.pop(context, true),
+                child: Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(SDS.radiusM),
+                    boxShadow: SDS.shadowAccent(AppColors.primary),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.directions_rounded, color: Colors.white, size: 22),
+                      SizedBox(width: 10),
+                      Text(
+                        '길 안내 시작',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: SDS.fwBlack,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -361,12 +353,37 @@ class StoreDetailScreen extends StatelessWidget {
     final storeReviews = MockData.reviews.where((r) => r.storeId == store.id).toList();
 
     return _SectionCard(
-      title: '방문자 리뷰 💬',
+      title: '방문자 리뷰',
       child: storeReviews.isEmpty
-          ? AppEmptyState(
-              icon: Icons.rate_review_outlined,
-              title: '다녀오신 후 리뷰를 남겨주세요',
-              description: '직접 방문한 경험을 들려주시면\n다른 분들에게 큰 도움이 돼요!',
+          ? Column(
+              children: [
+                AppEmptyState(
+                  icon: Icons.rate_review_outlined,
+                  title: '다녀오신 후 리뷰를 남겨주세요',
+                  description: '직접 방문한 경험을 들려주시면\n다른 분들에게 큰 도움이 돼요!',
+                ),
+                const SizedBox(height: 12),
+                ShrinkableButton(
+                  onTap: () => _showReviewSubmitSheet(context),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '리뷰 쓰기',
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             )
           : Column(
               children: [
@@ -457,25 +474,52 @@ class StoreDetailScreen extends StatelessWidget {
                   ),
                 )),
                 const SizedBox(height: 8),
-                ShrinkableButton(
-                  onTap: () => _showReviewSubmitSheet(context),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '리뷰 전체 보기',
-                        style: textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
+                Row(
+                  children: [
+                    Expanded(
+                      child: ShrinkableButton(
+                        onTap: () {},
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '리뷰 전체 보기',
+                              style: textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ShrinkableButton(
+                        onTap: () => _showReviewSubmitSheet(context),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '리뷰 쓰기',
+                              style: textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -487,7 +531,7 @@ class StoreDetailScreen extends StatelessWidget {
     
     final textTheme = Theme.of(context).textTheme;
     return _SectionCard(
-      title: '지금 가게 상황은 어때요? ⚡',
+      title: '지금 가게 상황은 어때요?',
       child: Column(
         children: [
           if (store.freshness != null) ...[
@@ -578,56 +622,97 @@ class StoreDetailScreen extends StatelessWidget {
     );
   }
   void _showReviewSubmitSheet(BuildContext context) {
+    double rating = 0;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-        ),
-        padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 40),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text('방문은 어떠셨나요?', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: SDS.fwBlack, letterSpacing: SDS.lsTight)),
-            const SizedBox(height: 8),
-            Text('이 가게에 대한 솔직한 후기를 들려주세요.', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) => Icon(Icons.star_rounded, size: 40, color: index < 4 ? AppColors.warning : AppColors.divider)),
-            ),
-            const SizedBox(height: 24),
-            TextField(
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText: '음식의 맛, 서비스, 분위기 등에 대해 알려주세요.',
-                filled: true,
-                fillColor: AppColors.background,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-              ),
-            ),
-            const SizedBox(height: 24),
-            AppPrimaryButton(
-              label: '리뷰를 등록할게요',
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('리뷰가 성공적으로 등록되었어요! ✨')));
-              },
-            ),
-          ],
-        ),
+      builder: (_) => StatefulBuilder(
+        builder: (context, setSheetState) {
+          return Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                ),
+                padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 40),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text('방문은 어떠셨나요?', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: SDS.fwBlack, letterSpacing: SDS.lsTight)),
+                    const SizedBox(height: 8),
+                    Text('이 가게에 대한 솔직한 후기를 들려주세요.', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) {
+                        final starValue = index + 1;
+                        IconData icon;
+                        if (rating >= starValue) {
+                          icon = Icons.star_rounded;
+                        } else if (rating >= starValue - 0.5) {
+                          icon = Icons.star_half_rounded;
+                        } else {
+                          icon = Icons.star_border_rounded;
+                        }
+                        return GestureDetector(
+                          onTapDown: (details) {
+                            final isLeftHalf = details.localPosition.dx < 20;
+                            setSheetState(() {
+                              rating = isLeftHalf ? starValue - 0.5 : starValue.toDouble();
+                            });
+                          },
+                          child: SizedBox(
+                            width: 40,
+                            height: 40,
+                            child: Icon(icon, size: 40, color: rating >= starValue - 0.5 ? AppColors.warning : AppColors.divider),
+                          ),
+                        );
+                      }),
+                    ),
+                    if (rating > 0) ...[
+                      const SizedBox(height: 8),
+                      Center(
+                        child: Text(
+                          '$rating점',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: SDS.fwBold,
+                            color: AppColors.warning,
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    TextField(
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: '음식의 맛, 서비스, 분위기 등에 대해 알려주세요.',
+                        filled: true,
+                        fillColor: AppColors.background,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    AppPrimaryButton(
+                      label: '리뷰를 등록할게요',
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('리뷰가 성공적으로 등록되었어요!')));
+                      },
+                    ),
+                  ],
+                ),
+          );
+        },
       ),
     );
   }

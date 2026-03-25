@@ -18,7 +18,7 @@ class MarketStoriesWidget extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: SDS.gutter),
           child: Text(
-            '시장의 실시간 일상 📸',
+            '시장의 실시간 일상',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w900,

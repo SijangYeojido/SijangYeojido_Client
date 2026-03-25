@@ -55,7 +55,7 @@ class _SearchScreenState extends State<SearchScreen> {
           SDS.topBar(
             context: context,
             title: '시장 검색',
-            subtitle: '찾으시는 시장 또는 가게를 입력해 주세요 🏛️',
+            subtitle: '찾으시는 시장 또는 가게를 입력해 주세요',
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
