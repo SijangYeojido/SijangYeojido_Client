@@ -664,10 +664,13 @@ class StoreDetailScreen extends StatelessWidget {
                           icon = Icons.star_border_rounded;
                         }
                         return GestureDetector(
-                          onTapDown: (details) {
-                            final isLeftHalf = details.localPosition.dx < 20;
+                          onTap: () {
                             setSheetState(() {
-                              rating = isLeftHalf ? starValue - 0.5 : starValue.toDouble();
+                              if (rating == starValue - 0.5) {
+                                rating = starValue.toDouble();
+                              } else {
+                                rating = starValue - 0.5;
+                              }
                             });
                           },
                           child: SizedBox(

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/shrinkable_button.dart';
@@ -140,9 +142,10 @@ class MarketInfoScreen extends StatelessWidget {
                     '위치 및 교통',
                     '서울 관악구 신림동 1587-39\n지하철 2호선 신림역 도보 5분 거리',
                   ),
+                  const SizedBox(height: 48),
                   SDSFadeIn(
                     delay: const Duration(milliseconds: 600),
-                    child: _buildUltimateUtilityGrid(),
+                    child: _buildUltimateUtilityGrid(context),
                   ),
                   const SizedBox(height: 56),
 
@@ -168,11 +171,63 @@ class MarketInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildUltimateUtilityGrid() {
+  static const _phoneNumber = '028545453';
+
+  void _showCenterToast(BuildContext context, String message) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (_) => Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.white, fontSize: 15),
+            ),
+          ),
+        ),
+      ),
+    );
+    overlay.insert(entry);
+    Future.delayed(const Duration(seconds: 2), entry.remove);
+  }
+
+  Future<void> _handleCall(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('전화 연결'),
+        content: const Text('02-854-5453으로 전화를 걸까요?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('전화걸기')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final uri = Uri(scheme: 'tel', path: _phoneNumber);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      await Clipboard.setData(const ClipboardData(text: '02-854-5453'));
+      if (context.mounted) {
+        _showCenterToast(context, '전화번호를 복사했습니다.');
+      }
+    }
+  }
+
+  Widget _buildUltimateUtilityGrid(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildCircularAction(Icons.phone_rounded, '전화하기'),
+        _buildCircularAction(Icons.phone_rounded, '전화하기', onTap: () => _handleCall(context)),
         _buildCircularAction(Icons.location_on_rounded, '위치보기'),
         _buildCircularAction(Icons.share_rounded, '공유하기'),
         _buildCircularAction(Icons.bookmark_rounded, '저장하기'),
@@ -180,11 +235,11 @@ class MarketInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCircularAction(IconData icon, String label) {
+  Widget _buildCircularAction(IconData icon, String label, {VoidCallback? onTap}) {
     return Column(
       children: [
         ShrinkableButton(
-          onTap: () {},
+          onTap: onTap ?? () {},
           child: Container(
             width: 68,
             height: 68,
