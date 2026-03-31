@@ -202,11 +202,32 @@ class MarketInfoScreen extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('전화 연결'),
-        content: const Text('02-854-5453으로 전화를 걸까요?'),
+        title: const Text('전화 연결', textAlign: TextAlign.center),
+        content: const Text('02-854-5453으로 전화를 걸까요?', textAlign: TextAlign.center),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('전화걸기')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.textSecondary,
+              backgroundColor: const Color(0xFFF0F0F0),
+              minimumSize: const Size(100, 44),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('취소', style: TextStyle(fontWeight: FontWeight.w600)),
+          ),
+          const SizedBox(width: 12),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: AppColors.primary,
+              minimumSize: const Size(100, 44),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('전화걸기', style: TextStyle(fontWeight: FontWeight.w600)),
+          ),
         ],
       ),
     );
