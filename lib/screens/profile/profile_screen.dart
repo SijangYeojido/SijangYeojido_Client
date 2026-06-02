@@ -1,18 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../config/review_accounts.dart';
 import '../../theme/app_colors.dart';
-import '../../data/mock_data.dart';
+import '../../providers/app_data_provider.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/sds_widgets.dart';
 import '../../widgets/shrinkable_button.dart';
+import '../../widgets/app_ui.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/favorite_service.dart';
+import '../map/market_hub_screen.dart';
+import '../market/market_coupon_screen.dart';
+import '../reservation/reservation_list_screen.dart';
+import 'my_reviews_screen.dart';
+import 'notification_settings_screen.dart';
+import 'privacy_settings_screen.dart';
+import 'profile_settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final completedReservations = MockData.reservations.where((r) => r.isCompleted).length;
+    final data = context.watch<AppDataProvider>();
+    final auth = context.watch<AuthProvider>();
+    final completedReservations = data.reservations
+        .where((r) => r.isCompleted)
+        .length;
+    final favoriteCount = FavoriteService().favoriteIds.length;
+    final favoriteMarket = data.markets.isNotEmpty ? data.markets.first : null;
+    final userName = auth.userName ?? '시장여지도 사용자';
+    final initial = userName.trim().isEmpty ? '시' : userName.characters.first;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -55,7 +73,12 @@ class ProfileScreen extends StatelessWidget {
                             const Spacer(),
                             _ActionIconBtn(
                               icon: Icons.settings_rounded,
-                              onTap: () {},
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ProfileSettingsScreen(),
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -70,14 +93,15 @@ class ProfileScreen extends StatelessWidget {
                             padding: const EdgeInsets.all(24),
                             child: Row(
                               children: [
-                                _ProfileAvatar(initial: '김'),
+                                _ProfileAvatar(initial: initial),
                                 const SizedBox(width: 20),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        '김시장님',
+                                      Text(
+                                        userName,
                                         style: TextStyle(
                                           fontSize: 22,
                                           fontWeight: SDS.fwBlack,
@@ -87,7 +111,7 @@ class ProfileScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 4),
                                       const Text(
-                                        '시장여지도와 함께한 지 3개월째',
+                                        '시장여지도와 함께한 지 3개월째 ✨',
                                         style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: SDS.fwBold,
@@ -115,7 +139,11 @@ class ProfileScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: SDSFadeIn(
               delay: const Duration(milliseconds: 500),
-              child: _StatsRow(completedDeals: completedReservations),
+              child: _StatsRow(
+                visitedMarkets: data.markets.length,
+                favoriteCount: favoriteCount,
+                completedDeals: completedReservations,
+              ),
             ),
           ),
 
@@ -130,22 +158,84 @@ class ProfileScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     _buildSectionHeader('단골 시장'),
-                    _FavoriteMarketCard(
-                      name: '신원시장',
-                      address: '서울 종로구 창경궁로 88',
-                      storeCount: MockData.stores.length,
-                    ),
+                    if (favoriteMarket == null)
+                      const AppEmptyState(
+                        icon: Icons.storefront_outlined,
+                        title: '아직 표시할 시장이 없어요',
+                        description: '서버에서 시장 정보를 불러오면 여기에 표시돼요.',
+                      )
+                    else
+                      _FavoriteMarketCard(
+                        name: favoriteMarket.name,
+                        address: favoriteMarket.address,
+                        storeCount: data
+                            .storesForMarket(favoriteMarket.name)
+                            .length,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MarketHubScreen(
+                              marketName: favoriteMarket.name,
+                            ),
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 40),
                     _buildSectionHeader('나의 활동'),
-                    _UltimateSettingItem(icon: Icons.star_rounded, label: '내가 쓴 리뷰', color: AppColors.warning),
+                    _UltimateSettingItem(
+                      icon: Icons.receipt_long_rounded,
+                      label: '주문 내역',
+                      color: AppColors.primary,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ReservationListScreen(),
+                        ),
+                      ),
+                    ),
+                    _UltimateSettingItem(
+                      icon: Icons.confirmation_number_rounded,
+                      label: '나의 쿠폰',
+                      color: AppColors.orange,
+                      onTap: () => _openCoupons(context, favoriteMarket?.name),
+                    ),
+                    _UltimateSettingItem(
+                      icon: Icons.star_rounded,
+                      label: '내가 쓴 리뷰',
+                      color: AppColors.warning,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const MyReviewsScreen(),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 40),
                     _buildSectionHeader('설정'),
-                    _UltimateSettingItem(icon: Icons.notifications_rounded, label: '알림 설정'),
-                    _UltimateSettingItem(icon: Icons.shield_rounded, label: '개인정보 관리'),
+                    _UltimateSettingItem(
+                      icon: Icons.notifications_rounded,
+                      label: '알림 설정',
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationSettingsScreen(),
+                        ),
+                      ),
+                    ),
+                    _UltimateSettingItem(
+                      icon: Icons.shield_rounded,
+                      label: '개인정보 관리',
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PrivacySettingsScreen(),
+                        ),
+                      ),
+                    ),
                     _UltimateSettingItem(
                       icon: Icons.swap_horiz_rounded,
-                      label: '역할 변경',
-                      onTap: () => context.read<AuthProvider>().toggleRole(),
+                      label: '다른 역할로 전환',
+                      onTap: () => _showRoleSwitchSheet(context, auth.role),
                     ),
                     _UltimateSettingItem(
                       icon: Icons.logout_rounded,
@@ -180,6 +270,94 @@ class ProfileScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _openCoupons(BuildContext context, String? marketName) async {
+    final data = context.read<AppDataProvider>();
+    await data.loadCoupons();
+    if (!context.mounted) return;
+    final resolvedMarket =
+        marketName ?? (data.markets.isNotEmpty ? data.markets.first.name : '신원시장');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MarketCouponScreen(marketName: resolvedMarket),
+      ),
+    );
+  }
+
+  void _showRoleSwitchSheet(BuildContext context, UserRole currentRole) {
+    final options = ReviewAccounts.all
+        .where((account) => account.role != currentRole)
+        .toList();
+    if (options.isEmpty) return;
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '다른 역할로 전환',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: SDS.fwBlack,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                '심사용 계정으로 다시 로그인하면 해당 역할의 기능을 확인할 수 있어요.',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                  fontWeight: SDS.fwMedium,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ...options.map(
+                (account) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: ShrinkableButton(
+                    onTap: () async {
+                      Navigator.pop(sheetContext);
+                      final auth = context.read<AuthProvider>();
+                      await auth.logout();
+                      await auth.loginWithReviewAccount(account.role);
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF7F8FA),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        '${account.label} 계정으로 전환',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: SDS.fwBlack,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -219,8 +397,14 @@ class _ProfileAvatar extends StatelessWidget {
 }
 
 class _StatsRow extends StatelessWidget {
+  final int visitedMarkets;
+  final int favoriteCount;
   final int completedDeals;
-  const _StatsRow({required this.completedDeals});
+  const _StatsRow({
+    required this.visitedMarkets,
+    required this.favoriteCount,
+    required this.completedDeals,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -228,9 +412,26 @@ class _StatsRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
-          _StatBento(label: '방문 시장', value: '1', icon: Icons.location_on_rounded, color: AppColors.primary),
+          _StatBento(
+            label: '방문 시장',
+            value: visitedMarkets.toString(),
+            icon: Icons.location_on_rounded,
+            color: AppColors.primary,
+          ),
           const SizedBox(width: 12),
-          _StatBento(label: '즐겨찾기', value: '5', icon: Icons.favorite_rounded, color: AppColors.danger),
+          _StatBento(
+            label: '즐겨찾기',
+            value: favoriteCount.toString(),
+            icon: Icons.favorite_rounded,
+            color: AppColors.danger,
+          ),
+          const SizedBox(width: 12),
+          _StatBento(
+            label: '예약 완료',
+            value: completedDeals.toString(),
+            icon: Icons.bolt_rounded,
+            color: AppColors.orange,
+          ),
         ],
       ),
     );
@@ -265,12 +466,20 @@ class _StatBento extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               value,
-              style: const TextStyle(fontSize: 22, fontWeight: SDS.fwBlack, color: AppColors.textPrimary),
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: SDS.fwBlack,
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               label,
-              style: const TextStyle(fontSize: 12, fontWeight: SDS.fwBold, color: AppColors.textTertiary),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: SDS.fwBold,
+                color: AppColors.textTertiary,
+              ),
             ),
           ],
         ),
@@ -283,17 +492,19 @@ class _FavoriteMarketCard extends StatelessWidget {
   final String name;
   final String address;
   final int storeCount;
+  final VoidCallback onTap;
 
   const _FavoriteMarketCard({
     required this.name,
     required this.address,
     required this.storeCount,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return ShrinkableButton(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -317,7 +528,11 @@ class _FavoriteMarketCard extends StatelessWidget {
                 color: AppColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.storefront_rounded, color: AppColors.primary, size: 26),
+              child: const Icon(
+                Icons.storefront_rounded,
+                color: AppColors.primary,
+                size: 26,
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -326,17 +541,28 @@ class _FavoriteMarketCard extends StatelessWidget {
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(fontSize: 18, fontWeight: SDS.fwBlack, color: AppColors.textPrimary),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: SDS.fwBlack,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     address,
-                    style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: SDS.fwMedium),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                      fontWeight: SDS.fwMedium,
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textTertiary,
+            ),
           ],
         ),
       ),
@@ -349,6 +575,7 @@ class _UltimateSettingItem extends StatelessWidget {
   final String label;
   final Color? color;
   final VoidCallback? onTap;
+
   const _UltimateSettingItem({
     required this.icon,
     required this.label,
@@ -363,7 +590,9 @@ class _UltimateSettingItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xFFF2F4F6), width: 1)),
+          border: Border(
+            bottom: BorderSide(color: Color(0xFFF2F4F6), width: 1),
+          ),
         ),
         child: Row(
           children: [
@@ -379,7 +608,11 @@ class _UltimateSettingItem extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            const Icon(Icons.chevron_right_rounded, size: 20, color: AppColors.textTertiary),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: AppColors.textTertiary,
+            ),
           ],
         ),
       ),

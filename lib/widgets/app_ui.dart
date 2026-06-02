@@ -23,8 +23,9 @@ class AppSectionHeader extends StatelessWidget {
     return Padding(
       padding: padding,
       child: Row(
-        crossAxisAlignment:
-            subtitle == null ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+        crossAxisAlignment: subtitle == null
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Column(
@@ -51,10 +52,7 @@ class AppSectionHeader extends StatelessWidget {
               ],
             ),
           ),
-          if (trailing != null) ...[
-            const SizedBox(width: 8),
-            trailing!,
-          ],
+          if (trailing != null) ...[const SizedBox(width: 8), trailing!],
         ],
       ),
     );
@@ -100,11 +98,7 @@ class AppCard extends StatelessWidget {
 
     if (onTap == null) return card;
 
-    return ShrinkableButton(
-      onTap: onTap,
-      shrinkScale: 0.98,
-      child: card,
-    );
+    return ShrinkableButton(onTap: onTap, shrinkScale: 0.98, child: card);
   }
 }
 
@@ -125,10 +119,7 @@ class AppPrimaryButton extends StatelessWidget {
       onTap: onPressed,
       child: SizedBox(
         width: double.infinity,
-        child: ElevatedButton(
-          onPressed: onPressed,
-          child: Text(label),
-        ),
+        child: ElevatedButton(onPressed: onPressed, child: Text(label)),
       ),
     );
   }
@@ -212,12 +203,8 @@ class AppEmptyState extends StatelessWidget {
 
 class AppUI {
   static LinearGradient get primaryGradient => const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          AppColors.primary,
-          AppColors.accent,
-        ],
-      );
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [AppColors.primary, AppColors.accent],
+  );
 }
-

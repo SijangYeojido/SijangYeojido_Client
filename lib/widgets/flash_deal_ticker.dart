@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../data/mock_data.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_data_provider.dart';
 
 class FlashDealTickerWidget extends StatefulWidget {
   const FlashDealTickerWidget({super.key});
@@ -47,7 +48,9 @@ class _FlashDealTickerWidgetState extends State<FlashDealTickerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final deals = MockData.flashDeals;
+    final data = context.watch<AppDataProvider>();
+    final deals = data.flashDeals;
+    if (deals.isEmpty) return const SizedBox.shrink();
 
     return Container(
       height: 48,
@@ -66,15 +69,18 @@ class _FlashDealTickerWidgetState extends State<FlashDealTickerWidget> {
         physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           final deal = deals[index % deals.length];
-          final store = MockData.stores.firstWhere((s) => s.id == deal.storeId);
-          
+          final store = data.getStoreById(deal.storeId);
+
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             alignment: Alignment.center,
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF04452),
                     borderRadius: BorderRadius.circular(4),
@@ -90,7 +96,7 @@ class _FlashDealTickerWidgetState extends State<FlashDealTickerWidget> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  '${store.name}: ${deal.title}',
+                  '${store?.name ?? '점포'}: ${deal.title}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,

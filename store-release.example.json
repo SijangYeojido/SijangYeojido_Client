@@ -1,0 +1,25 @@
+{
+  "appStore": {
+    "appIdentifier": "com.sijangyeojido.app",
+    "appName": "시장여지도 - 전통시장 특가",
+    "sku": "sijangyeojido-ios",
+    "primaryLanguage": "Korean",
+    "companyName": "",
+    "appleId": "6773524670",
+    "teamId": "",
+    "ipaPath": "build/ios/ipa/Runner.ipa",
+    "submitForReview": true
+  },
+  "oneStore": {
+    "packageName": "com.sijangyeojido.app",
+    "productId": "",
+    "artifactPath": "build/app/outputs/bundle/release/app-release.aab",
+    "submitForVerification": false
+  },
+  "metadata": {
+    "defaultLocale": "ko",
+    "locales": [
+      "ko"
+    ]
+  }
+}

@@ -129,7 +129,12 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildRoleCard(String title, String subtitle, IconData icon, UserRole role) {
+  Widget _buildRoleCard(
+    String title,
+    String subtitle,
+    IconData icon,
+    UserRole role,
+  ) {
     final isSelected = _selectedRole == role;
     return Expanded(
       child: GestureDetector(
@@ -168,7 +173,9 @@ class _SignupScreenState extends State<SignupScreen> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: SDS.fwMedium,
-                  color: isSelected ? AppColors.primary.withValues(alpha: 0.7) : AppColors.textTertiary,
+                  color: isSelected
+                      ? AppColors.primary.withValues(alpha: 0.7)
+                      : AppColors.textTertiary,
                 ),
               ),
             ],
@@ -199,7 +206,10 @@ class _SignupScreenState extends State<SignupScreen> {
           hintStyle: const TextStyle(color: AppColors.textTertiary),
           border: InputBorder.none,
           prefixIcon: Icon(icon, color: AppColors.textTertiary, size: 20),
-          contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18,
+            horizontal: 16,
+          ),
         ),
       ),
     );

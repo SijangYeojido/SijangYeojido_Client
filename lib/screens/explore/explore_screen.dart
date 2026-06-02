@@ -1,15 +1,15 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../theme/app_colors.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../models/models.dart';
-import '../../data/mock_data.dart';
+import '../../providers/app_data_provider.dart';
 
 import '../map/store_detail_screen.dart';
 import '../../widgets/sds_widgets.dart';
-
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -23,7 +23,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   final List<String> _categories = ['전체', '먹거리', '생선/해산물', '청과/야채', '포목/직물'];
 
   List<Store> get _filteredStores {
-    var stores = MockData.stores;
+    var stores = context.watch<AppDataProvider>().stores;
     if (_selectedCategory != '전체') {
       stores = stores.where((s) => s.category == _selectedCategory).toList();
     }
@@ -59,7 +59,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
           fit: StackFit.expand,
           children: [
             Image.file(
-              File('/Users/bagjun-won/.gemini/antigravity/brain/673c5789-358e-4d47-abc7-c24556e62ea4/traditional_market_hero_1773854073585.png'),
+              File(
+                '/Users/bagjun-won/.gemini/antigravity/brain/673c5789-358e-4d47-abc7-c24556e62ea4/traditional_market_hero_1773854073585.png',
+              ),
               fit: BoxFit.cover,
             ),
             Container(
@@ -92,7 +94,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.auto_awesome, size: 16, color: AppColors.cinematicGold),
+                      Icon(
+                        Icons.auto_awesome,
+                        size: 16,
+                        color: AppColors.cinematicGold,
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         '오늘의 가장 신선한 이야기가 기다려요',
@@ -136,13 +142,20 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   onTap: () => setState(() => _selectedCategory = cat),
                   child: AnimatedContainer(
                     duration: SDS.durationFast,
-                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 22,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.cinematicDeep : AppColors.surface,
+                      color: isSelected
+                          ? AppColors.cinematicDeep
+                          : AppColors.surface,
                       borderRadius: BorderRadius.circular(SDS.radiusCapsule),
                       boxShadow: isSelected ? SDS.shadowSoft : null,
                       border: Border.all(
-                        color: isSelected ? AppColors.cinematicDeep : AppColors.divider,
+                        color: isSelected
+                            ? AppColors.cinematicDeep
+                            : AppColors.divider,
                         width: 1.5,
                       ),
                     ),
@@ -151,7 +164,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: SDS.fwBold,
-                        color: isSelected ? Colors.white : AppColors.textSecondary,
+                        color: isSelected
+                            ? Colors.white
+                            : AppColors.textSecondary,
                         letterSpacing: SDS.lsNormal,
                       ),
                     ),
@@ -197,7 +212,11 @@ class _GlassSearchDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => 88;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       decoration: BoxDecoration(
@@ -216,7 +235,11 @@ class _GlassSearchDelegate extends SliverPersistentHeaderDelegate {
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Row(
               children: [
-                const Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 24),
+                const Icon(
+                  Icons.search_rounded,
+                  color: AppColors.textSecondary,
+                  size: 24,
+                ),
                 const SizedBox(width: 14),
                 Text(
                   '어떤 가게를 찾아볼까요?',
@@ -235,7 +258,11 @@ class _GlassSearchDelegate extends SliverPersistentHeaderDelegate {
                     color: AppColors.cinematicDeep.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.tune_rounded, size: 18, color: AppColors.textSecondary),
+                  child: const Icon(
+                    Icons.tune_rounded,
+                    size: 18,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -246,7 +273,8 @@ class _GlassSearchDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => false;
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
+      false;
 }
 
 class _StoreEpicCard extends StatelessWidget {
@@ -283,7 +311,10 @@ class _StoreEpicCard extends StatelessWidget {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(SDS.radiusS),
@@ -298,7 +329,11 @@ class _StoreEpicCard extends StatelessWidget {
                             ),
                           ),
                           const Spacer(),
-                          const Icon(Icons.star_rounded, size: 16, color: AppColors.cinematicGold),
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 16,
+                            color: AppColors.cinematicGold,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             '4.8',
@@ -332,7 +367,11 @@ class _StoreEpicCard extends StatelessWidget {
                       const Spacer(),
                       Row(
                         children: [
-                          Icon(Icons.location_on_rounded, size: 14, color: AppColors.textTertiary),
+                          Icon(
+                            Icons.location_on_rounded,
+                            size: 14,
+                            color: AppColors.textTertiary,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             '여기서 120m',

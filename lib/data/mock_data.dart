@@ -56,11 +56,11 @@ class MockData {
   ];
 
   static MarketInfo getMarket(String name) {
-    return markets.firstWhere((m) => m.name == name,
-        orElse: () => markets.first);
+    return markets.firstWhere(
+      (m) => m.name == name,
+      orElse: () => markets.first,
+    );
   }
-
-
 
   static final List<Store> stores = [
     Store(
@@ -70,10 +70,24 @@ class MockData {
       zoneId: 'A',
       category: '건어물',
       status: StoreStatus.open,
-      paymentMethods: [PaymentMethod.cash, PaymentMethod.card, PaymentMethod.zeroPay],
+      paymentMethods: [
+        PaymentMethod.cash,
+        PaymentMethod.card,
+        PaymentMethod.zeroPay,
+      ],
       items: [
-        StoreItem(name: '프리미엄 멸치 (500g)', price: 15000, imageUrl: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=400'),
-        StoreItem(name: '반건조 오징어 (5미)', price: 22000, imageUrl: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&q=80&w=400'),
+        StoreItem(
+          name: '프리미엄 멸치 (500g)',
+          price: 15000,
+          imageUrl:
+              'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=400',
+        ),
+        StoreItem(
+          name: '반건조 오징어 (5미)',
+          price: 22000,
+          imageUrl:
+              'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&q=80&w=400',
+        ),
       ],
       lastUpdated: DateTime(2026, 3, 16),
       infoSource: '방문자 제보',
@@ -89,8 +103,18 @@ class MockData {
       status: StoreStatus.open,
       paymentMethods: [PaymentMethod.cash, PaymentMethod.kakao],
       items: [
-        StoreItem(name: '꿀호떡', price: 1500, imageUrl: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc2fe0a?auto=format&fit=crop&q=80&w=400'),
-        StoreItem(name: '씨앗호떡', price: 2000, imageUrl: 'https://images.unsplash.com/photo-1582928503102-3c1d9b3d2238?auto=format&fit=crop&q=80&w=400'),
+        StoreItem(
+          name: '꿀호떡',
+          price: 1500,
+          imageUrl:
+              'https://images.unsplash.com/photo-1590080875515-8a3a8dc2fe0a?auto=format&fit=crop&q=80&w=400',
+        ),
+        StoreItem(
+          name: '씨앗호떡',
+          price: 2000,
+          imageUrl:
+              'https://images.unsplash.com/photo-1582928503102-3c1d9b3d2238?auto=format&fit=crop&q=80&w=400',
+        ),
       ],
       lastUpdated: DateTime(2026, 3, 16),
       infoSource: '방문자 제보',
@@ -1732,30 +1756,10 @@ class MockData {
   ];
 
   static final List<Zone> zones = [
-    Zone(
-      id: 'A',
-      name: 'A구역',
-      description: '포목/직물',
-      color: AppColors.zoneA,
-    ),
-    Zone(
-      id: 'B',
-      name: 'B구역',
-      description: '먹거리',
-      color: AppColors.zoneB,
-    ),
-    Zone(
-      id: 'C',
-      name: 'C구역',
-      description: '생선/해산물',
-      color: AppColors.zoneC,
-    ),
-    Zone(
-      id: 'D',
-      name: 'D구역',
-      description: '청과/야채',
-      color: AppColors.zoneD,
-    ),
+    Zone(id: 'A', name: 'A구역', description: '포목/직물', color: AppColors.zoneA),
+    Zone(id: 'B', name: 'B구역', description: '먹거리', color: AppColors.zoneB),
+    Zone(id: 'C', name: 'C구역', description: '생선/해산물', color: AppColors.zoneC),
+    Zone(id: 'D', name: 'D구역', description: '청과/야채', color: AppColors.zoneD),
   ];
 
   static Zone? getZoneById(String id) {
@@ -1784,7 +1788,7 @@ class MockData {
       reservedAt: _now.subtract(const Duration(minutes: 5)),
       expiresAt: _now.add(const Duration(minutes: 10)),
       pickupCode: '3847',
-      isCompleted: false,
+      status: 'ACTIVE',
     ),
     Reservation(
       id: 'r2',
@@ -1795,7 +1799,7 @@ class MockData {
       reservedAt: _now.subtract(const Duration(hours: 2)),
       expiresAt: _now.subtract(const Duration(hours: 1, minutes: 45)),
       pickupCode: '5291',
-      isCompleted: true,
+      status: 'COMPLETED',
     ),
   ];
 
@@ -1803,19 +1807,23 @@ class MockData {
     StoreStory(
       id: 'st1',
       storeId: 's1',
-      imageUrl: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=300',
+      imageUrl:
+          'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=300',
       isLive: true,
       createdAt: _now.subtract(const Duration(minutes: 15)),
     ),
     StoreStory(
       id: 'st2',
       storeId: 's7',
-      imageUrl: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300',
+      imageUrl:
+          'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300',
       createdAt: _now.subtract(const Duration(hours: 1)),
     ),
     StoreStory(
       id: 'st3',
-      storeId: 's25',      imageUrl: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=300',
+      storeId: 's25',
+      imageUrl:
+          'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=300',
       isLive: true,
       createdAt: _now.subtract(const Duration(minutes: 2)),
     ),
@@ -1846,7 +1854,9 @@ class MockData {
       userAvatar: 'https://i.pravatar.cc/150?u=rv1',
       content: '부모님 모시고 왔는데 너무 좋아하시네요. 씨앗호떡 진짜 맛있어요!',
       rating: 5.0,
-      images: ['https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300'],
+      images: [
+        'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300',
+      ],
       createdAt: _now.subtract(const Duration(days: 2)),
     ),
     StoreReview(
@@ -1865,7 +1875,9 @@ class MockData {
       userAvatar: 'https://i.pravatar.cc/150?u=rv3',
       content: '신원호떡은 진리입니다. 겉바속촉 그 자체!',
       rating: 5.0,
-      images: ['https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300'],
+      images: [
+        'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=300',
+      ],
       createdAt: _now.subtract(const Duration(hours: 12)),
     ),
   ];

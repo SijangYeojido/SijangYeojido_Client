@@ -1,23 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
+import 'config/app_config.dart';
 import 'theme/app_theme.dart';
+import 'providers/app_data_provider.dart';
 import 'providers/auth_provider.dart';
+import 'services/notification_service.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/auth/profile_setup_screen.dart';
 import 'screens/main_scaffold.dart';
 import 'screens/onboarding/splash_screen.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('ko_KR');
+  await NotificationService.instance.initialize();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
     ),
   );
+  final authProvider = AuthProvider();
+  if (AppConfig.resetLocalDataOnLaunch) {
+    await authProvider.resetLocalDataForFreshRun();
+  }
+  await authProvider.restoreSession();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AuthProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider.value(value: NotificationService.instance),
+        ChangeNotifierProvider(create: (_) => AppDataProvider()),
+      ],
       child: const SijangYeojidoApp(),
     ),
   );
@@ -53,7 +69,14 @@ class _AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
-        return auth.isLoggedIn ? const MainScaffold() : const LoginScreen();
+        if (!auth.hasRestoredSession) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (!auth.isLoggedIn) return const LoginScreen();
+        if (auth.needsProfileSetup) return const ProfileSetupScreen();
+        return const MainScaffold();
       },
     );
   }

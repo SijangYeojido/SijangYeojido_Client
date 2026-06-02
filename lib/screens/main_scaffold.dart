@@ -7,6 +7,7 @@ import 'home/nearby_map_screen.dart';
 import 'profile/profile_screen.dart';
 import 'merchant/merchant_dashboard.dart';
 import 'merchant/product_management_screen.dart';
+import 'admin/admin_dashboard_screen.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
@@ -19,6 +20,14 @@ class _MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 0;
 
   List<Widget> _getScreens(UserRole role) {
+    if (role == UserRole.admin) {
+      return const [
+        AdminDashboardScreen(),
+        HomeScreen(),
+        NearbyMapScreen(),
+        ProfileScreen(),
+      ];
+    }
     if (role == UserRole.merchant) {
       return [
         const MerchantDashboard(),
@@ -26,14 +35,34 @@ class _MainScaffoldState extends State<MainScaffold> {
         const ProfileScreen(),
       ];
     }
-    return [
-      const HomeScreen(),
-      const NearbyMapScreen(),
-      const ProfileScreen(),
-    ];
+    return [const HomeScreen(), const NearbyMapScreen(), const ProfileScreen()];
   }
 
   List<SDSFloatingTabItem> _getTabItems(UserRole role) {
+    if (role == UserRole.admin) {
+      return const [
+        SDSFloatingTabItem(
+          icon: Icons.admin_panel_settings_outlined,
+          activeIcon: Icons.admin_panel_settings_rounded,
+          label: '운영',
+        ),
+        SDSFloatingTabItem(
+          icon: Icons.home_rounded,
+          activeIcon: Icons.home_rounded,
+          label: '홈',
+        ),
+        SDSFloatingTabItem(
+          icon: Icons.location_on_outlined,
+          activeIcon: Icons.location_on_rounded,
+          label: '지도',
+        ),
+        SDSFloatingTabItem(
+          icon: Icons.person_outline_rounded,
+          activeIcon: Icons.person_rounded,
+          label: '내 정보',
+        ),
+      ];
+    }
     if (role == UserRole.merchant) {
       return const [
         SDSFloatingTabItem(
@@ -84,10 +113,14 @@ class _MainScaffoldState extends State<MainScaffold> {
         children: [
           IndexedStack(
             index: _currentIndex,
-            children: screens.map((screen) => Padding(
-              padding: const EdgeInsets.only(bottom: 80),
-              child: screen,
-            )).toList(),
+            children: screens
+                .map(
+                  (screen) => Padding(
+                    padding: const EdgeInsets.only(bottom: 80),
+                    child: screen,
+                  ),
+                )
+                .toList(),
           ),
           Positioned(
             left: 0,

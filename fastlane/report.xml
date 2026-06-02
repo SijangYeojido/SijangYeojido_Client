@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="fastlane.lanes">
+
+
+
+
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000222">
+
+      </testcase>
+
+
+      <testcase classname="fastlane.lanes" name="1: Switch to ios asc_auth lane" time="0.000103">
+
+      </testcase>
+
+
+      <testcase classname="fastlane.lanes" name="2: app_store_connect_api_key" time="0.002286">
+
+      </testcase>
+
+
+      <testcase classname="fastlane.lanes" name="3: upload_to_app_store" time="1002.551163">
+
+      </testcase>
+
+  </testsuite>
+</testsuites>

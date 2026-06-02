@@ -23,16 +23,24 @@ class Zone {
 }
 
 class StoreItem {
+  final String? id;
   final String name;
+  final String? category;
+  final String? origin;
   final String? unitNumber;
   final int? price;
   final String? imageUrl;
+  final String? stockStatus;
 
   const StoreItem({
+    this.id,
     required this.name,
+    this.category,
+    this.origin,
     this.unitNumber,
     this.price,
     this.imageUrl,
+    this.stockStatus,
   });
 }
 
@@ -52,6 +60,13 @@ class Store {
   final int? freshness; // 0-100
   final String? inventoryStatus; // e.g., '여유', '매진임박', '품절'
   final String marketName;
+  final String? description;
+  final String? openingTime;
+  final String? closingTime;
+  final List<String> regularHolidays;
+  final List<String> temporaryHolidays;
+  final List<String> imageUrls;
+  final String? addressDetail;
 
   const Store({
     required this.id,
@@ -69,12 +84,15 @@ class Store {
     this.freshness,
     this.inventoryStatus,
     this.marketName = '신원시장',
+    this.description,
+    this.openingTime,
+    this.closingTime,
+    this.regularHolidays = const [],
+    this.temporaryHolidays = const [],
+    this.imageUrls = const [],
+    this.addressDetail,
   });
-
-
 }
-
-
 
 class POI {
   final String name;
@@ -121,7 +139,8 @@ class Reservation {
   final DateTime reservedAt;
   final DateTime expiresAt;
   final String pickupCode;
-  final bool isCompleted;
+  final String status;
+  final String paymentStatus;
 
   const Reservation({
     required this.id,
@@ -132,11 +151,15 @@ class Reservation {
     required this.reservedAt,
     required this.expiresAt,
     required this.pickupCode,
-    this.isCompleted = false,
+    this.status = 'ACTIVE',
+    this.paymentStatus = 'PAID',
   });
 
-  bool get isExpired => DateTime.now().isAfter(expiresAt);
-  bool get isActive => !isCompleted && !isExpired;
+  bool get isCompleted => status == 'COMPLETED';
+  bool get isPendingPayment => status == 'PENDING_PAYMENT';
+  bool get isExpired =>
+      status == 'EXPIRED' || DateTime.now().isAfter(expiresAt);
+  bool get isActive => status == 'ACTIVE' && !isExpired;
 
   Duration get remainingTime {
     final diff = expiresAt.difference(DateTime.now());
@@ -243,6 +266,9 @@ class FlashDeal {
   final String storeId;
   final String title;
   final String discount;
+  final int dealPrice;
+  final int? originalPrice;
+  final int availableQuantity;
   final DateTime expiresAt;
 
   const FlashDeal({
@@ -250,6 +276,9 @@ class FlashDeal {
     required this.storeId,
     required this.title,
     required this.discount,
+    this.dealPrice = 0,
+    this.originalPrice,
+    this.availableQuantity = 0,
     required this.expiresAt,
   });
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 /// SDS (Sijang Design System) v8
-/// 
+///
 /// 앱 전체의 일관된 고품격 미학을 유지하기 위한 통합 디자인 시스템 토큰입니다.
 class SDS {
   // --- Blur Filters (V8 Cinematic) ---
@@ -105,7 +105,7 @@ class SDS {
   static const Duration durationFast = Duration(milliseconds: 240);
   static const Duration durationNormal = Duration(milliseconds: 400);
   static const Duration durationSlow = Duration(milliseconds: 800);
-  
+
   static const Curve curveStandard = Curves.easeInOutCubic;
   static const Curve curveEntrance = Curves.easeOutQuart;
   static const Curve curveSpring = Curves.elasticOut;
@@ -114,7 +114,7 @@ class SDS {
   static const double lsTight = -0.8;
   static const double lsNormal = -0.5;
   static const double lsWide = 0.2;
-  
+
   static const FontWeight fwLight = FontWeight.w300;
   static const FontWeight fwRegular = FontWeight.w400;
   static const FontWeight fwMedium = FontWeight.w500;
@@ -161,7 +161,12 @@ class SDS {
     bool showBackButton = true,
   }) {
     return Container(
-      padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 8, 20, 16),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        MediaQuery.of(context).padding.top + 8,
+        20,
+        16,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(color: Color(0xFFF2F4F6), width: 1)),
@@ -173,12 +178,16 @@ class SDS {
               padding: const EdgeInsets.only(right: 12),
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
-                child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: Color(0xFF191F28)),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  size: 20,
+                  color: Color(0xFF191F28),
+                ),
               ),
             )
           else if (leading != null)
             Padding(padding: const EdgeInsets.only(right: 12), child: leading),
-          
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,13 +239,11 @@ class SDS {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: padding ?? const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding:
+            padding ?? const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           children: [
-            if (leading != null) ...[
-              leading,
-              const SizedBox(width: 16),
-            ],
+            if (leading != null) ...[leading, const SizedBox(width: 16)],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,10 +272,7 @@ class SDS {
                 ],
               ),
             ),
-            if (trailing != null) ...[
-              const SizedBox(width: 12),
-              trailing,
-            ],
+            if (trailing != null) ...[const SizedBox(width: 12), trailing],
           ],
         ),
       ),
@@ -284,7 +288,8 @@ class SDS {
     Color? color,
     double? width,
   }) {
-    final bgColor = color ?? (isPrimary ? AppColors.primary : const Color(0xFFF2F4F6));
+    final bgColor =
+        color ?? (isPrimary ? AppColors.primary : const Color(0xFFF2F4F6));
     final textColor = isPrimary ? Colors.white : const Color(0xFF4E5968);
 
     return GestureDetector(
@@ -296,29 +301,37 @@ class SDS {
           color: color ?? (isPrimary ? null : const Color(0xFFF2F4F6)),
           gradient: isPrimary ? AppColors.primaryGradient : null,
           borderRadius: BorderRadius.circular(radiusM),
-          boxShadow: isPrimary ? [
-            BoxShadow(
-              color: bgColor.withValues(alpha: 0.25),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            )
-          ] : null,
+          boxShadow: isPrimary
+              ? [
+                  BoxShadow(
+                    color: bgColor.withValues(alpha: 0.25),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 20, color: textColor),
+              Flexible(flex: 0, child: Icon(icon, size: 20, color: textColor)),
               const SizedBox(width: 8),
             ],
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: fwBlack,
-                color: textColor,
-                letterSpacing: lsNormal,
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: fwBlack,
+                  color: textColor,
+                  letterSpacing: lsNormal,
+                ),
               ),
             ),
           ],

@@ -21,7 +21,11 @@ class MarketParkingScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: ShrinkableButton(
             onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+            child: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: AppColors.textPrimary,
+              size: 20,
+            ),
           ),
         ),
       ),
@@ -50,7 +54,12 @@ class MarketParkingScreen extends StatelessWidget {
               padding: EdgeInsets.only(left: 16.0),
               child: Text(
                 '신원시장 방문 시 이용 가능한\n주차장 정보를 확인하세요.',
-                style: TextStyle(fontSize: 15, color: AppColors.textSecondary, fontWeight: SDS.fwBold, height: 1.5),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: AppColors.textSecondary,
+                  fontWeight: SDS.fwBold,
+                  height: 1.5,
+                ),
               ),
             ),
             const SizedBox(height: 32),
@@ -67,11 +76,12 @@ class MarketParkingScreen extends StatelessWidget {
               distance: '신림역 1번 출구 인근 (도보 7분)',
               address: '서울 관악구 신원로 35',
             ),
-            
+
             const SizedBox(height: 32),
             _buildBentoTipCard(
               title: '신원시장 주차 꿀팁',
-              content: '• 시장 노상 공영주차장은 카드 결제 전용입니다.\n• 주말 및 공휴일은 매우 혼잡할 수 있습니다.\n• 도림천 산책로와 연결되어 있어 쾌적하게 이용 가능합니다.',
+              content:
+                  '• 시장 노상 공영주차장은 카드 결제 전용입니다.\n• 주말 및 공휴일은 매우 혼잡할 수 있습니다.\n• 도림천 산책로와 연결되어 있어 쾌적하게 이용 가능합니다.',
             ),
             const SizedBox(height: 80),
           ],
@@ -104,18 +114,33 @@ class MarketParkingScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     '\u00A0$name',
-                    style: const TextStyle(fontSize: 18, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: -0.3),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: SDS.fwBlack,
+                      color: AppColors.textPrimary,
+                      letterSpacing: 0.8,
+                    ),
+                    overflow: TextOverflow.visible,
+                    softWrap: false,
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: shinwonRed.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text('주차가능', style: TextStyle(color: shinwonRed, fontSize: 12, fontWeight: SDS.fwBlack)),
+                  child: const Text(
+                    '주차가능',
+                    style: TextStyle(
+                      color: shinwonRed,
+                      fontSize: 12,
+                      fontWeight: SDS.fwBlack,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -125,7 +150,7 @@ class MarketParkingScreen extends StatelessWidget {
             _buildNuclearInfoRow(Icons.directions_walk_rounded, distance),
             const SizedBox(height: 12),
             _buildNuclearInfoRow(Icons.location_on_outlined, address),
-            
+
             const SizedBox(height: 28),
             ShrinkableButton(
               onTap: () {},
@@ -138,8 +163,12 @@ class MarketParkingScreen extends StatelessWidget {
                 ),
                 child: const Center(
                   child: Text(
-                    '길찾기', 
-                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: SDS.fwBlack)
+                    '길찾기',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: SDS.fwBlack,
+                    ),
                   ),
                 ),
               ),
@@ -153,13 +182,22 @@ class MarketParkingScreen extends StatelessWidget {
   Widget _buildNuclearInfoRow(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.textSecondary.withValues(alpha: 0.6)),
+        Icon(
+          icon,
+          size: 18,
+          color: AppColors.textSecondary.withValues(alpha: 0.6),
+        ),
         const SizedBox(width: 20),
         Expanded(
           child: Text(
             '\u00A0$text',
-            style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, fontWeight: SDS.fwBold, letterSpacing: -0.2),
-            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+              fontWeight: SDS.fwBold,
+              letterSpacing: 0.5,
+            ),
+            overflow: TextOverflow.visible,
           ),
         ),
       ],
@@ -180,11 +218,20 @@ class MarketParkingScreen extends StatelessWidget {
           Row(
             children: [
               const SizedBox(width: 8),
-              const Icon(Icons.tips_and_updates_rounded, color: shinwonRed, size: 20),
+              const Icon(
+                Icons.tips_and_updates_rounded,
+                color: shinwonRed,
+                size: 20,
+              ),
               const SizedBox(width: 12),
               Text(
-                '\u00A0$title', 
-                style: const TextStyle(fontSize: 16, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: 0.5)
+                '\u00A0$title',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: SDS.fwBlack,
+                  color: AppColors.textPrimary,
+                  letterSpacing: 0.5,
+                ),
               ),
             ],
           ),
@@ -193,7 +240,12 @@ class MarketParkingScreen extends StatelessWidget {
             padding: const EdgeInsets.only(left: 8.0),
             child: Text(
               content,
-              style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, fontWeight: SDS.fwBold, height: 1.7),
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+                fontWeight: SDS.fwBold,
+                height: 1.7,
+              ),
             ),
           ),
         ],

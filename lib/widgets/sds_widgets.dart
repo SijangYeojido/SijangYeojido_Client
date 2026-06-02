@@ -34,18 +34,33 @@ class SDSListRow extends StatelessWidget {
   Widget build(BuildContext context) {
     double verticalPadding;
     switch (paddingLevel) {
-      case 1: verticalPadding = 14.0; break; // S (approx 44-48dp total)
-      case 3: verticalPadding = SDS.space24; break; // L
-      case 4: verticalPadding = SDS.space32; break; // XL
+      case 1:
+        verticalPadding = 14.0;
+        break; // S (approx 44-48dp total)
+      case 3:
+        verticalPadding = SDS.space24;
+        break; // L
+      case 4:
+        verticalPadding = SDS.space32;
+        break; // XL
       case 2:
-      default: verticalPadding = SDS.space18; break; // M (More spacious)
+      default:
+        verticalPadding = SDS.space18;
+        break; // M (More spacious)
     }
 
     final row = Container(
-      padding: EdgeInsets.symmetric(horizontal: SDS.gutter, vertical: verticalPadding),
+      padding: EdgeInsets.symmetric(
+        horizontal: SDS.gutter,
+        vertical: verticalPadding,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        border: showDivider ? const Border(bottom: BorderSide(color: AppColors.divider, width: 0.8)) : null,
+        border: showDivider
+            ? const Border(
+                bottom: BorderSide(color: AppColors.divider, width: 0.8),
+              )
+            : null,
       ),
       child: Row(
         children: [
@@ -86,7 +101,11 @@ class SDSListRow extends StatelessWidget {
             const SizedBox(width: SDS.space12),
             trailing!,
           ] else if (onTap != null) ...[
-            const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary, size: 24),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textTertiary,
+              size: 24,
+            ),
           ],
         ],
       ),
@@ -117,7 +136,8 @@ class SDSButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = color ?? (isPrimary ? AppColors.primary : AppColors.background);
+    final themeColor =
+        color ?? (isPrimary ? AppColors.primary : AppColors.background);
     final textColor = isPrimary ? Colors.white : AppColors.textPrimary;
 
     return ShrinkableButton(
@@ -130,7 +150,9 @@ class SDSButton extends StatelessWidget {
           gradient: isPrimary ? AppColors.primaryGradient : null,
           borderRadius: BorderRadius.circular(SDS.radiusM),
           boxShadow: isPrimary ? SDS.shadowAccent(AppColors.primary) : null,
-          border: isPrimary ? null : Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+          border: isPrimary
+              ? null
+              : Border.all(color: AppColors.border.withValues(alpha: 0.5)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -207,16 +229,16 @@ class SDSTopBar extends StatelessWidget implements PreferredSizeWidget {
                         child: const SizedBox(
                           width: 44,
                           height: 44,
-                          child: Icon(Icons.arrow_back_ios_new_rounded,
-                              size: 20, color: AppColors.textPrimary),
+                          child: Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 20,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
                     const Spacer(),
                     if (actions != null)
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: actions!,
-                      ),
+                      Row(mainAxisSize: MainAxisSize.min, children: actions!),
                   ],
                 ),
               ),
@@ -283,13 +305,9 @@ class SDSFloatingTabbar extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 24),
       height: 64,
-      decoration: SDS.glassDecoration(
-        radius: SDS.radiusCapsule,
-        opacity: 0.92,
-        blur: 24,
-      ).copyWith(
-        boxShadow: SDS.shadowPremium,
-      ),
+      decoration: SDS
+          .glassDecoration(radius: SDS.radiusCapsule, opacity: 0.92, blur: 24)
+          .copyWith(boxShadow: SDS.shadowPremium),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: items.asMap().entries.map((entry) {
@@ -298,34 +316,44 @@ class SDSFloatingTabbar extends StatelessWidget {
           final isSelected = currentIndex == index;
 
           return Expanded(
-            child: ShrinkableButton(
-              onTap: () => onTap(index),
-              shrinkScale: 0.9,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedScale(
-                    scale: isSelected ? 1.1 : 1.0,
-                    duration: SDS.durationFast,
-                    curve: Curves.easeOutBack,
-                    child: Icon(
-                      isSelected ? item.activeIcon : item.icon,
-                      color: isSelected ? AppColors.primary : AppColors.textTertiary,
-                      size: 24,
+            child: Semantics(
+              button: true,
+              label: 'tab-${item.label}',
+              child: ShrinkableButton(
+                onTap: () => onTap(index),
+                shrinkScale: 0.9,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedScale(
+                      scale: isSelected ? 1.1 : 1.0,
+                      duration: SDS.durationFast,
+                      curve: Curves.easeOutBack,
+                      child: Icon(
+                        isSelected ? item.activeIcon : item.icon,
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textTertiary,
+                        size: 24,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  AnimatedDefaultTextStyle(
-                    duration: SDS.durationFast,
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
-                      color: isSelected ? AppColors.primary : AppColors.textTertiary,
-                      letterSpacing: -0.5,
+                    const SizedBox(height: 4),
+                    AnimatedDefaultTextStyle(
+                      duration: SDS.durationFast,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: isSelected
+                            ? FontWeight.w900
+                            : FontWeight.w700,
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textTertiary,
+                        letterSpacing: -0.5,
+                      ),
+                      child: Text(item.label),
                     ),
-                    child: Text(item.label),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
@@ -386,7 +414,9 @@ class PremiumPlaceholder extends StatelessWidget {
     if (category.contains('먹거리')) return Icons.restaurant_rounded;
     if (category.contains('수산')) return Icons.set_meal_rounded;
     if (category.contains('정육')) return Icons.kebab_dining_rounded;
-    if (category.contains('과일') || category.contains('채소')) return Icons.eco_rounded;
+    if (category.contains('과일') || category.contains('채소')) {
+      return Icons.eco_rounded;
+    }
     return Icons.storefront_rounded;
   }
 }
@@ -414,9 +444,7 @@ class SDSStepBar extends StatelessWidget {
       child: FractionallySizedBox(
         alignment: Alignment.centerLeft,
         widthFactor: (currentStep + 1) / totalSteps,
-        child: Container(
-          color: color ?? AppColors.primary,
-        ),
+        child: Container(color: color ?? AppColors.primary),
       ),
     );
   }
@@ -441,19 +469,31 @@ class SDSStickyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    
+
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 12, 20, bottomPadding > 0 ? bottomPadding : 16),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        12,
+        20,
+        bottomPadding > 0 ? bottomPadding : 16,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.border.withValues(alpha: 0.5), width: 0.5)),
+        border: Border(
+          top: BorderSide(
+            color: AppColors.border.withValues(alpha: 0.5),
+            width: 0.5,
+          ),
+        ),
       ),
       child: ShrinkableButton(
         onTap: isEnabled && !isLoading ? onTap : null,
         child: Container(
           height: 56,
           decoration: BoxDecoration(
-            color: isEnabled ? AppColors.primary : AppColors.border.withValues(alpha: 0.5),
+            color: isEnabled
+                ? AppColors.primary
+                : AppColors.border.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(SDS.radiusM),
           ),
           child: Center(
@@ -461,7 +501,10 @@ class SDSStickyButton extends StatelessWidget {
                 ? const SizedBox(
                     width: 24,
                     height: 24,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 3,
+                    ),
                   )
                 : Text(
                     label,
@@ -547,10 +590,12 @@ class SDSCategoryItem extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              width: 76, 
+              width: 76,
               height: 76,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : Colors.white,
+                color: isSelected
+                    ? AppColors.primary.withValues(alpha: 0.05)
+                    : Colors.white,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -560,8 +605,10 @@ class SDSCategoryItem extends StatelessWidget {
                   ),
                 ],
                 border: Border.all(
-                  color: isSelected ? AppColors.primary.withValues(alpha: 0.3) : const Color(0xFFF2F4F6), 
-                  width: 1.5
+                  color: isSelected
+                      ? AppColors.primary.withValues(alpha: 0.3)
+                      : const Color(0xFFF2F4F6),
+                  width: 1.5,
                 ),
               ),
               child: ClipOval(
@@ -569,22 +616,32 @@ class SDSCategoryItem extends StatelessWidget {
                   child: ShaderMask(
                     shaderCallback: (rect) {
                       return const RadialGradient(
-                        colors: [Colors.white, Colors.white, Colors.transparent],
-                        stops: [0.0, 0.75, 1.0], // Fades out the square background corners
+                        colors: [
+                          Colors.white,
+                          Colors.white,
+                          Colors.transparent,
+                        ],
+                        stops: [
+                          0.0,
+                          0.75,
+                          1.0,
+                        ], // Fades out the square background corners
                       ).createShader(rect);
                     },
                     blendMode: BlendMode.dstIn,
                     child: Image.asset(
-                      assetPath, 
-                      width: 54, 
-                      height: 54, 
+                      assetPath,
+                      width: 54,
+                      height: 54,
                       fit: BoxFit.contain,
                     ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 8), // Reduced from 12 to prevent 2px overflow
+            const SizedBox(
+              height: 8,
+            ), // Reduced from 12 to prevent 2px overflow
             Text(
               label,
               maxLines: 1,
@@ -610,11 +667,7 @@ class SDSLogo extends StatelessWidget {
   final double size;
   final bool useGlass;
 
-  const SDSLogo({
-    super.key,
-    this.size = 120,
-    this.useGlass = true,
-  });
+  const SDSLogo({super.key, this.size = 120, this.useGlass = true});
 
   @override
   Widget build(BuildContext context) {
@@ -697,14 +750,14 @@ class _SDSLogoPainter extends CustomPainter {
 
     final Path pinPath = Path();
     final double radius = w * 0.36;
-    
+
     // Top circle part (270 degrees approx)
     pinPath.addArc(
       Rect.fromCircle(center: center, radius: radius),
       0.65 * 3.14159, // start angle
       1.73 * 3.14159, // sweep angle
     );
-    
+
     // Bottom point
     pinPath.lineTo(w / 2, h * 0.92);
     pinPath.close();
@@ -728,13 +781,13 @@ class _SDSLogoPainter extends CustomPainter {
     final double sSize = radius * 0.9;
     final double sTopY = center.dy - sSize * 0.35;
     final double sBottomY = center.dy + sSize * 0.45;
-    
+
     // Left Stroke of 'ㅅ'
     sPath.moveTo(center.dx, sTopY);
     sPath.lineTo(center.dx - sSize * 0.55, sBottomY);
     sPath.lineTo(center.dx - sSize * 0.28, sBottomY);
     sPath.lineTo(center.dx, sTopY + sSize * 0.22);
-    
+
     // Right Stroke of 'ㅅ'
     sPath.lineTo(center.dx + sSize * 0.28, sBottomY);
     sPath.lineTo(center.dx + sSize * 0.55, sBottomY);
@@ -742,7 +795,7 @@ class _SDSLogoPainter extends CustomPainter {
     sPath.close();
 
     canvas.drawPath(sPath, cutoutPaint);
-    
+
     // --- 4. Shadow inside the Cutout for 'Elevated' look ---
     final Paint innerShadow = Paint()
       ..color = const Color(0x33000000)
@@ -764,10 +817,7 @@ class SDSKakaoLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: Size(size, size),
-      painter: _KakaoLogoPainter(),
-    );
+    return CustomPaint(size: Size(size, size), painter: _KakaoLogoPainter());
   }
 }
 
@@ -787,11 +837,13 @@ class _KakaoLogoPainter extends CustomPainter {
     final double radiusX = w * 0.46;
     final double radiusY = h * 0.40;
 
-    path.addOval(Rect.fromCenter(
-      center: Offset(centerX, centerY),
-      width: radiusX * 2,
-      height: radiusY * 2,
-    ));
+    path.addOval(
+      Rect.fromCenter(
+        center: Offset(centerX, centerY),
+        width: radiusX * 2,
+        height: radiusY * 2,
+      ),
+    );
 
     // Tail (Little point at bottom-left area)
     final Path tail = Path();
@@ -816,10 +868,7 @@ class SDSGoogleLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: Size(size, size),
-      painter: _GoogleLogoPainter(),
-    );
+    return CustomPaint(size: Size(size, size), painter: _GoogleLogoPainter());
   }
 }
 
@@ -832,29 +881,45 @@ class _GoogleLogoPainter extends CustomPainter {
     canvas.scale(scale);
     canvas.translate(-10, -10); // Center the 20x20 'G' from the 40x40 SVG
 
-    final Paint bluePaint = Paint()..color = const Color(0xFF4285F4)..style = PaintingStyle.fill;
-    final Paint greenPaint = Paint()..color = const Color(0xFF34A853)..style = PaintingStyle.fill;
-    final Paint yellowPaint = Paint()..color = const Color(0xFFFBBC04)..style = PaintingStyle.fill;
-    final Paint redPaint = Paint()..color = const Color(0xFFE94235)..style = PaintingStyle.fill;
+    final Paint bluePaint = Paint()
+      ..color = const Color(0xFF4285F4)
+      ..style = PaintingStyle.fill;
+    final Paint greenPaint = Paint()
+      ..color = const Color(0xFF34A853)
+      ..style = PaintingStyle.fill;
+    final Paint yellowPaint = Paint()
+      ..color = const Color(0xFFFBBC04)
+      ..style = PaintingStyle.fill;
+    final Paint redPaint = Paint()
+      ..color = const Color(0xFFE94235)
+      ..style = PaintingStyle.fill;
 
     // Blue segment
     canvas.drawPath(
-      parseSvgPathData("M29.6 20.2273C29.6 19.5182 29.5364 18.8364 29.4182 18.1818H20V22.05H25.3818C25.15 23.3 24.4455 24.3591 23.3864 25.0682V27.5773H26.6182C28.5091 25.8364 29.6 23.2727 29.6 20.2273V20.2273Z"),
+      parseSvgPathData(
+        "M29.6 20.2273C29.6 19.5182 29.5364 18.8364 29.4182 18.1818H20V22.05H25.3818C25.15 23.3 24.4455 24.3591 23.3864 25.0682V27.5773H26.6182C28.5091 25.8364 29.6 23.2727 29.6 20.2273V20.2273Z",
+      ),
       bluePaint,
     );
     // Green segment
     canvas.drawPath(
-      parseSvgPathData("M20 30C22.7 30 24.9636 29.1045 28.6181 27.5773L25.3863 25.0682C24.4909 25.6682 23.3454 26.0227 20 26.0227C19.3954 26.0227 15.1909 24.2636 14.4045 21.9H11.0636V24.4909C12.7091 27.7591 16.0909 30 20 30Z"),
+      parseSvgPathData(
+        "M20 30C22.7 30 24.9636 29.1045 28.6181 27.5773L25.3863 25.0682C24.4909 25.6682 23.3454 26.0227 20 26.0227C19.3954 26.0227 15.1909 24.2636 14.4045 21.9H11.0636V24.4909C12.7091 27.7591 16.0909 30 20 30Z",
+      ),
       greenPaint,
     );
     // Yellow segment
     canvas.drawPath(
-      parseSvgPathData("M14.4045 21.9C14.2045 21.3 14.0909 20.6591 14.0909 20C14.0909 19.3409 14.2045 18.7 14.4045 18.1V15.5091H11.0636C10.3864 16.8591 10 18.3864 10 20C10 21.6136 10.3864 23.1409 11.0636 24.4909L14.4045 21.9Z"),
+      parseSvgPathData(
+        "M14.4045 21.9C14.2045 21.3 14.0909 20.6591 14.0909 20C14.0909 19.3409 14.2045 18.7 14.4045 18.1V15.5091H11.0636C10.3864 16.8591 10 18.3864 10 20C10 21.6136 10.3864 23.1409 11.0636 24.4909L14.4045 21.9Z",
+      ),
       yellowPaint,
     );
     // Red segment
     canvas.drawPath(
-      parseSvgPathData("M20 13.9773C21.4681 13.9773 22.7863 14.4818 23.8227 15.4727L26.6909 12.6045C24.9591 10.9909 22.6954 10 20 10C16.0909 10 12.7091 12.2409 11.0636 15.5091L14.4045 18.1C15.1909 15.7364 17.3954 13.9773 20 13.9773Z"),
+      parseSvgPathData(
+        "M20 13.9773C21.4681 13.9773 22.7863 14.4818 23.8227 15.4727L26.6909 12.6045C24.9591 10.9909 22.6954 10 20 10C16.0909 10 12.7091 12.2409 11.0636 15.5091L14.4045 18.1C15.1909 15.7364 17.3954 13.9773 20 13.9773Z",
+      ),
       redPaint,
     );
   }

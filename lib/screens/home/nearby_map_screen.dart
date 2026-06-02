@@ -1,7 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../data/mock_data.dart';
+import 'package:provider/provider.dart';
+import '../../providers/app_data_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/shrinkable_button.dart';
@@ -22,52 +23,6 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
   final TransformationController _transformController =
       TransformationController();
 
-  // Mock market data with map positions (normalized 0-1)
-  static final _markets = [
-    _MarketPin(
-      name: MockData.markets[0].name,
-      description: MockData.markets[0].description,
-      address: MockData.markets[0].address,
-      distance: '350m',
-      openStores: 42,
-      totalStores: 68,
-      x: 0.55,
-      y: 0.42,
-      isAvailable: MockData.markets[0].isAvailable,
-      highlights: MockData.markets[0].highlights,
-      accentColor: MockData.markets[0].accentColor,
-      hasFlashDeal: true,
-      isLiveStory: true,
-    ),
-    _MarketPin(
-      name: MockData.markets[1].name,
-      description: MockData.markets[1].description,
-      address: MockData.markets[1].address,
-      distance: '1.2km',
-      openStores: 0,
-      totalStores: 120,
-      x: 0.78,
-      y: 0.28,
-      isAvailable: MockData.markets[1].isAvailable,
-      highlights: MockData.markets[1].highlights,
-      accentColor: MockData.markets[1].accentColor,
-    ),
-    _MarketPin(
-      name: MockData.markets[2].name,
-      description: MockData.markets[2].description,
-      address: MockData.markets[2].address,
-      distance: '3.5km',
-      openStores: 0,
-      totalStores: 85,
-      x: 0.18,
-      y: 0.55,
-      isAvailable: MockData.markets[2].isAvailable,
-      highlights: MockData.markets[2].highlights,
-      accentColor: MockData.markets[2].accentColor,
-      hasFlashDeal: true,
-    ),
-  ];
-
   // User location (normalized 0-1)
   static const _userX = 0.50;
   static const _userY = 0.48;
@@ -79,9 +34,10 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
       duration: const Duration(milliseconds: 2000),
       vsync: this,
     )..repeat();
-    _pulseAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
-    );
+    _pulseAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeOut));
   }
 
   @override
@@ -94,6 +50,7 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final markets = _marketPins(context.watch<AppDataProvider>());
 
     return Scaffold(
       backgroundColor: const Color(0xFFEEF1F6),
@@ -112,7 +69,7 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
                 height: MediaQuery.of(context).size.height * 2,
                 child: CustomPaint(
                   painter: _NearbyMapPainter(
-                    markets: _markets,
+                    markets: markets,
                     selectedMarket: _selectedMarket,
                     userX: _userX,
                     userY: _userY,
@@ -138,14 +95,18 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
                   decoration: SDS.glassDecoration(opacity: 0.75, blur: 20),
                   child: Row(
                     children: [
-                      const Icon(Icons.search_rounded,
-                          size: 24, color: AppColors.primary),
+                      const Icon(
+                        Icons.search_rounded,
+                        size: 24,
+                        color: AppColors.primary,
+                      ),
                       const SizedBox(width: 16),
-                      Flexible(
+                      Expanded(
                         child: Text(
                           '어느 시장으로 안내해 드릴까요?',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          softWrap: false,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: SDS.fwBlack,
@@ -154,19 +115,26 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(SDS.radiusCapsule),
+                          borderRadius: BorderRadius.circular(
+                            SDS.radiusCapsule,
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.location_on_rounded,
-                                size: 14, color: AppColors.primary),
+                            const Icon(
+                              Icons.location_on_rounded,
+                              size: 14,
+                              color: AppColors.primary,
+                            ),
                             const SizedBox(width: 6),
                             const Text(
                               '종로구',
@@ -208,8 +176,11 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
                     ),
                   ],
                 ),
-                child: const Icon(Icons.my_location_rounded,
-                    size: 22, color: AppColors.primary),
+                child: const Icon(
+                  Icons.my_location_rounded,
+                  size: 22,
+                  color: AppColors.primary,
+                ),
               ),
             ),
           ),
@@ -233,7 +204,8 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
                           context,
                           MaterialPageRoute(
                             builder: (_) => MarketHubScreen(
-                                marketName: _selectedMarket!.name),
+                              marketName: _selectedMarket!.name,
+                            ),
                           ),
                         );
                       }
@@ -256,7 +228,7 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
     final matrix = _transformController.value.clone()..invert();
     final tapLocal = MatrixUtils.transformPoint(matrix, details.localPosition);
 
-    for (final market in _markets) {
+    for (final market in _marketPins(context.read<AppDataProvider>())) {
       final markerX = market.x * canvasSize.width;
       final markerY = market.y * canvasSize.height;
       final dx = tapLocal.dx - markerX;
@@ -273,6 +245,35 @@ class _NearbyMapScreenState extends State<NearbyMapScreen>
     if (_selectedMarket != null) {
       setState(() => _selectedMarket = null);
     }
+  }
+
+  List<_MarketPin> _marketPins(AppDataProvider data) {
+    const positions = [
+      Offset(0.55, 0.42),
+      Offset(0.78, 0.28),
+      Offset(0.18, 0.55),
+      Offset(0.36, 0.72),
+    ];
+    return data.markets.asMap().entries.map((entry) {
+      final market = entry.value;
+      final stores = data.storesForMarket(market.name);
+      final position = positions[entry.key % positions.length];
+      return _MarketPin(
+        name: market.name,
+        description: market.description,
+        address: market.address,
+        distance: entry.key == 0 ? '350m' : '${entry.key + 1}.2km',
+        openStores: stores.where((store) => store.status.name == 'open').length,
+        totalStores: market.storeCount,
+        x: position.dx,
+        y: position.dy,
+        isAvailable: market.isAvailable,
+        highlights: market.highlights,
+        accentColor: market.accentColor,
+        hasFlashDeal: entry.key.isEven,
+        isLiveStory: entry.key == 0,
+      );
+    }).toList();
   }
 }
 
@@ -368,18 +369,42 @@ class _NearbyMapPainter extends CustomPainter {
 
     // Building blocks
     final blocks = [
-      Rect.fromLTWH(size.width * 0.02, size.height * 0.02,
-          size.width * 0.12, size.height * 0.12),
-      Rect.fromLTWH(size.width * 0.38, size.height * 0.02,
-          size.width * 0.25, size.height * 0.12),
-      Rect.fromLTWH(size.width * 0.02, size.height * 0.32,
-          size.width * 0.15, size.height * 0.10),
-      Rect.fromLTWH(size.width * 0.70, size.height * 0.62,
-          size.width * 0.12, size.height * 0.15),
-      Rect.fromLTWH(size.width * 0.02, size.height * 0.65,
-          size.width * 0.10, size.height * 0.18),
-      Rect.fromLTWH(size.width * 0.85, size.height * 0.35,
-          size.width * 0.12, size.height * 0.08),
+      Rect.fromLTWH(
+        size.width * 0.02,
+        size.height * 0.02,
+        size.width * 0.12,
+        size.height * 0.12,
+      ),
+      Rect.fromLTWH(
+        size.width * 0.38,
+        size.height * 0.02,
+        size.width * 0.25,
+        size.height * 0.12,
+      ),
+      Rect.fromLTWH(
+        size.width * 0.02,
+        size.height * 0.32,
+        size.width * 0.15,
+        size.height * 0.10,
+      ),
+      Rect.fromLTWH(
+        size.width * 0.70,
+        size.height * 0.62,
+        size.width * 0.12,
+        size.height * 0.15,
+      ),
+      Rect.fromLTWH(
+        size.width * 0.02,
+        size.height * 0.65,
+        size.width * 0.10,
+        size.height * 0.18,
+      ),
+      Rect.fromLTWH(
+        size.width * 0.85,
+        size.height * 0.35,
+        size.width * 0.12,
+        size.height * 0.08,
+      ),
     ];
 
     for (final block in blocks) {
@@ -389,10 +414,18 @@ class _NearbyMapPainter extends CustomPainter {
 
     // Green park areas
     final parks = [
-      Rect.fromLTWH(size.width * 0.20, size.height * 0.70,
-          size.width * 0.12, size.height * 0.10),
-      Rect.fromLTWH(size.width * 0.80, size.height * 0.08,
-          size.width * 0.10, size.height * 0.08),
+      Rect.fromLTWH(
+        size.width * 0.20,
+        size.height * 0.70,
+        size.width * 0.12,
+        size.height * 0.10,
+      ),
+      Rect.fromLTWH(
+        size.width * 0.80,
+        size.height * 0.08,
+        size.width * 0.10,
+        size.height * 0.08,
+      ),
     ];
     for (final park in parks) {
       final rrect = RRect.fromRectAndRadius(park, const Radius.circular(8));
@@ -402,20 +435,38 @@ class _NearbyMapPainter extends CustomPainter {
 
   void _drawLabels(Canvas canvas, Size size) {
     // Road labels
-    _drawTextLabel(canvas, '종로', Offset(size.width * 0.50, size.height * 0.295),
-        10, const Color(0xFF999999));
-    _drawTextLabel(canvas, '을지로',
-        Offset(size.width * 0.50, size.height * 0.595), 10,
-        const Color(0xFF999999));
-    _drawTextLabel(canvas, '창경궁로',
-        Offset(size.width * 0.345, size.height * 0.50), 9,
-        const Color(0xFF999999),
-        rotate: true);
+    _drawTextLabel(
+      canvas,
+      '종로',
+      Offset(size.width * 0.50, size.height * 0.295),
+      10,
+      const Color(0xFF999999),
+    );
+    _drawTextLabel(
+      canvas,
+      '을지로',
+      Offset(size.width * 0.50, size.height * 0.595),
+      10,
+      const Color(0xFF999999),
+    );
+    _drawTextLabel(
+      canvas,
+      '창경궁로',
+      Offset(size.width * 0.345, size.height * 0.50),
+      9,
+      const Color(0xFF999999),
+      rotate: true,
+    );
   }
 
-  void _drawTextLabel(Canvas canvas, String text, Offset pos, double fontSize,
-      Color color,
-      {bool rotate = false}) {
+  void _drawTextLabel(
+    Canvas canvas,
+    String text,
+    Offset pos,
+    double fontSize,
+    Color color, {
+    bool rotate = false,
+  }) {
     final textSpan = TextSpan(
       text: text,
       style: TextStyle(
@@ -425,10 +476,8 @@ class _NearbyMapPainter extends CustomPainter {
         letterSpacing: 2,
       ),
     );
-    final tp = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    )..layout();
+    final tp = TextPainter(text: textSpan, textDirection: TextDirection.ltr)
+      ..layout();
 
     if (rotate) {
       canvas.save();
@@ -508,14 +557,33 @@ class _NearbyMapPainter extends CustomPainter {
           Offset(indicatorX, indicatorY),
           12,
           Paint()
-            ..color = const Color(0xFFF04452).withValues(alpha: 0.2 + 0.1 * sin(pulseValue.value * pi))
+            ..color = const Color(
+              0xFFF04452,
+            ).withValues(alpha: 0.2 + 0.1 * sin(pulseValue.value * pi))
             ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
         );
+
+        final indicatorText = TextSpan(
+          text: market.hasFlashDeal ? '⚡' : '📸',
+          style: const TextStyle(fontSize: 10),
+        );
+        final indicatorTp = TextPainter(
+          text: indicatorText,
+          textDirection: TextDirection.ltr,
+        )..layout();
 
         canvas.drawCircle(
           Offset(indicatorX, indicatorY),
           9,
           Paint()..color = const Color(0xFFF04452),
+        );
+
+        indicatorTp.paint(
+          canvas,
+          Offset(
+            indicatorX - indicatorTp.width / 2,
+            indicatorY - indicatorTp.height / 2,
+          ),
         );
       }
 
@@ -535,16 +603,17 @@ class _NearbyMapPainter extends CustomPainter {
           color: market.isAvailable
               ? AppColors.textPrimary
               : AppColors.textTertiary,
-          backgroundColor:
-              Colors.white.withValues(alpha: 0.9),
+          backgroundColor: Colors.white.withValues(alpha: 0.9),
         ),
       );
       final nameTp = TextPainter(
         text: nameSpan,
         textDirection: TextDirection.ltr,
       )..layout();
-      nameTp.paint(canvas,
-          Offset(cx - nameTp.width / 2, cy + (isSelected ? 28 : 22)));
+      nameTp.paint(
+        canvas,
+        Offset(cx - nameTp.width / 2, cy + (isSelected ? 28 : 22)),
+      );
     }
   }
 
@@ -624,7 +693,9 @@ class _MarketDetailCard extends StatelessWidget {
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: market.isAvailable
                                     ? AppColors.primaryLight
@@ -645,17 +716,30 @@ class _MarketDetailCard extends StatelessWidget {
                             if (market.hasFlashDeal) ...[
                               const SizedBox(width: 6),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF04452).withValues(alpha: 0.1),
+                                  color: const Color(
+                                    0xFFF04452,
+                                  ).withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(100),
-                                  border: Border.all(color: const Color(0xFFF04452).withValues(alpha: 0.3)),
+                                  border: Border.all(
+                                    color: const Color(
+                                      0xFFF04452,
+                                    ).withValues(alpha: 0.3),
+                                  ),
                                 ),
                                 child: const Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.bolt_rounded, size: 11, color: Color(0xFFF04452)),
-                                    SizedBox(width: 3),
+                                    Icon(
+                                      Icons.bolt_rounded,
+                                      size: 12,
+                                      color: Color(0xFFF04452),
+                                    ),
+                                    SizedBox(width: 4),
                                     Text(
                                       'DEAL',
                                       style: TextStyle(
@@ -682,16 +766,21 @@ class _MarketDetailCard extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.background,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
                       children: [
-                        const Icon(Icons.directions_walk_rounded,
-                            size: 20, color: AppColors.primary),
+                        const Icon(
+                          Icons.directions_walk_rounded,
+                          size: 20,
+                          color: AppColors.primary,
+                        ),
                         const SizedBox(height: 2),
                         Text(
                           market.distance,
@@ -724,11 +813,7 @@ class _MarketDetailCard extends StatelessWidget {
                         color: AppColors.textSecondary,
                       ),
                     ),
-                    Container(
-                      width: 1,
-                      height: 32,
-                      color: AppColors.border,
-                    ),
+                    Container(width: 1, height: 32, color: AppColors.border),
                     Expanded(
                       child: _StatItem(
                         icon: Icons.circle,
@@ -740,11 +825,7 @@ class _MarketDetailCard extends StatelessWidget {
                             : AppColors.textTertiary,
                       ),
                     ),
-                    Container(
-                      width: 1,
-                      height: 32,
-                      color: AppColors.border,
-                    ),
+                    Container(width: 1, height: 32, color: AppColors.border),
                     Expanded(
                       child: _StatItem(
                         icon: Icons.directions_walk_rounded,
@@ -764,8 +845,10 @@ class _MarketDetailCard extends StatelessWidget {
                 runSpacing: 6,
                 children: market.highlights.map((h) {
                   return Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: market.isAvailable
                           ? AppColors.primaryLight
@@ -795,20 +878,27 @@ class _MarketDetailCard extends StatelessWidget {
                   onTap: market.isAvailable ? onNavigate : null,
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: market.isAvailable 
-                        ? LinearGradient(
-                            colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.85)],
-                          )
-                        : null,
+                      gradient: market.isAvailable
+                          ? LinearGradient(
+                              colors: [
+                                AppColors.primary,
+                                AppColors.primary.withValues(alpha: 0.85),
+                              ],
+                            )
+                          : null,
                       color: market.isAvailable ? null : AppColors.divider,
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: market.isAvailable ? [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.25),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ] : [],
+                      boxShadow: market.isAvailable
+                          ? [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.25,
+                                ),
+                                blurRadius: 20,
+                                offset: const Offset(0, 8),
+                              ),
+                            ]
+                          : [],
                     ),
                     child: Center(
                       child: Row(
@@ -819,7 +909,9 @@ class _MarketDetailCard extends StatelessWidget {
                                 ? Icons.near_me_rounded
                                 : Icons.lock_outline_rounded,
                             size: 22,
-                            color: market.isAvailable ? Colors.white : AppColors.textTertiary,
+                            color: market.isAvailable
+                                ? Colors.white
+                                : AppColors.textTertiary,
                           ),
                           const SizedBox(width: 12),
                           Text(
@@ -828,7 +920,9 @@ class _MarketDetailCard extends StatelessWidget {
                               fontSize: 17,
                               fontWeight: SDS.fwBlack,
                               letterSpacing: -0.5,
-                              color: market.isAvailable ? Colors.white : AppColors.textTertiary,
+                              color: market.isAvailable
+                                  ? Colors.white
+                                  : AppColors.textTertiary,
                             ),
                           ),
                         ],

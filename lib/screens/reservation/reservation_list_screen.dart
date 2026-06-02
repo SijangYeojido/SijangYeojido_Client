@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../providers/app_data_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../models/models.dart';
-import '../../data/mock_data.dart';
 import '../pickup/pickup_screen.dart';
 import '../../widgets/app_ui.dart';
 import '../../theme/sijang_design_system.dart';
@@ -21,6 +22,9 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AppDataProvider>().loadReservations();
+    });
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
@@ -34,8 +38,9 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final active = MockData.reservations.where((r) => r.isActive).toList();
-    final past = MockData.reservations.where((r) => !r.isActive).toList();
+    final reservations = context.watch<AppDataProvider>().reservations;
+    final active = reservations.where((r) => r.isActive).toList();
+    final past = reservations.where((r) => !r.isActive).toList();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -51,9 +56,7 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
             ),
           ),
           if (active.isEmpty && past.isEmpty)
-            SliverFillRemaining(
-              child: _EmptyState(),
-            )
+            SliverFillRemaining(child: _EmptyState())
           else ...[
             if (active.isNotEmpty) ...[
               _sectionHeader(
@@ -121,10 +124,10 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
           child: Text(
             title,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  color: color,
-                ),
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              color: color,
+            ),
           ),
         ),
       ),
@@ -136,7 +139,10 @@ class _ActiveReservationCard extends StatelessWidget {
   final Reservation reservation;
   final VoidCallback onTap;
 
-  const _ActiveReservationCard({required this.reservation, required this.onTap});
+  const _ActiveReservationCard({
+    required this.reservation,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +166,11 @@ class _ActiveReservationCard extends StatelessWidget {
                     color: AppColors.primary.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(SDS.radiusM),
                   ),
-                  child: const Icon(Icons.shopping_bag_rounded, color: AppColors.primary, size: 28),
+                  child: const Icon(
+                    Icons.shopping_bag_rounded,
+                    color: AppColors.primary,
+                    size: 28,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -218,7 +228,9 @@ class _ActiveReservationCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: isUrgent ? AppColors.danger.withValues(alpha: 0.1) : AppColors.primary.withValues(alpha: 0.1),
+        color: isUrgent
+            ? AppColors.danger.withValues(alpha: 0.1)
+            : AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(SDS.radiusS),
       ),
       child: Column(
@@ -246,7 +258,6 @@ class _ActiveReservationCard extends StatelessWidget {
   }
 }
 
-
 class _PastReservationCard extends StatelessWidget {
   final Reservation reservation;
 
@@ -267,18 +278,24 @@ class _PastReservationCard extends StatelessWidget {
         ),
         child: Icon(
           reservation.isCompleted ? Icons.check_rounded : Icons.close_rounded,
-          color: reservation.isCompleted ? AppColors.success : AppColors.textTertiary,
+          color: reservation.isCompleted
+              ? AppColors.success
+              : AppColors.textTertiary,
           size: 20,
         ),
       ),
       title: Text(reservation.itemName),
-      subtitle: Text('${reservation.storeName} • ${NumberFormat('#,###', 'ko_KR').format(reservation.totalAmount)}원'),
+      subtitle: Text(
+        '${reservation.storeName} • ${NumberFormat('#,###', 'ko_KR').format(reservation.totalAmount)}원',
+      ),
       trailing: Text(
         reservation.isCompleted ? '잘 전달해 드렸어요' : '시간이 지났어요',
         style: TextStyle(
           fontSize: 12,
           fontWeight: SDS.fwBold,
-          color: reservation.isCompleted ? AppColors.success : AppColors.textTertiary,
+          color: reservation.isCompleted
+              ? AppColors.success
+              : AppColors.textTertiary,
         ),
       ),
     );

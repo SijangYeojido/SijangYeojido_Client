@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../models/models.dart';
-import '../data/mock_data.dart';
+import '../providers/app_data_provider.dart';
 import '../theme/sijang_design_system.dart';
 import '../theme/app_colors.dart';
 import 'shrinkable_button.dart';
@@ -10,7 +12,14 @@ class MarketStoriesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stories = MockData.stories;
+    final stores = context
+        .watch<AppDataProvider>()
+        .stores
+        .where((store) => store.imageUrls.isNotEmpty)
+        .take(8)
+        .toList();
+
+    if (stores.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,13 +41,10 @@ class MarketStoriesWidget extends StatelessWidget {
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: SDS.gutter),
             scrollDirection: Axis.horizontal,
-            itemCount: stories.length,
+            itemCount: stores.length,
             separatorBuilder: (context, index) => const SizedBox(width: 16),
             itemBuilder: (context, index) {
-              final story = stories[index];
-              final store = MockData.stores.firstWhere((s) => s.id == story.storeId);
-              
-              return _StoryAvatar(story: story, store: store);
+              return _StoryAvatar(store: stores[index], isLive: index == 0);
             },
           ),
         ),
@@ -48,10 +54,10 @@ class MarketStoriesWidget extends StatelessWidget {
 }
 
 class _StoryAvatar extends StatelessWidget {
-  final StoreStory story;
   final Store store;
+  final bool isLive;
 
-  const _StoryAvatar({required this.story, required this.store});
+  const _StoryAvatar({required this.store, required this.isLive});
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +74,9 @@ class _StoryAvatar extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: story.isLive 
-                      ? [const Color(0xFFF04452), const Color(0xFFFF8E3C)]
-                      : [const Color(0xFFCBD5E1), const Color(0xFF94A3B8)],
+                    colors: isLive
+                        ? [const Color(0xFFF04452), const Color(0xFFFF8E3C)]
+                        : [const Color(0xFFCBD5E1), const Color(0xFF94A3B8)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -83,16 +89,19 @@ class _StoryAvatar extends StatelessWidget {
                   ),
                   child: CircleAvatar(
                     radius: 28,
-                    backgroundImage: NetworkImage(story.imageUrl),
+                    backgroundImage: NetworkImage(store.imageUrls.first),
                   ),
                 ),
               ),
-              if (story.isLive)
+              if (isLive)
                 Positioned(
                   right: 0,
                   bottom: 0,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF04452),
                       borderRadius: BorderRadius.circular(4),
@@ -120,8 +129,8 @@ class _StoryAvatar extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11,
-                fontWeight: story.isLive ? FontWeight.w800 : FontWeight.w600,
-                color: story.isLive ? AppColors.textPrimary : AppColors.textSecondary,
+                fontWeight: isLive ? FontWeight.w800 : FontWeight.w600,
+                color: isLive ? AppColors.textPrimary : AppColors.textSecondary,
               ),
             ),
           ),

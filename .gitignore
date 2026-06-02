@@ -50,3 +50,15 @@ kakao_login_medium_narrow.png
 .claude/
 .metadata
 .flutter-plugins
+
+# Store release secrets
+.env
+.env.*
+fastlane/.env
+fastlane/.env.*
+store-release.local.json
+AuthKey_*.p8
+.bundle/
+vendor/bundle/
+android/key.properties
+android/app/upload-keystore.jks

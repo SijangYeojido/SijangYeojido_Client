@@ -29,7 +29,11 @@ class MarketInfoScreen extends StatelessWidget {
                 onTap: () => Navigator.pop(context),
                 child: const CircleAvatar(
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 18),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: AppColors.textPrimary,
+                    size: 18,
+                  ),
                 ),
               ),
             ),
@@ -84,7 +88,11 @@ class MarketInfoScreen extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.stars_rounded, color: AppColors.primary, size: 20),
+                                const Icon(
+                                  Icons.stars_rounded,
+                                  color: AppColors.primary,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   '전통의 가치',
@@ -155,9 +163,21 @@ class MarketInfoScreen extends StatelessWidget {
                     child: _buildPremiumInfoSection(
                       title: '방문 가이드',
                       items: [
-                        _buildPremiumInfoItem(Icons.access_time_filled_rounded, '영업 시간', '매일 09:00 - 23:00'),
-                        _buildPremiumInfoItem(Icons.shopping_bag_rounded, '주요 품목', '먹거리, 빈대떡, 육회, 한복'),
-                        _buildPremiumInfoItem(Icons.credit_card_rounded, '결제 수단', '온누리상품권, 제로페이 가능'),
+                        _buildPremiumInfoItem(
+                          Icons.access_time_filled_rounded,
+                          '영업 시간',
+                          '매일 09:00 - 23:00',
+                        ),
+                        _buildPremiumInfoItem(
+                          Icons.shopping_bag_rounded,
+                          '주요 품목',
+                          '먹거리, 빈대떡, 육회, 한복',
+                        ),
+                        _buildPremiumInfoItem(
+                          Icons.credit_card_rounded,
+                          '결제 수단',
+                          '온누리상품권, 제로페이 가능',
+                        ),
                       ],
                     ),
                   ),
@@ -203,7 +223,10 @@ class MarketInfoScreen extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('전화 연결', textAlign: TextAlign.center),
-        content: const Text('02-854-5453으로 전화를 걸까요?', textAlign: TextAlign.center),
+        content: const Text(
+          '02-854-5453으로 전화를 걸까요?',
+          textAlign: TextAlign.center,
+        ),
         actionsAlignment: MainAxisAlignment.center,
         actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
         actions: [
@@ -213,9 +236,14 @@ class MarketInfoScreen extends StatelessWidget {
               foregroundColor: AppColors.textSecondary,
               backgroundColor: const Color(0xFFF0F0F0),
               minimumSize: const Size(100, 44),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text('취소', style: TextStyle(fontWeight: FontWeight.w600)),
+            child: const Text(
+              '취소',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
           const SizedBox(width: 12),
           TextButton(
@@ -224,9 +252,14 @@ class MarketInfoScreen extends StatelessWidget {
               foregroundColor: Colors.white,
               backgroundColor: AppColors.primary,
               minimumSize: const Size(100, 44),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text('전화걸기', style: TextStyle(fontWeight: FontWeight.w600)),
+            child: const Text(
+              '전화걸기',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
@@ -248,7 +281,11 @@ class MarketInfoScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildCircularAction(Icons.phone_rounded, '전화하기', onTap: () => _handleCall(context)),
+        _buildCircularAction(
+          Icons.phone_rounded,
+          '전화하기',
+          onTap: () => _handleCall(context),
+        ),
         _buildCircularAction(Icons.location_on_rounded, '위치보기'),
         _buildCircularAction(Icons.share_rounded, '공유하기'),
         _buildCircularAction(Icons.bookmark_rounded, '저장하기'),
@@ -256,7 +293,11 @@ class MarketInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCircularAction(IconData icon, String label, {VoidCallback? onTap}) {
+  Widget _buildCircularAction(
+    IconData icon,
+    String label, {
+    VoidCallback? onTap,
+  }) {
     return Column(
       children: [
         ShrinkableButton(
@@ -286,7 +327,10 @@ class MarketInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPremiumInfoSection({required String title, required List<Widget> items}) {
+  Widget _buildPremiumInfoSection({
+    required String title,
+    required List<Widget> items,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

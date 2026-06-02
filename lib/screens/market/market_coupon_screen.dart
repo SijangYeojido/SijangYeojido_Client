@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/app_data_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/shrinkable_button.dart';
@@ -12,6 +14,7 @@ class MarketCouponScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final coupons = context.watch<AppDataProvider>().coupons;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -21,7 +24,11 @@ class MarketCouponScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: ShrinkableButton(
             onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+            child: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: AppColors.textPrimary,
+              size: 20,
+            ),
           ),
         ),
       ),
@@ -32,17 +39,18 @@ class MarketCouponScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(left: 12.0),
               child: Text(
-                '사용 가능한 쿠폰이\n3개 있어요',
-                style: TextStyle(
+                '\u00A0사용 가능한 쿠폰이\n\u00A0${coupons.length}개 있어요',
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: SDS.fwBlack,
                   color: AppColors.textPrimary,
                   height: 1.3,
-                  letterSpacing: -0.5,
+                  letterSpacing: 0.8,
                 ),
+                overflow: TextOverflow.visible,
               ),
             ),
             const SizedBox(height: 32),
@@ -55,28 +63,31 @@ class MarketCouponScreen extends StatelessWidget {
               padding: EdgeInsets.only(left: 12.0),
               child: Text(
                 '\u00A0진행 중인 혜택',
-                style: TextStyle(fontSize: 18, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: 0.8),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: SDS.fwBlack,
+                  color: AppColors.textPrimary,
+                  letterSpacing: 0.8,
+                ),
               ),
             ),
             const SizedBox(height: 16),
-            _buildNuclearCouponItem(
-              title: '웰컴 특별 할인권',
-              subtitle: '첫 결제 시 즉시 혜택',
-              value: '15%',
-              isDownloaded: false,
-            ),
-            _buildNuclearCouponItem(
-              title: '단골 고객 감사 리워드',
-              subtitle: '현장 결제 시 적립',
-              value: '5,000원',
-              isDownloaded: true,
-            ),
-            _buildNuclearCouponItem(
-              title: '주말 상생 할인지원금',
-              subtitle: '공휴일/주말 전용',
-              value: '3,000원',
-              isDownloaded: false,
-            ),
+            if (coupons.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(12),
+                child: Text('현재 받을 수 있는 쿠폰이 없습니다.'),
+              )
+            else
+              ...coupons.map(
+                (coupon) => _buildNuclearCouponItem(
+                  context: context,
+                  id: int.tryParse(coupon['id']?.toString() ?? '') ?? 0,
+                  title: coupon['title']?.toString() ?? '쿠폰',
+                  subtitle: coupon['description']?.toString() ?? '',
+                  value: coupon['benefit']?.toString() ?? '혜택',
+                  isDownloaded: coupon['claimed'] == true,
+                ),
+              ),
             const SizedBox(height: 80),
           ],
         ),
@@ -88,7 +99,7 @@ class MarketCouponScreen extends StatelessWidget {
     // NUCLEAR FIX: Bypass SDS.epicCard to avoid forced ClipRRect
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 34),
       decoration: BoxDecoration(
         color: shinwonRed,
         borderRadius: BorderRadius.circular(SDS.radiusL),
@@ -96,29 +107,31 @@ class MarketCouponScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const SizedBox(width: 8),
+          const SizedBox(width: 14), // Safety physical spacer
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '이번 달 절약 가능한 금액',
+                  '\u00A0이번 달 절약 가능한 금액',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: SDS.fwBold,
-                    letterSpacing: -0.3,
+                    letterSpacing: 1.0,
                   ),
+                  overflow: TextOverflow.visible,
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  '약 24,000원',
+                  '\u00A0약 24,000원',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 26,
                     fontWeight: SDS.fwBlack,
-                    letterSpacing: -0.5,
+                    letterSpacing: 1.0,
                   ),
+                  overflow: TextOverflow.visible,
                 ),
               ],
             ),
@@ -129,7 +142,11 @@ class MarketCouponScreen extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(18),
             ),
-            child: const Icon(Icons.savings_rounded, color: Colors.white, size: 30),
+            child: const Icon(
+              Icons.savings_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
           ),
         ],
       ),
@@ -137,6 +154,8 @@ class MarketCouponScreen extends StatelessWidget {
   }
 
   Widget _buildNuclearCouponItem({
+    required BuildContext context,
+    required int id,
     required String title,
     required String subtitle,
     required String value,
@@ -163,7 +182,11 @@ class MarketCouponScreen extends StatelessWidget {
               child: Center(
                 child: Text(
                   value,
-                  style: const TextStyle(color: shinwonRed, fontSize: 16, fontWeight: SDS.fwBlack),
+                  style: const TextStyle(
+                    color: shinwonRed,
+                    fontSize: 16,
+                    fontWeight: SDS.fwBlack,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -174,31 +197,57 @@ class MarketCouponScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
-                    style: const TextStyle(fontSize: 16, fontWeight: SDS.fwBlack, color: AppColors.textPrimary, letterSpacing: -0.3),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    '\u00A0$title',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: SDS.fwBlack,
+                      color: AppColors.textPrimary,
+                      letterSpacing: 0.5,
+                    ),
+                    overflow: TextOverflow.visible,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    subtitle,
-                    style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: SDS.fwBold, letterSpacing: -0.2),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    '\u00A0$subtitle',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                      fontWeight: SDS.fwBold,
+                      letterSpacing: 0.5,
+                    ),
+                    overflow: TextOverflow.visible,
                   ),
                 ],
               ),
             ),
             ShrinkableButton(
-              onTap: () {},
+              onTap: isDownloaded || id == 0
+                  ? () {}
+                  : () async {
+                      try {
+                        await context.read<AppDataProvider>().claimCoupon(id);
+                      } catch (_) {
+                        if (!context.mounted) return;
+                        final message =
+                            context.read<AppDataProvider>().errorMessage ??
+                            '쿠폰을 받을 수 없습니다. 잠시 후 다시 시도해 주세요.';
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(message)));
+                      }
+                    },
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isDownloaded ? const Color(0xFFF2F4F6) : shinwonRed.withValues(alpha: 0.1),
+                  color: isDownloaded
+                      ? const Color(0xFFF2F4F6)
+                      : shinwonRed.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isDownloaded ? Icons.check_circle_rounded : Icons.download_rounded,
+                  isDownloaded
+                      ? Icons.check_circle_rounded
+                      : Icons.download_rounded,
                   color: isDownloaded ? AppColors.textTertiary : shinwonRed,
                   size: 24,
                 ),

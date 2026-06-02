@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../config/review_accounts.dart';
 import '../../providers/auth_provider.dart';
-import '../../theme/sijang_design_system.dart';
 import '../../theme/app_colors.dart';
-import '../../widgets/sds_widgets.dart';
+import '../../theme/sijang_design_system.dart';
 import '../../widgets/shrinkable_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,411 +14,491 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
-  final PageController _pageController = PageController();
-  int _currentStep = 0;
-  final int _totalSteps = 3;
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isRegisterMode = false;
   UserRole _selectedRole = UserRole.customer;
 
-  // Design Tokens for Absolute Consistency
-  static const double _buttonHeight = 64.0;
-  static const double _cardHeight = 110.0;
-  static const double _horizontalPadding = 24.0;
-  static const double _headerTopPadding = 56.0;
-
-  void _nextPage() {
-    if (_currentStep < _totalSteps - 1) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeOutQuart,
-      );
-    }
-  }
-
-  void _previousPage() {
-    if (_currentStep > 0) {
-      _pageController.previousPage(
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeOutQuart,
-      );
-    } else {
-      Navigator.maybePop(context);
-    }
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: _buildAppBar(),
-      body: PageView(
-        controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        onPageChanged: (index) => setState(() => _currentStep = index),
-        children: [
-          _buildStep(
-            title: '전통의 가치를\n지도로 펼치다',
-            subtitle: '시장여지도에서 내 주변 시장의\n모든 숨은 이야기들을 만나보세요.',
-            content: _buildWelcomeContent(),
-          ),
-          _buildStep(
-            title: '반가워요!\n어떻게 오셨나요?',
-            subtitle: '상인과 사용자 중 본인에게 맞는\n최적화된 경험을 선택해 주세요.',
-            content: _buildRoleContent(),
-          ),
-          _buildStep(
-            title: '본격적으로\n시작해볼까요?',
-            subtitle: '안전하고 간편하게 계정을 연결하고\n시장여지도의 모든 기능을 이용하세요.',
-            content: _buildSocialContent(),
-          ),
-        ],
-      ),
-      bottomNavigationBar: _buildBottomActionArea(),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar() {
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(64),
-      child: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: AppColors.textPrimary),
-                    onPressed: _previousPage,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+                _buildHeader(),
+                const SizedBox(height: 36),
+                _buildModeSwitch(),
+                const SizedBox(height: 24),
+                if (_isRegisterMode) ...[
+                  _buildInput(
+                    controller: _nameController,
+                    label: '이름',
+                    icon: Icons.person_outline_rounded,
+                    textInputAction: TextInputAction.next,
+                    validator: (value) {
+                      if ((value ?? '').trim().length < 2) {
+                        return '이름은 2자 이상 입력해 주세요.';
+                      }
+                      return null;
+                    },
                   ),
-                  const Spacer(),
+                  const SizedBox(height: 14),
                 ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            SDSStepBar(totalSteps: _totalSteps, currentStep: _currentStep),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Unified Step Structure
-  Widget _buildStep({
-    required String title,
-    required String subtitle,
-    required Widget content,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: _horizontalPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: _headerTopPadding),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 34,
-              fontWeight: SDS.fwBlack,
-              color: AppColors.textPrimary,
-              height: 1.25,
-              letterSpacing: -1.8,
-            ),
-          ),
-          const SizedBox(height: 18),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 18,
-              color: AppColors.textSecondary,
-              height: 1.6,
-              fontWeight: SDS.fwMedium,
-              letterSpacing: -0.4,
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 32),
-                  child: content,
+                _buildInput(
+                  controller: _emailController,
+                  label: '이메일',
+                  icon: Icons.alternate_email_rounded,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  validator: (value) {
+                    final email = (value ?? '').trim();
+                    if (!email.contains('@') || !email.contains('.')) {
+                      return '올바른 이메일을 입력해 주세요.';
+                    }
+                    return null;
+                  },
                 ),
-              ),
+                const SizedBox(height: 14),
+                _buildInput(
+                  controller: _passwordController,
+                  label: '비밀번호',
+                  icon: Icons.lock_outline_rounded,
+                  obscureText: true,
+                  textInputAction: TextInputAction.done,
+                  validator: (value) {
+                    if ((value ?? '').length < 8) {
+                      return '비밀번호는 8자 이상 입력해 주세요.';
+                    }
+                    return null;
+                  },
+                ),
+                if (_isRegisterMode) ...[
+                  const SizedBox(height: 22),
+                  _buildRoleSelector(),
+                ],
+                const SizedBox(height: 28),
+                _buildSubmitButton(auth),
+                if (!_isRegisterMode) ...[
+                  const SizedBox(height: 28),
+                  _buildReviewLoginSection(auth),
+                ],
+                if (auth.sessionRestoreMessage != null) ...[
+                  const SizedBox(height: 16),
+                  _buildInfoBanner(auth.sessionRestoreMessage!),
+                ],
+                if (auth.errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    auth.errorMessage!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.danger,
+                      fontWeight: SDS.fwSemiBold,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWelcomeContent() {
-    return Hero(
-      tag: 'market_hero',
-      child: Image.asset(
-        'assets/images/market_hero.png',
-        width: 340,
-        height: 340,
-        fit: BoxFit.contain,
-      ),
-    );
-  }
-
-  Widget _buildRoleContent() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _V15RoleCard(
-          title: '일반 사용자예요',
-          description: '시장의 맛집과 정보를 찾고 싶어요',
-          icon: Icons.person_search_rounded,
-          isSelected: _selectedRole == UserRole.customer,
-          fixedHeight: _cardHeight,
-          onTap: () => setState(() => _selectedRole = UserRole.customer),
         ),
-        const SizedBox(height: 16),
-        _V15RoleCard(
-          title: '시장 상인이에요',
-          description: '내 매장을 관리하고 상품을 등록할래요',
-          icon: Icons.storefront_rounded,
-          isSelected: _selectedRole == UserRole.merchant,
-          fixedHeight: _cardHeight,
-          onTap: () => setState(() => _selectedRole = UserRole.merchant),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: SDS.shadowAccent(AppColors.primary),
+          ),
+          child: const Icon(
+            Icons.storefront_rounded,
+            color: Colors.white,
+            size: 34,
+          ),
+        ),
+        const SizedBox(height: 24),
+        const Text(
+          '시장여지도',
+          style: TextStyle(
+            fontSize: 34,
+            fontWeight: SDS.fwBlack,
+            color: AppColors.textPrimary,
+            height: 1.2,
+          ),
+        ),
+        const SizedBox(height: 10),
+        const Text(
+          '이메일 계정으로 로그인하고 전통시장 특가와 예약 기능을 이용하세요.',
+          style: TextStyle(
+            fontSize: 16,
+            color: AppColors.textSecondary,
+            height: 1.5,
+            fontWeight: SDS.fwMedium,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildSocialContent() {
+  Widget _buildModeSwitch() {
     return Container(
-      padding: const EdgeInsets.all(40),
+      height: 52,
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F8FA),
-        borderRadius: BorderRadius.circular(44),
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(18),
       ),
-      child: const Icon(
-        Icons.lock_person_rounded,
-        size: 80,
-        color: AppColors.textTertiary,
+      child: Row(
+        children: [
+          _buildModeButton('로그인', !_isRegisterMode),
+          _buildModeButton('회원가입', _isRegisterMode),
+        ],
       ),
     );
   }
 
-  Widget _buildBottomActionArea() {
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-    
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.fromLTRB(_horizontalPadding, 16, _horizontalPadding, bottomPadding + 16),
-      child: _currentStep == 2 
-          ? _buildSocialButtons() 
-          : _buildPrimaryButton(),
+  Widget _buildModeButton(String label, bool selected) {
+    return Expanded(
+      child: ShrinkableButton(
+        onTap: () => setState(() => _isRegisterMode = label == '회원가입'),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: selected ? SDS.shadowSoft : null,
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: SDS.fwBlack,
+              color: selected ? AppColors.primary : AppColors.textSecondary,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildPrimaryButton() {
+  Widget _buildInput({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    TextInputAction? textInputAction,
+    bool obscureText = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      validator: validator,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      obscureText: obscureText,
+      autocorrect: false,
+      enableSuggestions: !obscureText,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        filled: true,
+        fillColor: const Color(0xFFF8FAFC),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoleSelector() {
+    return Row(
+      children: [
+        _buildRoleCard(
+          label: '일반 사용자',
+          icon: Icons.person_search_rounded,
+          role: UserRole.customer,
+        ),
+        const SizedBox(width: 12),
+        _buildRoleCard(
+          label: '시장 상인',
+          icon: Icons.storefront_rounded,
+          role: UserRole.merchant,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRoleCard({
+    required String label,
+    required IconData icon,
+    required UserRole role,
+  }) {
+    final selected = _selectedRole == role;
+    return Expanded(
+      child: ShrinkableButton(
+        onTap: () => setState(() => _selectedRole = role),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.primaryLight : const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: selected ? AppColors.primary : const Color(0xFFE2E8F0),
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 22,
+                color: selected ? AppColors.primary : AppColors.textSecondary,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: SDS.fwBlack,
+                    color: selected
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton(AuthProvider auth) {
     return ShrinkableButton(
-      onTap: _nextPage,
+      onTap: auth.isLoading ? () {} : _submit,
       child: Container(
-        height: _buttonHeight,
+        height: 60,
         decoration: BoxDecoration(
           gradient: AppColors.primaryGradient,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.15),
-              blurRadius: 24,
+              color: AppColors.primary.withValues(alpha: 0.18),
+              blurRadius: 22,
               offset: const Offset(0, 12),
             ),
           ],
         ),
         child: Center(
-          child: Text(
-            _currentStep == 0 ? '시작하기' : '다음으로',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: SDS.fwBlack,
-              color: Colors.white,
-              letterSpacing: -0.5,
-            ),
-          ),
+          child: auth.isLoading
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.4,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  _isRegisterMode ? '회원가입' : '로그인',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: SDS.fwBlack,
+                    color: Colors.white,
+                  ),
+                ),
         ),
       ),
     );
   }
 
-  Widget _buildSocialButtons() {
+  Widget _buildReviewLoginSection(AuthProvider auth) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildSocialButton(
-          label: '카카오 로그인',
-          color: const Color(0xFFFEE500),
-          textColor: const Color(0xFF3C1E1E),
-          logo: const SDSKakaoLogo(size: 28),
-          onTap: _handleFinalLogin,
-          customRadius: 24,
-          customHeight: 58,
+        const Row(
+          children: [
+            Expanded(child: Divider(color: Color(0xFFE2E8F0))),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                '심사용 계정으로 로그인',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: SDS.fwBold,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+            Expanded(child: Divider(color: Color(0xFFE2E8F0))),
+          ],
         ),
-        const SizedBox(height: 12),
-        _buildSocialButton(
-          label: '구글로 로그인',
-          color: Colors.white,
-          textColor: const Color(0xFF1F1F1F),
-          logo: const SDSGoogleLogo(size: 28),
-          hasBorder: true,
-          customBorderColor: const Color(0xFFDBE0E5),
-          customRadius: 24,
-          customHeight: 58,
-          onTap: _handleFinalLogin,
+        const SizedBox(height: 16),
+        Row(
+          children: ReviewAccounts.all.map((account) {
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right: account == ReviewAccounts.admin ? 0 : 8,
+                ),
+                child: _buildReviewAccountButton(auth, account),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 10),
+        const Text(
+          '데모 데이터(신원시장, 점포, 특가, 예약)가 미리 입력된 계정입니다.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 12,
+            color: AppColors.textTertiary,
+            fontWeight: SDS.fwMedium,
+            height: 1.4,
+          ),
         ),
       ],
     );
   }
 
-  void _handleFinalLogin() {
-    context.read<AuthProvider>().login('user@example.com', '', _selectedRole);
-  }
-
-  Widget _buildSocialButton({
-    required String label,
-    required Color color,
-    required Color textColor,
-    required Widget logo,
-    required VoidCallback onTap,
-    bool hasBorder = false,
-    Color? customBorderColor,
-    double? customRadius,
-    double? customHeight,
-  }) {
-    return ShrinkableButton(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        height: customHeight ?? _buttonHeight,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(customRadius ?? 22),
-          border: hasBorder ? Border.all(color: customBorderColor ?? const Color(0xFFE2E8F0), width: 1.2) : null,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            logo,
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 18.5,
-                fontWeight: SDS.fwBlack,
-                color: textColor,
-                letterSpacing: -0.7,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _V15RoleCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final IconData icon;
-  final bool isSelected;
-  final double fixedHeight;
-  final VoidCallback onTap;
-
-  const _V15RoleCard({
-    required this.title,
-    required this.description,
-    required this.icon,
-    required this.isSelected,
-    required this.fixedHeight,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ShrinkableButton(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutQuart,
-        height: fixedHeight,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.white : const Color(0xFFF7F8FA),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.transparent,
-            width: 2.5,
+  Widget _buildReviewAccountButton(AuthProvider auth, ReviewAccount account) {
+    return Semantics(
+      button: true,
+      label: 'review-login-${account.role.name}',
+      child: ShrinkableButton(
+        onTap: auth.isLoading ? null : () => _loginWithReviewAccount(account),
+        child: Container(
+          height: 52,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.12),
-              blurRadius: 36,
-              offset: const Offset(0, 18),
+          child: Text(
+            account.label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: SDS.fwBlack,
+              color: AppColors.textPrimary,
             ),
-          ] : null,
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: isSelected ? AppColors.primaryGradient : null,
-                color: isSelected ? null : Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: isSelected ? SDS.shadowAccent(AppColors.primary) : null,
-              ),
-              child: Icon(
-                icon,
-                color: isSelected ? Colors.white : AppColors.textSecondary,
-                size: 32,
-              ),
-            ),
-            const SizedBox(width: 24),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 21,
-                      fontWeight: SDS.fwBlack,
-                      color: isSelected ? AppColors.primary : AppColors.textPrimary,
-                      letterSpacing: -0.6,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textSecondary,
-                      fontWeight: SDS.fwMedium,
-                      letterSpacing: -0.4,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected)
-              const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 30),
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  Widget _buildInfoBanner(String message) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFBEB),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.info_outline_rounded,
+            color: Color(0xFFD97706),
+            size: 18,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 13,
+                fontWeight: SDS.fwBold,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _loginWithReviewAccount(ReviewAccount account) async {
+    context.read<AuthProvider>().clearSessionRestoreMessage();
+    setState(() {
+      _isRegisterMode = false;
+      _emailController.text = account.email;
+      _passwordController.text = account.password;
+    });
+    final auth = context.read<AuthProvider>();
+    final success = await auth.loginWithEmail(
+      email: account.email,
+      password: account.password,
+    );
+    if (!mounted || success) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(auth.errorMessage ?? '인증에 실패했습니다.')),
+    );
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    final auth = context.read<AuthProvider>();
+    auth.clearSessionRestoreMessage();
+    final success = _isRegisterMode
+        ? await auth.registerWithEmail(
+            name: _nameController.text,
+            email: _emailController.text,
+            password: _passwordController.text,
+            role: _selectedRole,
+          )
+        : await auth.loginWithEmail(
+            email: _emailController.text,
+            password: _passwordController.text,
+          );
+    if (!mounted || success) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(auth.errorMessage ?? '인증에 실패했습니다.')));
   }
 }

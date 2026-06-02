@@ -1,0 +1,163 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Create the App Store Connect app record and Developer Portal bundle id"
+  lane :appstore_create_app do
+    produce(
+      username: ENV.fetch("FASTLANE_USER"),
+      app_identifier: "com.sijangyeojido.app",
+      app_name: ENV.fetch("PRODUCE_APP_NAME", "시장여지도 - 전통시장 특가"),
+      sku: ENV.fetch("PRODUCE_SKU", "sijangyeojido-ios"),
+      language: ENV.fetch("PRODUCE_LANGUAGE", "ko"),
+      company_name: ENV["PRODUCE_COMPANY_NAME"],
+      platform: "ios",
+      skip_itc: false,
+      skip_devcenter: ENV["PRODUCE_SKIP_DEVCENTER"] == "true"
+    )
+  end
+
+  private_lane :asc_auth do
+    app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_content: ENV.fetch("ASC_KEY_CONTENT"),
+      is_key_content_base64: true
+    )
+  end
+
+  desc "Upload binary, metadata, and screenshots to App Store Connect"
+  lane :appstore_upload do
+    asc_auth
+    upload_to_app_store(
+      ipa: ENV.fetch("IOS_IPA_PATH", "build/ios/ipa/Runner.ipa"),
+      skip_metadata: false,
+      skip_screenshots: false,
+      submit_for_review: false,
+      force: true
+    )
+  end
+
+  desc "Upload only the IPA binary to App Store Connect"
+  lane :appstore_binary_upload do
+    asc_auth
+    upload_to_app_store(
+      ipa: ENV.fetch("IOS_IPA_PATH", "build/ios/ipa/Runner.ipa"),
+      skip_metadata: true,
+      skip_screenshots: true,
+      submit_for_review: false,
+      run_precheck_before_submit: false,
+      precheck_include_in_app_purchases: false,
+      force: true
+    )
+  end
+
+  desc "Update App Store metadata and screenshots without a binary"
+  lane :appstore_metadata do
+    asc_auth
+    upload_to_app_store(
+      skip_binary_upload: true,
+      skip_metadata: false,
+      skip_screenshots: false,
+      submit_for_review: false,
+      run_precheck_before_submit: false,
+      precheck_include_in_app_purchases: false,
+      force: true
+    )
+  end
+
+  desc "Upload and submit the App Store version for review"
+  lane :appstore_submit_review do
+    asc_auth
+    upload_to_app_store(
+      ipa: ENV.fetch("IOS_IPA_PATH", "build/ios/ipa/Runner.ipa"),
+      skip_metadata: false,
+      skip_screenshots: false,
+      submit_for_review: true,
+      precheck_include_in_app_purchases: false,
+      automatic_release: false,
+      force: true
+    )
+  end
+
+  desc "Upload metadata/screenshots and submit the already-uploaded build for review"
+  lane :appstore_submit_existing_build do
+    asc_auth
+    upload_to_app_store(
+      skip_binary_upload: true,
+      skip_metadata: false,
+      skip_screenshots: false,
+      submit_for_review: true,
+      precheck_include_in_app_purchases: false,
+      automatic_release: false,
+      force: true
+    )
+  end
+
+  desc "Submit existing build using Apple ID session instead of App Store Connect API key"
+  lane :appstore_submit_existing_build_login do
+    upload_to_app_store(
+      username: ENV.fetch("FASTLANE_USER"),
+      skip_binary_upload: true,
+      skip_metadata: false,
+      skip_screenshots: false,
+      submit_for_review: true,
+      precheck_include_in_app_purchases: false,
+      automatic_release: false,
+      force: true
+    )
+  end
+
+  desc "Upload screenshots only"
+  lane :appstore_screenshots_only do
+    asc_auth
+    upload_to_app_store(
+      skip_binary_upload: true,
+      skip_metadata: true,
+      skip_screenshots: false,
+      overwrite_screenshots: true,
+      submit_for_review: false,
+      run_precheck_before_submit: false,
+      precheck_include_in_app_purchases: false,
+      force: true
+    )
+  end
+
+  desc "Upload metadata only without submitting"
+  lane :appstore_metadata_only_login do
+    upload_to_app_store(
+      username: ENV.fetch("FASTLANE_USER"),
+      skip_binary_upload: true,
+      skip_metadata: false,
+      skip_screenshots: true,
+      submit_for_review: false,
+      precheck_include_in_app_purchases: false,
+      run_precheck_before_submit: false,
+      copyright: "2026 Junwon Park",
+      price_tier: 0,
+      primary_category: "Shopping",
+      submission_information: {
+        content_rights_contains_third_party_content: false
+      },
+      force: true
+    )
+  end
+
+  desc "Submit the existing version without uploading metadata or screenshots"
+  lane :appstore_submit_only do
+    upload_to_app_store(
+      username: ENV.fetch("FASTLANE_USER"),
+      skip_binary_upload: true,
+      skip_metadata: true,
+      skip_screenshots: true,
+      submit_for_review: true,
+      precheck_include_in_app_purchases: false,
+      run_precheck_before_submit: false,
+      copyright: "2026 Junwon Park",
+      submission_information: {
+        export_compliance_uses_encryption: false
+      },
+      automatic_release: false,
+      force: true
+    )
+  end
+end

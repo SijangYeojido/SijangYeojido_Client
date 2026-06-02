@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../models/models.dart';
+import 'package:provider/provider.dart';
 import '../../data/mock_data.dart';
+import '../../models/models.dart';
+import '../../providers/app_data_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/app_ui.dart';
 import '../../widgets/shrinkable_button.dart';
+import '../map/market_hub_screen.dart';
 import '../map/store_detail_screen.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/sds_widgets.dart';
@@ -17,31 +20,31 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<Store> _results = [];
+  List<MarketInfo> _marketResults = [];
+  List<Store> _storeResults = [];
   bool _hasStartedTyped = false;
-  
+
   // Real history would use shared_preferences
-  final List<String> _recentSearches = ['수산시장', '떡볶이', '축산'];
+  final List<String> _recentSearches = ['승인시연상회', '신원시장', '관악구', '떡볶이'];
 
   void _onSearch(String query) {
-    if (query.isEmpty) {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) {
       setState(() {
-        _results = [];
+        _marketResults = [];
+        _storeResults = [];
         _hasStartedTyped = false;
       });
       return;
     }
 
-    final queryLower = query.toLowerCase();
-    final allStores = MockData.stores;
+    final data = context.read<AppDataProvider>();
     setState(() {
-      _results = allStores.where((s) => 
-        s.name.toLowerCase().contains(queryLower) ||
-        s.category.toLowerCase().contains(queryLower) ||
-        s.items.any((i) => i.name.toLowerCase().contains(queryLower))
-      ).toList();
+      _marketResults = data.searchMarkets(trimmed);
+      _storeResults = data.searchStores(trimmed);
       _hasStartedTyped = true;
     });
+    data.recordAction('search.query', metadata: {'keyword': trimmed});
   }
 
   @override
@@ -83,44 +86,62 @@ class _SearchScreenState extends State<SearchScreen> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(32),
                         color: Colors.white.withValues(alpha: 0.6),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1.5),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          width: 1.5,
+                        ),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: TextField(
-                        controller: _searchController,
-                        autofocus: true,
-                        onChanged: _onSearch,
-                        decoration: InputDecoration(
-                          hintText: '가게 이름 또는 시장 테마 검색',
-                          hintStyle: TextStyle(
-                            color: AppColors.textTertiary,
-                            fontWeight: SDS.fwBold,
-                            fontSize: 16,
+                      child: Semantics(
+                        label: 'global-search-field',
+                        textField: true,
+                        child: TextField(
+                          controller: _searchController,
+                          autofocus: true,
+                          onChanged: _onSearch,
+                          decoration: InputDecoration(
+                            hintText: '시장명, 지역, 점포명, 품목 검색',
+                            hintStyle: TextStyle(
+                              color: AppColors.textTertiary,
+                              fontWeight: SDS.fwBold,
+                              fontSize: 16,
+                            ),
+                            prefixIcon: ShaderMask(
+                              shaderCallback: (bounds) => AppColors
+                                  .primaryGradient
+                                  .createShader(bounds),
+                              child: const Icon(
+                                Icons.search_rounded,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                            suffixIcon: _searchController.text.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(
+                                      Icons.cancel_rounded,
+                                      color: AppColors.textTertiary,
+                                    ),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      _onSearch('');
+                                    },
+                                  )
+                                : null,
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 22,
+                            ),
                           ),
-                          prefixIcon: ShaderMask(
-                            shaderCallback: (bounds) => AppColors.primaryGradient.createShader(bounds),
-                            child: const Icon(Icons.search_rounded, color: Colors.white, size: 28),
+                          style: TextStyle(
+                            fontWeight: SDS.fwBlack,
+                            color: AppColors.textPrimary,
+                            fontSize: 17,
                           ),
-                          suffixIcon: _searchController.text.isNotEmpty 
-                            ? IconButton(
-                                icon: const Icon(Icons.cancel_rounded, color: AppColors.textTertiary),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  _onSearch('');
-                                },
-                              )
-                            : null,
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,  // Explicitly remove default borders
-                          focusedBorder: InputBorder.none,  // Explicitly remove focus border
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 22),
-                        ),
-                        style: TextStyle(
-                          fontWeight: SDS.fwBlack,
-                          color: AppColors.textPrimary,
-                          fontSize: 17,
                         ),
                       ),
                     ),
@@ -130,8 +151,8 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           Expanded(
-            child: _hasStartedTyped 
-                ? _buildSearchResults() 
+            child: _hasStartedTyped
+                ? _buildSearchResults()
                 : _buildSearchHome(textTheme),
           ),
         ],
@@ -229,7 +250,11 @@ class _SearchScreenState extends State<SearchScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                const Icon(Icons.storefront_rounded, color: AppColors.primary, size: 20),
+                const Icon(
+                  Icons.storefront_rounded,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
                 const SizedBox(width: 10),
                 Text(
                   categories[index],
@@ -247,7 +272,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchResults() {
-    if (_results.isEmpty) {
+    if (_marketResults.isEmpty && _storeResults.isEmpty) {
       return AppEmptyState(
         icon: Icons.search_off_rounded,
         title: '검색 결과가 없어요',
@@ -255,34 +280,63 @@ class _SearchScreenState extends State<SearchScreen> {
       );
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: _results.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 2),
-      itemBuilder: (context, index) {
-        final store = _results[index];
-        return SDS.listRow(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          leading: Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(SDS.radiusS),
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+      children: [
+        if (_marketResults.isNotEmpty) ...[
+          _ResultSectionTitle(title: '시장 검색 결과', count: _marketResults.length),
+          const SizedBox(height: 8),
+          ..._marketResults.asMap().entries.map(
+            (entry) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _MarketResultRow(
+                market: entry.value,
+                index: entry.key,
+                onTap: () {
+                  context.read<AppDataProvider>().recordAction(
+                    'search.market.select',
+                    metadata: {'marketName': entry.value.name},
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          MarketHubScreen(marketName: entry.value.name),
+                    ),
+                  );
+                },
+              ),
             ),
-            child: Icon(_iconForCategory(store.category), color: AppColors.primary, size: 24),
           ),
-          title: Text(store.name),
-          subtitle: Text('${store.category} · ${store.zoneId}구역'),
-          trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textTertiary),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => StoreDetailScreen(store: store)),
-            );
-          },
-        );
-      },
+          const SizedBox(height: 20),
+        ],
+        if (_storeResults.isNotEmpty) ...[
+          _ResultSectionTitle(title: '점포 검색 결과', count: _storeResults.length),
+          const SizedBox(height: 8),
+          ..._storeResults.asMap().entries.map(
+            (entry) => Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: _StoreResultRow(
+                store: entry.value,
+                index: entry.key,
+                icon: _iconForCategory(entry.value.category),
+                onTap: () {
+                  context.read<AppDataProvider>().recordAction(
+                    'search.store.select',
+                    metadata: {'storeId': entry.value.id},
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => StoreDetailScreen(store: entry.value),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -290,7 +344,131 @@ class _SearchScreenState extends State<SearchScreen> {
     if (category.contains('먹거리')) return Icons.restaurant_rounded;
     if (category.contains('수산')) return Icons.set_meal_rounded;
     if (category.contains('정육')) return Icons.kebab_dining_rounded;
-    if (category.contains('과일') || category.contains('채소')) return Icons.eco_rounded;
+    if (category.contains('과일') || category.contains('채소')) {
+      return Icons.eco_rounded;
+    }
     return Icons.storefront_rounded;
+  }
+}
+
+class _ResultSectionTitle extends StatelessWidget {
+  const _ResultSectionTitle({required this.title, required this.count});
+
+  final String title;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: SDS.fwBlack,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          '$count건',
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: SDS.fwBold,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MarketResultRow extends StatelessWidget {
+  const _MarketResultRow({
+    required this.market,
+    required this.index,
+    required this.onTap,
+  });
+
+  final MarketInfo market;
+  final int index;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'market-result-$index',
+      button: true,
+      excludeSemantics: true,
+      child: SDS.listRow(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        leading: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: market.accentColor.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(SDS.radiusS),
+          ),
+          child: Icon(
+            Icons.store_mall_directory_rounded,
+            color: market.accentColor,
+            size: 24,
+          ),
+        ),
+        title: Text(market.name),
+        subtitle: Text('${market.address} · ${market.storeCount}개 점포'),
+        trailing: const Icon(
+          Icons.arrow_forward_ios_rounded,
+          size: 14,
+          color: AppColors.textTertiary,
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+class _StoreResultRow extends StatelessWidget {
+  const _StoreResultRow({
+    required this.store,
+    required this.index,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final Store store;
+  final int index;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'store-result-$index',
+      button: true,
+      excludeSemantics: true,
+      child: SDS.listRow(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        leading: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(SDS.radiusS),
+          ),
+          child: Icon(icon, color: AppColors.primary, size: 24),
+        ),
+        title: Text(store.name),
+        subtitle: Text(
+          '${store.marketName} · ${store.category} · ${store.zoneId}구역',
+        ),
+        trailing: const Icon(
+          Icons.arrow_forward_ios_rounded,
+          size: 14,
+          color: AppColors.textTertiary,
+        ),
+        onTap: onTap,
+      ),
+    );
   }
 }

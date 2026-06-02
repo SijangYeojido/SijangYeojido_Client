@@ -40,7 +40,7 @@ class AppColors {
 
   // Legacy aliases (keep to reduce churn)
   static const Color orange = Color(0xFFFFB020); // Aligned with warning
-  static const Color blue = Color(0xFF3182F6);   // Aligned with success
+  static const Color blue = Color(0xFF3182F6); // Aligned with success
   static const Color blueLight = Color(0xFFE8F3FF);
 
   // Market zone colors

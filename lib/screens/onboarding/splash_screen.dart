@@ -32,7 +32,10 @@ class _SplashScreenState extends State<SplashScreen> {
             // 1. Official 3D Pin (With enhanced filtering for perfect white transparency)
             // Using matrix to blow out any non-pure-white grey background before multiply
             ColorFiltered(
-              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.multiply),
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.multiply,
+              ),
               child: ColorFiltered(
                 colorFilter: const ColorFilter.matrix([
                   1.1, 0, 0, 0, -10, // Lighten and clip blacks
@@ -52,19 +55,20 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             const SizedBox(height: 28),
-            
+
             // 2. Official Brand Branding "시장여지도" (Now in Brand Red)
             const Text(
               '시장여지도',
               style: TextStyle(
                 fontSize: 34,
                 fontWeight: FontWeight.w900,
-                color: AppColors.primary, // Official Hong-saek (Traditional Red)
+                color:
+                    AppColors.primary, // Official Hong-saek (Traditional Red)
                 letterSpacing: -1.2,
               ),
             ),
             const SizedBox(height: 12),
-            
+
             // 3. Official Slogan (Now in Brand Red)
             const Text(
               '시장에 가고 싶을 때',
