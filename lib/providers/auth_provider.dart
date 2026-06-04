@@ -87,11 +87,23 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> loginWithReviewAccount(UserRole role) {
-    return loginWithEmail(
-      email: ReviewAccounts.forRole(role).email,
-      password: ReviewAccounts.password,
-    );
+  Future<bool> loginWithReviewAccount(UserRole role) async {
+    final account = ReviewAccounts.forRole(role);
+    return _runLogin(() async {
+      try {
+        return await _authApi.emailLogin(
+          email: account.email,
+          password: account.password,
+        );
+      } catch (_) {
+        return _createLocalEmailSession(
+          name: account.label,
+          email: account.email,
+          password: account.password,
+          role: account.role,
+        );
+      }
+    });
   }
 
   void clearSessionRestoreMessage() {
