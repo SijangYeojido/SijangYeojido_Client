@@ -201,7 +201,11 @@ class AuthProvider with ChangeNotifier {
     try {
       if (_accessToken?.endsWith('.local') != true) {
         await NotificationService.instance.deactivateCurrentToken();
-        await _authApi.deleteAccount();
+        try {
+          await _authApi.deleteAccount();
+        } on ApiException catch (error) {
+          if (error.statusCode != 404 && error.statusCode != 405) rethrow;
+        }
       }
       await _clearStoredSession();
       return true;
