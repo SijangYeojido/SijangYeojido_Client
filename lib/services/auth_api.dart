@@ -113,4 +113,8 @@ class AuthApi {
     final response = await _client.patch('/users/me', body: body);
     return AuthProfile.fromJson(response as Map<String, dynamic>);
   }
+
+  Future<void> deleteAccount() async {
+    await _client.delete('/users/me');
+  }
 }

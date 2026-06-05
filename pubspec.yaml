@@ -2,7 +2,7 @@ name: sijangyeojido_client
 description: "시장여지도 - Traditional Market Guide App"
 publish_to: 'none'
 
-version: 1.0.0+5
+version: 1.0.0+6
 
 environment:
   sdk: ^3.10.1

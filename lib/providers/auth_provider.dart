@@ -189,10 +189,29 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> logout() async {
     await NotificationService.instance.deactivateCurrentToken();
-    await _storage.delete(key: _tokenKey);
-    ApiClient.instance.accessToken = null;
-    _clearSession();
+    await _clearStoredSession();
     notifyListeners();
+  }
+
+  Future<bool> deleteAccount() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      if (_accessToken?.endsWith('.local') != true) {
+        await NotificationService.instance.deactivateCurrentToken();
+        await _authApi.deleteAccount();
+      }
+      await _clearStoredSession();
+      return true;
+    } catch (error) {
+      _setError(_friendlyError(error));
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void login(String email, String password, UserRole role) {
@@ -329,6 +348,17 @@ class AuthProvider with ChangeNotifier {
     _accessToken = null;
     _needsProfileSetup = false;
     _errorMessage = null;
+  }
+
+  Future<void> _clearStoredSession() async {
+    await _storage.delete(key: _tokenKey);
+    await _storage.delete(key: _localEmailKey);
+    await _storage.delete(key: _localPasswordKey);
+    await _storage.delete(key: _localNameKey);
+    await _storage.delete(key: _localRoleKey);
+    ApiClient.instance.accessToken = null;
+    FavoriteService().favoriteIds.clear();
+    _clearSession();
   }
 
   void _setError(String message) {

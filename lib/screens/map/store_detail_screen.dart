@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../data/mock_data.dart';
 import '../../models/models.dart';
 import '../../providers/app_data_provider.dart';
 import '../../theme/app_colors.dart';
@@ -644,7 +646,7 @@ class StoreDetailScreen extends StatelessWidget {
                 label: '길 안내 시작',
                 isPrimary: false,
                 icon: Icons.directions_rounded,
-                onTap: () => Navigator.pop(context, true),
+                onTap: () => _openDirections(context, market),
               ),
             ),
             const SizedBox(width: 12),
@@ -693,6 +695,26 @@ class StoreDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _openDirections(BuildContext context, MarketInfo market) async {
+    final query = [
+      market.address,
+      store.addressDetail,
+      store.name,
+    ].whereType<String>().where((value) => value.trim().isNotEmpty).join(' ');
+    final destination = query.isEmpty ? store.name : query;
+    final uri = Uri.https('maps.apple.com', '/', {
+      'daddr': destination,
+      'dirflg': 'w',
+    });
+
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('지도 앱을 열 수 없습니다. 잠시 후 다시 시도해 주세요.')),
+      );
+    }
   }
 
   Widget _buildSocialReviews(BuildContext context) {
