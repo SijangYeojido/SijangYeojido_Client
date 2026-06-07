@@ -22,6 +22,8 @@ class AuthProvider with ChangeNotifier {
   static const _localPasswordKey = 'sijang.localPassword';
   static const _localNameKey = 'sijang.localName';
   static const _localRoleKey = 'sijang.localRole';
+  static const _sessionEmailKey = 'sijang.sessionEmail';
+  static const _deletedEmailKey = 'sijang.deletedEmail';
 
   final backend_auth.AuthApi _authApi;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
@@ -32,6 +34,7 @@ class AuthProvider with ChangeNotifier {
   UserRole _role = UserRole.customer;
   String? _userName;
   String? _profileImage;
+  String? _email;
   String? _accessToken;
   String? _errorMessage;
   String? _sessionRestoreMessage;
@@ -43,6 +46,7 @@ class AuthProvider with ChangeNotifier {
   UserRole get role => _role;
   String? get userName => _userName;
   String? get profileImage => _profileImage;
+  String? get email => _email;
   String? get accessToken => _accessToken;
   String? get errorMessage => _errorMessage;
   String? get sessionRestoreMessage => _sessionRestoreMessage;
@@ -73,6 +77,7 @@ class AuthProvider with ChangeNotifier {
         role: profile.role,
         profileImage: profile.profileImage,
         needsProfileSetup: profile.needsProfileSetup,
+        email: await _storage.read(key: _sessionEmailKey),
       );
       await FavoriteService().loadFavorites();
       await NotificationService.instance.syncAfterLogin();
@@ -89,6 +94,10 @@ class AuthProvider with ChangeNotifier {
 
   Future<bool> loginWithReviewAccount(UserRole role) async {
     final account = ReviewAccounts.forRole(role);
+    if (await _isDeletedEmail(account.email)) {
+      _setError('삭제된 계정입니다. 다른 계정으로 로그인해 주세요.');
+      return false;
+    }
     return _runLogin(() async {
       try {
         return await _authApi.emailLogin(
@@ -103,7 +112,7 @@ class AuthProvider with ChangeNotifier {
           role: account.role,
         );
       }
-    });
+    }, email: account.email);
   }
 
   void clearSessionRestoreMessage() {
@@ -115,6 +124,10 @@ class AuthProvider with ChangeNotifier {
     required String email,
     required String password,
   }) async {
+    if (await _isDeletedEmail(email)) {
+      _setError('삭제된 계정입니다. 다른 계정으로 로그인해 주세요.');
+      return false;
+    }
     return _runLogin(() async {
       try {
         return await _authApi.emailLogin(
@@ -126,7 +139,7 @@ class AuthProvider with ChangeNotifier {
         if (fallback != null) return fallback;
         rethrow;
       }
-    });
+    }, email: email);
   }
 
   Future<bool> registerWithEmail({
@@ -135,6 +148,10 @@ class AuthProvider with ChangeNotifier {
     required String password,
     required UserRole role,
   }) async {
+    if (await _isDeletedEmail(email)) {
+      _setError('삭제된 계정입니다. 다른 이메일을 사용해 주세요.');
+      return false;
+    }
     return _runLogin(() async {
       try {
         return await _authApi.emailRegister(
@@ -152,12 +169,13 @@ class AuthProvider with ChangeNotifier {
           role: role,
         );
       }
-    });
+    }, email: email);
   }
 
   Future<bool> _runLogin(
-    Future<backend_auth.AuthSession> Function() action,
-  ) async {
+    Future<backend_auth.AuthSession> Function() action, {
+    String? email,
+  }) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -168,12 +186,19 @@ class AuthProvider with ChangeNotifier {
         throw const ApiException(401, '로그인 응답에 토큰이 없습니다.');
       }
       await _storage.write(key: _tokenKey, value: session.accessToken);
+      if (email != null) {
+        await _storage.write(
+          key: _sessionEmailKey,
+          value: email.trim().toLowerCase(),
+        );
+      }
       _applyProfile(
         token: session.accessToken,
         name: session.name,
         role: session.role,
         profileImage: session.profileImage,
         needsProfileSetup: session.needsProfileSetup,
+        email: email,
       );
       await FavoriteService().loadFavorites();
       await NotificationService.instance.syncAfterLogin();
@@ -206,6 +231,9 @@ class AuthProvider with ChangeNotifier {
         } on ApiException catch (error) {
           if (error.statusCode != 404 && error.statusCode != 405) rethrow;
         }
+      }
+      if (_email case final email?) {
+        await _storage.write(key: _deletedEmailKey, value: email);
       }
       await _clearStoredSession();
       return true;
@@ -307,6 +335,7 @@ class AuthProvider with ChangeNotifier {
     required UserRole role,
     String? profileImage,
     bool needsProfileSetup = false,
+    String? email,
   }) {
     _accessToken = token;
     ApiClient.instance.accessToken = token;
@@ -314,6 +343,7 @@ class AuthProvider with ChangeNotifier {
     _role = role;
     _userName = name;
     _profileImage = profileImage;
+    _email = email?.trim().toLowerCase();
     _needsProfileSetup = needsProfileSetup;
     _errorMessage = null;
   }
@@ -349,6 +379,7 @@ class AuthProvider with ChangeNotifier {
     _role = UserRole.customer;
     _userName = null;
     _profileImage = null;
+    _email = null;
     _accessToken = null;
     _needsProfileSetup = false;
     _errorMessage = null;
@@ -360,9 +391,15 @@ class AuthProvider with ChangeNotifier {
     await _storage.delete(key: _localPasswordKey);
     await _storage.delete(key: _localNameKey);
     await _storage.delete(key: _localRoleKey);
+    await _storage.delete(key: _sessionEmailKey);
     ApiClient.instance.accessToken = null;
     FavoriteService().favoriteIds.clear();
     _clearSession();
+  }
+
+  Future<bool> _isDeletedEmail(String email) async {
+    final deleted = await _storage.read(key: _deletedEmailKey);
+    return deleted == email.trim().toLowerCase();
   }
 
   void _setError(String message) {
