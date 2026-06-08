@@ -65,6 +65,15 @@ void main() {
         await _wait(tester, seconds: 1);
       }
 
+      Future<void> scrollToTop() async {
+        final scrollables = find.byType(Scrollable);
+        if (scrollables.evaluate().isEmpty) return;
+        for (var i = 0; i < 4; i += 1) {
+          await tester.drag(scrollables.first, const Offset(0, 900));
+          await tester.pump(const Duration(milliseconds: 250));
+        }
+      }
+
       Future<void> ensureOnMarketHub() async {
         if (find.bySemanticsLabel('market-action-시장 지도').evaluate().isNotEmpty) {
           return;
@@ -92,7 +101,7 @@ void main() {
           );
           if (cards.evaluate().isNotEmpty) {
             await tester.ensureVisible(cards.first);
-            await tester.tap(cards.first);
+            await tester.tap(cards.first, warnIfMissed: false);
             await _wait(tester, seconds: seconds);
             return;
           }
@@ -159,6 +168,7 @@ void main() {
       await capture('09_profile');
 
       await tapLabelOrText('tab-홈', '홈');
+      await scrollToTop();
       await tapLabelOrText('home-search', '시장명, 지역, 점포명, 품목 검색');
       await tester.enterText(find.bySemanticsLabel('global-search-field'), '신원');
       await _wait(tester, seconds: 2);
