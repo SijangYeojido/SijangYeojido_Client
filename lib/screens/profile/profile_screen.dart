@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../config/review_accounts.dart';
 import '../../theme/app_colors.dart';
 import '../../providers/app_data_provider.dart';
 import '../../theme/sijang_design_system.dart';
@@ -233,11 +232,6 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                     _UltimateSettingItem(
-                      icon: Icons.swap_horiz_rounded,
-                      label: '다른 역할로 전환',
-                      onTap: () => _showRoleSwitchSheet(context, auth.role),
-                    ),
-                    _UltimateSettingItem(
                       icon: Icons.logout_rounded,
                       label: '로그아웃',
                       onTap: () => context.read<AuthProvider>().logout(),
@@ -287,79 +281,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showRoleSwitchSheet(BuildContext context, UserRole currentRole) {
-    final options = ReviewAccounts.all
-        .where((account) => account.role != currentRole)
-        .toList();
-    if (options.isEmpty) return;
-
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (sheetContext) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '다른 역할로 전환',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: SDS.fwBlack,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                '심사용 계정으로 다시 로그인하면 해당 역할의 기능을 확인할 수 있어요.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                  fontWeight: SDS.fwMedium,
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ...options.map(
-                (account) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: ShrinkableButton(
-                    onTap: () async {
-                      Navigator.pop(sheetContext);
-                      final auth = context.read<AuthProvider>();
-                      await auth.logout();
-                      await auth.loginWithReviewAccount(account.role);
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF7F8FA),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        '${account.label} 계정으로 전환',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: SDS.fwBlack,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 }
 
 class _ProfileAvatar extends StatelessWidget {

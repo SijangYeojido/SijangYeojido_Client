@@ -140,11 +140,11 @@ class AppDataProvider with ChangeNotifier {
     try {
       await _loadFromServer();
     } catch (error) {
-      _errorMessage = _friendlyError(error);
       final restored = await _restoreFromCache();
       if (!restored) {
         _useMockFallback();
       }
+      _errorMessage = _friendlyError(error);
     } finally {
       _isLoading = false;
       notifyListeners();

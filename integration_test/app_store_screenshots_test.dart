@@ -131,7 +131,20 @@ void main() {
       await _wait(tester, seconds: 2);
       await capture('01_login');
 
-      expect(await authProvider.loginWithReviewAccount(UserRole.customer), isTrue);
+      final screenshotEmail = 'screenshots@sijangyeojido.com';
+      const screenshotPassword = 'ExhibitPass2026!';
+      final loggedIn =
+          await authProvider.registerWithEmail(
+            name: '전시 사용자',
+            email: screenshotEmail,
+            password: screenshotPassword,
+            role: UserRole.customer,
+          ) ||
+          await authProvider.loginWithEmail(
+            email: screenshotEmail,
+            password: screenshotPassword,
+          );
+      expect(loggedIn, isTrue);
 
       await tester.pumpWidget(appShell(const MainScaffold()));
       await _waitForText(tester, '신원시장', timeoutSeconds: 30);

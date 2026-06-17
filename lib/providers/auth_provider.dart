@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../config/app_config.dart';
-import '../config/review_accounts.dart';
 import '../models/auth_role.dart';
 import '../services/api_client.dart';
 import '../services/auth_api.dart' as backend_auth;
@@ -90,29 +89,6 @@ class AuthProvider with ChangeNotifier {
       _hasRestoredSession = true;
       notifyListeners();
     }
-  }
-
-  Future<bool> loginWithReviewAccount(UserRole role) async {
-    final account = ReviewAccounts.forRole(role);
-    if (await _isDeletedEmail(account.email)) {
-      _setError('삭제된 계정입니다. 다른 계정으로 로그인해 주세요.');
-      return false;
-    }
-    return _runLogin(() async {
-      try {
-        return await _authApi.emailLogin(
-          email: account.email,
-          password: account.password,
-        );
-      } catch (_) {
-        return _createLocalEmailSession(
-          name: account.label,
-          email: account.email,
-          password: account.password,
-          role: account.role,
-        );
-      }
-    }, email: account.email);
   }
 
   void clearSessionRestoreMessage() {

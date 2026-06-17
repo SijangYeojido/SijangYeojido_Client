@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/sds_widgets.dart';
+import 'auth/login_screen.dart';
 import 'home/home_screen.dart';
 import 'home/nearby_map_screen.dart';
 import 'profile/profile_screen.dart';
@@ -106,13 +107,14 @@ class _MainScaffoldState extends State<MainScaffold> {
     final auth = context.watch<AuthProvider>();
     final screens = _getScreens(auth.role);
     final items = _getTabItems(auth.role);
+    final currentIndex = _currentIndex >= screens.length ? 0 : _currentIndex;
 
     return Scaffold(
       extendBody: true,
       body: Stack(
         children: [
           IndexedStack(
-            index: _currentIndex,
+            index: currentIndex,
             children: screens
                 .map(
                   (screen) => Padding(
@@ -127,13 +129,36 @@ class _MainScaffoldState extends State<MainScaffold> {
             right: 0,
             bottom: 20,
             child: SDSFloatingTabbar(
-              currentIndex: _currentIndex,
-              onTap: (index) => setState(() => _currentIndex = index),
+              currentIndex: currentIndex,
+              onTap: (index) => _handleTabTap(context, auth, index),
               items: items,
             ),
           ),
         ],
       ),
+    );
+  }
+
+  void _handleTabTap(BuildContext context, AuthProvider auth, int index) {
+    if (!auth.isLoggedIn && _requiresLogin(auth.role, index)) {
+      _showLoginRequired(context);
+      return;
+    }
+    setState(() => _currentIndex = index);
+  }
+
+  bool _requiresLogin(UserRole role, int index) {
+    if (role == UserRole.admin || role == UserRole.merchant) return true;
+    return index == 2;
+  }
+
+  void _showLoginRequired(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('예약, 쿠폰, 내 정보 기능은 로그인 후 이용할 수 있습니다.')),
+    );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
     );
   }
 }

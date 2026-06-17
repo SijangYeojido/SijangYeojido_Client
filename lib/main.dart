@@ -7,7 +7,6 @@ import 'theme/app_theme.dart';
 import 'providers/app_data_provider.dart';
 import 'providers/auth_provider.dart';
 import 'services/notification_service.dart';
-import 'screens/auth/login_screen.dart';
 import 'screens/auth/profile_setup_screen.dart';
 import 'screens/main_scaffold.dart';
 import 'screens/onboarding/splash_screen.dart';
@@ -74,8 +73,9 @@ class _AuthWrapper extends StatelessWidget {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        if (!auth.isLoggedIn) return const LoginScreen();
-        if (auth.needsProfileSetup) return const ProfileSetupScreen();
+        if (auth.isLoggedIn && auth.needsProfileSetup) {
+          return const ProfileSetupScreen();
+        }
         return const MainScaffold();
       },
     );

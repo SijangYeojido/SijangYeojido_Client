@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/app_data_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/shrinkable_button.dart';
+import '../auth/login_screen.dart';
 
 class MarketCouponScreen extends StatelessWidget {
   final String marketName;
@@ -224,6 +226,7 @@ class MarketCouponScreen extends StatelessWidget {
               onTap: isDownloaded || id == 0
                   ? () {}
                   : () async {
+                      if (!_ensureLoggedIn(context)) return;
                       try {
                         await context.read<AppDataProvider>().claimCoupon(id);
                       } catch (_) {
@@ -257,5 +260,17 @@ class MarketCouponScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool _ensureLoggedIn(BuildContext context) {
+    if (context.read<AuthProvider>().isLoggedIn) return true;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('쿠폰 받기는 로그인 후 이용할 수 있습니다.')));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
+    return false;
   }
 }

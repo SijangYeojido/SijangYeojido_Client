@@ -49,8 +49,8 @@ void main() {
       final auth = AuthProvider(authApi: _MissingDeleteAuthApi());
 
       final loggedIn = await auth.loginWithEmail(
-        email: 'review-user@sijangyeojido.com',
-        password: 'SijangReview2026!',
+        email: 'exhibit-user@sijangyeojido.com',
+        password: 'ExhibitPass2026!',
       );
       expect(loggedIn, isTrue);
       expect(auth.isLoggedIn, isTrue);
@@ -60,8 +60,8 @@ void main() {
       expect(auth.isLoggedIn, isFalse);
 
       final loginAgain = await auth.loginWithEmail(
-        email: 'review-user@sijangyeojido.com',
-        password: 'SijangReview2026!',
+        email: 'exhibit-user@sijangyeojido.com',
+        password: 'ExhibitPass2026!',
       );
       expect(loginAgain, isFalse);
       expect(auth.errorMessage, contains('삭제된 계정'));
@@ -78,7 +78,7 @@ class _MissingDeleteAuthApi extends backend_auth.AuthApi {
     return backend_auth.AuthSession(
       accessToken: 'test-token',
       userId: 1,
-      name: '심사 사용자',
+      name: '전시 사용자',
       role: UserRole.customer,
     );
   }

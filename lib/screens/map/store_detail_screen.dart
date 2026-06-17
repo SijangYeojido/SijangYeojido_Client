@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../data/mock_data.dart';
 import '../../models/models.dart';
 import '../../providers/app_data_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/sijang_design_system.dart';
 import '../../widgets/sds_widgets.dart';
@@ -13,6 +14,7 @@ import '../../widgets/app_ui.dart';
 import '../../services/favorite_service.dart';
 import '../market/market_map_simple_screen.dart';
 import '../pickup/pickup_screen.dart';
+import '../auth/login_screen.dart';
 
 class StoreDetailScreen extends StatelessWidget {
   final Store store;
@@ -655,6 +657,7 @@ class StoreDetailScreen extends StatelessWidget {
                 label: '점포 상품 예약',
                 color: market.accentColor,
                 onTap: () async {
+                  if (!_ensureLoggedIn(context)) return;
                   try {
                     final appData = context.read<AppDataProvider>();
                     if (appData.isUsingCachedData) {
@@ -872,6 +875,7 @@ class StoreDetailScreen extends StatelessWidget {
     Store store,
     FlashDeal deal,
   ) async {
+    if (!_ensureLoggedIn(context)) return;
     try {
       final appData = context.read<AppDataProvider>();
       if (appData.isUsingCachedData) {
@@ -906,6 +910,18 @@ class StoreDetailScreen extends StatelessWidget {
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
     }
+  }
+
+  bool _ensureLoggedIn(BuildContext context) {
+    if (context.read<AuthProvider>().isLoggedIn) return true;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('예약은 로그인 후 이용할 수 있습니다.')));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
+    return false;
   }
 
   Widget _buildRealTimeInsight(BuildContext context) {

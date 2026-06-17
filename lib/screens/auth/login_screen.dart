@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../config/review_accounts.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/sijang_design_system.dart';
@@ -97,10 +96,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
                 const SizedBox(height: 28),
                 _buildSubmitButton(auth),
-                if (!_isRegisterMode) ...[
-                  const SizedBox(height: 28),
-                  _buildReviewLoginSection(auth),
-                ],
                 if (auth.sessionRestoreMessage != null) ...[
                   const SizedBox(height: 16),
                   _buildInfoBanner(auth.sessionRestoreMessage!),
@@ -353,90 +348,15 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildReviewLoginSection(AuthProvider auth) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Row(
-          children: [
-            Expanded(child: Divider(color: Color(0xFFE2E8F0))),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                '심사용 계정으로 로그인',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: SDS.fwBold,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
-            Expanded(child: Divider(color: Color(0xFFE2E8F0))),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: ReviewAccounts.all.map((account) {
-            return Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  right: account == ReviewAccounts.admin ? 0 : 8,
-                ),
-                child: _buildReviewAccountButton(auth, account),
-              ),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 10),
-        const Text(
-          '데모 데이터(신원시장, 점포, 특가, 예약)가 미리 입력된 계정입니다.',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 12,
-            color: AppColors.textTertiary,
-            fontWeight: SDS.fwMedium,
-            height: 1.4,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildReviewAccountButton(AuthProvider auth, ReviewAccount account) {
-    return Semantics(
-      button: true,
-      label: 'review-login-${account.role.name}',
-      child: ShrinkableButton(
-        onTap: auth.isLoading ? null : () => _loginWithReviewAccount(account),
-        child: Container(
-          height: 52,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-          ),
-          child: Text(
-            account.label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: SDS.fwBlack,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildInfoBanner(String message) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFFFFFBEB),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+        border: Border.all(
+          color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -463,24 +383,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> _loginWithReviewAccount(ReviewAccount account) async {
-    context.read<AuthProvider>().clearSessionRestoreMessage();
-    setState(() {
-      _isRegisterMode = false;
-      _emailController.text = account.email;
-      _passwordController.text = account.password;
-    });
-    final auth = context.read<AuthProvider>();
-    final success = await auth.loginWithEmail(
-      email: account.email,
-      password: account.password,
-    );
-    if (!mounted || success) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(auth.errorMessage ?? '인증에 실패했습니다.')),
-    );
-  }
-
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final auth = context.read<AuthProvider>();
@@ -496,7 +398,11 @@ class _LoginScreenState extends State<LoginScreen> {
             email: _emailController.text,
             password: _passwordController.text,
           );
-    if (!mounted || success) return;
+    if (!mounted) return;
+    if (success) {
+      if (Navigator.canPop(context)) Navigator.pop(context);
+      return;
+    }
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(auth.errorMessage ?? '인증에 실패했습니다.')));
